@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:56:21.326775",
+    "topic": "New AI reasoning techniques (innovation-focused)",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "How to Master AI Powered Creativity in Just 13 Minutes | Jeremy Utley",
+            "link": "https://www.youtube.com/watch?v=wv779vmyPVY&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        },
+        {
+            "title": "Deepseek A1 OBLITERATES OpenAI o1 in REASONING #ai #chatgpt #technology",
+            "link": "https://www.youtube.com/watch?v=_4UVSHJA7v0&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        },
+        {
+            "title": "How to Stop AI from Killing Your Critical Thinking | Advait Sarkar | TED",
+            "link": "https://www.youtube.com/watch?v=3lPnN8omdPA&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp0gcJCcUKAYcqIYzv"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data includes YouTube video titles and links related to AI reasoning techniques, such as \"How to Master AI Powered Creativity in Just 13 Minutes\" by Jeremy Utley, \"Deepseek A1 OBLITERATES OpenAI o1 in REASONING\" which compares the reasoning capabilities of two AI models, and \"How to Stop AI from Killing Your Critical Thinking\" by Advait Sarkar. These videos appear to discuss the potential of AI in enhancing creativity and reasoning, as well as the importance of maintaining human critical thinking skills in the age of AI. \n| Integrity Check: Fail \n\nReason for failing the integrity check: The data provided is incomplete and lacks concrete information about new AI reasoning techniques. The YouTube video titles and links seem to be more focused on the applications and implications of AI rather than the techniques themselves. Additionally, the absence of web results and the lack of detailed descriptions of the videos' content raise concerns about the accuracy and reliability of the information. Furthermore, the use of sensational language in some video titles, such as \"OBLITERATES\", may indicate a bias or exaggeration, which could compromise the integrity of the research data.",
+    "status": "completed"
+}

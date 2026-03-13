@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:27:33.891211",
+    "topic": "New AI reasoning techniques (innovation-focused)",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Microsoft developing AI reasoning models to compete with OpenAI, The Information reports",
+            "link": "https://www.youtube.com/shorts/1Q1JrKiolEY"
+        },
+        {
+            "title": "OpenAI's 01 Model Explained: The Future of AI Reasoning and Problem-Solving!",
+            "link": "https://www.youtube.com/watch?v=gftV0xjZ44E&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        },
+        {
+            "title": "New AI Model Mimics Human Mind With Energy Based Reasoning",
+            "link": "https://www.youtube.com/watch?v=ZHXjw_-ypLg&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: Research on new AI reasoning techniques is ongoing, with companies like Microsoft and OpenAI developing innovative models to improve AI's problem-solving capabilities. OpenAI's 01 Model and a new AI model that mimics human mind with energy-based reasoning are examples of such developments. | Integrity Check: Pass \n\nNote: The summary is based on the provided YouTube results and does not contain any obvious inaccuracies or hallucinations. However, the lack of web results and the reliance on YouTube videos may indicate a need for further verification from more authoritative sources.",
+    "status": "completed"
+}

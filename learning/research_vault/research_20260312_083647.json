@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:36:47.976331",
+    "topic": "Autonomous Skill Agents development",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Intro to Agent Skills",
+            "link": "https://www.youtube.com/watch?v=4mnP1lRdUm8&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        },
+        {
+            "title": "5 Types of AI Agents: Autonomous Functions & Real-World Applications",
+            "link": "https://www.youtube.com/watch?v=fXizBc03D7E&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        },
+        {
+            "title": "Não construa agentes, construa habilidades – Barry Zhang e Mahesh Murag, Anthropic",
+            "link": "https://www.youtube.com/watch?v=CEvIs9y1uog&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data on Autonomous Skill Agents development includes YouTube videos titled 'Intro to Agent Skills', '5 Types of AI Agents: Autonomous Functions & Real-World Applications', and 'Não construa agentes, construa habilidades – Barry Zhang e Mahesh Murag, Anthropic'. These videos provide information on agent skills, types of AI agents, and the approach of building skills instead of agents. | Integrity Check: Pass \n\nNote: Since the provided data only includes YouTube video titles and links, and does not contain any specific claims or statements that can be verified as inaccurate or hallucinations, the integrity check passes. However, a more comprehensive evaluation would require analyzing the content of the videos and other related research data.",
+    "status": "completed"
+}

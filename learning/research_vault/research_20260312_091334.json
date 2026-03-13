@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T09:13:34.413741",
+    "topic": "New AI reasoning techniques (innovation-focused)",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "OpenAI's Reasoning AI: The Future is Now?",
+            "link": "https://www.youtube.com/shorts/SI0-SAQZVF8"
+        },
+        {
+            "title": "By popular request- Apple’s disruptive new AI reasoning model research paper, “The Illusion of",
+            "link": "https://www.youtube.com/shorts/gdmOG8_BJGQ"
+        },
+        {
+            "title": "How to Master AI Powered Creativity in Just 13 Minutes | Jeremy Utley",
+            "link": "https://www.youtube.com/watch?v=wv779vmyPVY&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data on new AI reasoning techniques includes YouTube results with titles related to OpenAI's Reasoning AI, Apple's new AI reasoning model research paper, and a video on mastering AI-powered creativity. However, there are no web results provided. The YouTube titles suggest a focus on innovation and future developments in AI reasoning.\n\nIntegrity Check: Fail \n\nReasoning: \n1. The data lacks concrete information and credible sources from academic or research institutions, which raises concerns about the accuracy and reliability of the information.\n2. The YouTube titles appear to be more promotional or attention-grabbing rather than providing a clear, factual summary of the research.\n3. Without access to the actual content of the YouTube videos or research papers, it is difficult to verify the claims made in the titles.\n4. The absence of web results may indicate a lack of peer-reviewed or published research on the topic, which could further compromise the integrity of the data. \n\nTherefore, the integrity check fails due to the potential for inaccuracies, hallucinations, or misleading information.",
+    "status": "completed"
+}

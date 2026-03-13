@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T09:09:03.337051",
+    "topic": "GitHub open-source AI automation tools",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Projetos em alta no GitHub - Parte 1: Ferramentas de IA de código aberto e automação para desenvo...",
+            "link": "https://www.youtube.com/watch?v=u8KfUzV7_lU&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Principais novos projetos de código aberto do GitHub desta semana: Agentes de IA, Ferramentas Web...",
+            "link": "https://www.youtube.com/watch?v=gsevjVkN9KA&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Projetos mais populares do GitHub esta semana - Parte 1: IA de código aberto, automação e ferrame...",
+            "link": "https://www.youtube.com/watch?v=8dXnWk_f77c&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data includes YouTube results with titles and links related to GitHub open-source AI automation tools, such as \"Projetos em alta no GitHub - Parte 1: Ferramentas de IA de código aberto e automação para desenvo...\", \"Principais novos projetos de código aberto do GitHub desta semana: Agentes de IA, Ferramentas Web...\", and \"Projetos mais populares do GitHub esta semana - Parte 1: IA de código aberto, automação e ferrame...\". These results suggest that there are various open-source AI automation tools available on GitHub, and some YouTube videos are discussing popular and new projects. | Integrity Check: Pass \n\nNote: The integrity check passes because the provided data appears to be a genuine search result, and the YouTube titles and links seem to be related to the topic of GitHub open-source AI automation tools. However, without further context or information, it's difficult to verify the accuracy of the specific projects or tools mentioned in the YouTube titles.",
+    "status": "completed"
+}

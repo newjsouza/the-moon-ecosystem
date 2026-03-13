@@ -1,0 +1,75 @@
+system:
+  name: "The Moon AI"
+  version: "1.0.0"
+  debug: false
+  log_level: "INFO"
+  max_concurrent_agents: 5
+  learning_enabled: true
+
+llm:
+  provider: "groq"
+  model: "llama-3.3-70b-versatile"
+  temperature: 0.7
+  max_tokens: 4096
+
+agents:
+  architect:
+    enabled: true
+    priority: 4
+    max_retries: 3
+    timeout: 120
+  proactive:
+    enabled: true
+    priority: 3
+    max_retries: 2
+    timeout: 60
+  news_monitor:
+    enabled: true
+    priority: 2
+    max_retries: 3
+    timeout: 300
+  vault:
+    enabled: true
+    priority: 4
+    max_retries: 1
+    timeout: 30
+  api_discovery:
+    enabled: true
+    priority: 3
+    max_retries: 2
+    timeout: 120
+  desktop:
+    enabled: true
+    priority: 3
+    max_retries: 1
+    timeout: 300
+  llm:
+    enabled: true
+    priority: 3
+    max_retries: 3
+    timeout: 120
+  context:
+    enabled: true
+    priority: 3
+    max_retries: 1
+    timeout: 30
+  crawler:
+    enabled: true
+    priority: 3
+    max_retries: 2
+    timeout: 120
+  researcher:
+    enabled: true
+    priority: 3
+    max_retries: 3
+    timeout: 300
+  terminal:
+    enabled: true
+    priority: 4
+    max_retries: 1
+    timeout: 120
+  prompt_enhancer:
+    enabled: true
+    priority: 4
+    max_retries: 2
+    timeout: 60

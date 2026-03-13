@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:54:06.253125",
+    "topic": "Autonomous Skill Agents development",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Intro to Agent Skills",
+            "link": "https://www.youtube.com/watch?v=4mnP1lRdUm8&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        },
+        {
+            "title": "5 Types of AI Agents: Autonomous Functions & Real-World Applications",
+            "link": "https://www.youtube.com/watch?v=fXizBc03D7E&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnTSBwkJxQoBhyohjO8%3D"
+        },
+        {
+            "title": "Claude Skills Built Me an AI Agent Army (They Run Everything Now)",
+            "link": "https://www.youtube.com/watch?v=G-5bInklwRQ&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data on Autonomous Skill Agents development includes three YouTube video titles and links, which suggest that the topic covers introductory concepts, types of AI agents, and real-world applications. The videos may provide information on agent skills, autonomous functions, and potential uses of AI agents. \n\nIntegrity Check: Fail\n\nReasoning: \n- The web results are empty, which may indicate a lack of comprehensive information on the topic.\n- The YouTube results, while relevant, are limited to video titles and links, and do not provide concrete evidence or factual data to support the research.\n- The deep content snippet is missing, which could have provided more context or information on the topic.\n- There is no clear indication of the credibility or reliability of the sources, which is essential for verifying the accuracy of the research data.\n- The titles of the YouTube videos seem to be more attention-grabbing than factual, which may suggest potential inaccuracies or hallucinations. For example, the title \"Claude Skills Built Me an AI Agent Army (They Run Everything Now)\" appears to be sensationalized and may not be a credible or factual representation of the topic.",
+    "status": "completed"
+}

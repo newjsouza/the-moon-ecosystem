@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<article class="single-post">
+    <header class="post-header container">
+        <span class="category-badge">{{ post.category }}</span>
+        <h1>{{ post.title }}</h1>
+        <div class="post-meta">
+            <span class="author">Escrito por <strong>{{ post.author }}</strong></span>
+            <span class="divider">•</span>
+            <span class="date">{{ post.date }}</span>
+        </div>
+    </header>
+
+    <div class="post-cover container">
+        <img src="{% if post.image.startswith('http') %}{{ post.image }}{% else %}assets/{{ post.image }}{% endif %}" alt="Capa: {{ post.title }}" onerror="this.style.display='none'">
+    </div>
+
+    <div class="post-body container-narrow">
+        {{ post.content | safe }}
+    </div>
+</article>
+{% endblock %}

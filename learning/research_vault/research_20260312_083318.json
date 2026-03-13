@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:33:18.399921",
+    "topic": "New AI reasoning techniques (innovation-focused)",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "OpenAI's Reasoning AI: The Future is Now?",
+            "link": "https://www.youtube.com/shorts/SI0-SAQZVF8"
+        },
+        {
+            "title": "By popular request- Apple’s disruptive new AI reasoning model research paper, “The Illusion of",
+            "link": "https://www.youtube.com/shorts/gdmOG8_BJGQ"
+        },
+        {
+            "title": "How to Master AI Powered Creativity in Just 13 Minutes | Jeremy Utley",
+            "link": "https://www.youtube.com/watch?v=wv779vmyPVY&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data on new AI reasoning techniques includes YouTube videos discussing OpenAI's Reasoning AI, Apple's disruptive new AI reasoning model research paper, and a talk on mastering AI-powered creativity. | Integrity Check: Fail\n\nReasons for failing the integrity check:\n1. Lack of web results to verify the information.\n2. The YouTube results are mostly promotional or introductory in nature, lacking in-depth technical details or peer-reviewed research to support the claims.\n3. The titles of the YouTube videos seem sensationalized, which may indicate a bias towards attracting viewers rather than providing factual information.\n4. There is no concrete evidence or credible sources provided to support the claims made in the video titles, which may lead to inaccuracies or hallucinations.",
+    "status": "completed"
+}

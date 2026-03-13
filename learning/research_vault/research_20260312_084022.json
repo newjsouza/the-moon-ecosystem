@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:40:22.585828",
+    "topic": "GitHub open-source AI automation tools",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Projetos em alta no GitHub - Parte 1: Ferramentas de IA de código aberto e automação para desenvo...",
+            "link": "https://www.youtube.com/watch?v=u8KfUzV7_lU&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Projetos mais populares do GitHub esta semana - Parte 1: IA de código aberto, automação e ferrame...",
+            "link": "https://www.youtube.com/watch?v=8dXnWk_f77c&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Principais novos projetos de código aberto do GitHub desta semana: Agentes de IA, Ferramentas Web...",
+            "link": "https://www.youtube.com/watch?v=gsevjVkN9KA&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data provides YouTube results related to GitHub open-source AI automation tools, including videos about popular and new projects on GitHub, such as open-source AI, automation, and web tools. However, there are no web results provided. The YouTube video titles and links suggest that they are in Portuguese and may discuss various open-source AI and automation projects on GitHub.\n\nIntegrity Check: Fail \n\nReasons for failing the integrity check:\n1. Lack of web results: The data only provides YouTube results, but no web results are available for verification.\n2. Language barrier: The YouTube video titles and links are in Portuguese, which may limit the understanding of the content for non-Portuguese speakers.\n3. Limited information: The data does not provide a comprehensive overview of GitHub open-source AI automation tools, as it only includes a few YouTube video links.\n4. Potential bias: The YouTube video titles suggest a focus on popular or new projects, which may not represent the entire scope of open-source AI automation tools on GitHub.",
+    "status": "completed"
+}

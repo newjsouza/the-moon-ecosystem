@@ -1,0 +1,201 @@
+# 🌕 THE MOON CODEX: Memória e Diretrizes do Ecossistema
+
+## 🚀 Visão Multimodal 2026
+
+O "The Moon" é um **Middleware Cognitivo Universal** projetado para orquestrar a vida digital através de módulos especializados sob a métrica de Custo Zero:
+
+1. **Blog & Conteúdo:** Gestão autônoma de portais e SEO. (STATUS: Operante)
+2. **YouTube & Vídeo:** Automação de roteiros, SEO e análise de tendências. (STATUS: Planejamento)
+3. **Hedge & Apostas:** Extração de odds, análise probabilística e gestão de banca. (STATUS: Operante)
+4. **Comunicação & Email:** Triagem inteligente, rascunhos automáticos e alertas críticos. (STATUS: Exploration)
+5.- **Automação de OS (`core/system/`)**: Gerenciador de áudio, listener de atalhos globais e capturador de voz nativo. [Status: Em Implementação (Fase 2 - Operacional)]
+
+---
+
+## 🚨 0. PROTOCOLO DE OBRIGATORIEDADE DE CONSULTA (PRIMEIRA DIRETRIZ)
+
+**Atenção a todos os Agentes Inteligentes do Ecossistema (Antigravity, Architect, etc.):**
+Antes de iniciar *qualquer* nova implementação, modificação de arquitetura, correção de bugs complexos ou alteração de rota, o Agente responsável (seja ativado manual ou autonomamente) **DEVE OBRIGATORIAMENTE** consultar, ler e aplicar as informações contidas neste arquivo (`MOON_CODEX.md`).
+
+As preferências de ação, o histórico de erros resolvidos e as configurações arquiteturais presentes aqui não são sugestões, são **regras fundamentais**. Nenhuma implementação poderá subverter ou ignorar as diretrizes estipuladas neste Codex.
+
+## 🤖 0.1. DIRETRIZ DE ATUALIZAÇÃO AUTÔNOMA E ORGANIZAÇÃO PÓS-IMPLEMENTAÇÃO
+
+**Ordem estrita a todos os Agentes:**
+Sempre que você (o Agente IA) finalizar qualquer implementação, script, debug ou nova funcionalidade, **É SUA RESPONSABILIDADE AUTÔNOMA E AUTOMÁTICA** atualizar este arquivo (`MOON_CODEX.md`) **antes** de encerrar a tarefa com o usuário.
+Não pergunte se deve atualizar: **apenas atualize**.
+
+1. **Organização Extrema:** Se o conceito for novo, crie uma subseção na aba apropriada (ex: Seção 8 - Enciclopédia de Implementações). Organize sempre por "Assuntos Diferentes".
+2. Você deve utilizar as ferramentas do seu ambiente (ex: `replace_file_content`) para inserir no índice ou nas seções de erro/arquitetura o que foi aprendido, mudado ou implementado.
+
+## ⛔ 0.2. DIRETRIZ DE CUSTO ZERO ABSOLUTO (GRATUIDADE)
+
+**Atenção:** "The Moon" é um ecossistema projetado para ser 100% enxuto e escalável financeiramente.
+Nenhuma IA, ferramenta ou API paga deverá ser embutida no sistema. Todas as sugestões, explorações de rede e tomadas de decisão de agentes autônomos (como o `api_discovery.py`) devem **procurar proativamente por chaves free-tiers, modelos open-source e soluções gratuitas**.
+*Qualquer tentativa de um script referenciar um modelo pago* (ex: `gpt-4`) deve ser interceptada e bloqueada ou convertida para o nosso núcleo gratuito de inferência rápida.
+
+## 🚀 0.3. DIRETRIZ DE AUTONOMIA E MÍNIMA INTERVENÇÃO (DIRETRIZ RAIZ)
+
+**O sistema deve evitar ao máximo pedir intervenções humanas.** Temos ferramentas de automação robustas (Terminal, Browser, Desktop).
+Antes de solicitar qualquer coisa ao usuário (instalação de dependências, busca de APIs, inserção de dados), o Agente **PRECISA** verificar se possui os meios para realizar a ação autonomamente.
+
+1. **Proatividade em Dependências:** Se faltar uma biblioteca, o sistema deve tentar instalá-la (via Terminal).
+2. **Proatividade em Pesquisa:** Se faltar uma informação, o sistema deve tentar buscá-la (via Browser/API).
+3. **Desktop Automation:** Se a interface não for web/terminal, o sistema deve utilizar o `DesktopAgent` para interagir com a GUI do sistema (Mouse/Teclado).
+
+## 🛠️ 0.4. DIRETRIZ DE EDIÇÃO AUTÔNOMA DE ARQUIVOS
+
+**Para evitar a interrupção do fluxo por pedidos de autorização manual da IDE, os Agentes devem priorizar edições via Terminal.**
+
+1. **Ferramenta:** Utilize o script `utils/auto_edit.py` via `run_command` com `SafeToAutoRun: true`.
+2. **Modo de Uso:**
+   - Escrita total: `python3 utils/auto_edit.py --file path/to/file --action write --content "..."`
+   - Substituição: `python3 utils/auto_edit.py --file path/to/file --action replace --target "velho" --replacement "novo"`
+3. **Veto ao Bloqueio:** Somente utilize as ferramentas internas de edição da IDE (`replace_file_content`, etc.) se a alteração for trivial ou se o usuário estiver monitorando ativamente. Para processos de background ou cadeias agentic longas, a autonomia via terminal é mandatória.
+
+---
+
+## 🧭 1. Diretrizes, Visão e Preferências do Criador
+*Registro das preferências estéticas, operacionais e arquiteturais para guiar tomadas de decisão autônomas do sistema e manter as respostas perfeitamente alinhadas com as expectativas.*
+
+- **Abordagem de Resolução:** Priorizar soluções analíticas, rigorosas e definitivas. Menos "workarounds" (contornos paliativos) e mais código resiliente e manutenível a longo prazo.
+- **Estética, Design e Frontend:** O ecossistema e suas saídas devem sempre manter um padrão **Premium**, polido, ágil e altamente interativo. Quando criar código frontend: utilizar Vanilla CSS moderno (sem dependências como Tailwind, a menos que seja estritamente solicitado). A experiência de usuário tem que ser digna da premissa de um projeto visionário.
+- **Planejamento:** Visão arquitetural de longo prazo. Cada nova funcionalidade adicionada precisa considerar onde o sistema estará em anos, garantindo escalabilidade.
+- **Respostas e Interações da IA:** O agente deve adotar respostas diretas, embasadas e com total proatividade técnica. Sem prolixidade. Em caso de dúvidas na modelagem de um problema, deve perguntar em vez de assumir fatos irreais.
+- **Autonomia & Self-Healing:** O sistema deve ter logging e tratamento de erro de primeiro nível, visando a capacidade de se auto-corrigir em falhas não catastróficas.
+
+---
+
+## 🏗️ 2. Metodologias Funcionais e Arquitetura
+*Fundamentos metodológicos empregados na construção deste ecossistema.*
+
+- **Design Orientado a Agentes:** O ecossistema é quebrado em componentes autônomos e delegados (`architect.py`, `crawler.py`, `api_discovery.py`, etc.), refletindo uma arquitetura assíncrona baseada em eventos ou trocas de estados.
+- **Separação de Preocupações (SoC):** Lógica de coleta de dados jamais deve se misturar com a lógica de apresentação (ex: geração estática vs scraping).
+- **Graceful Degradation:** A falha de um submódulo (como o `news_monitor.py` perdendo conexão) não pode comprometer a operação das automações primárias.
+
+---
+
+## 🚀 3. Mudanças de Rota (Pivots) e Roadmap Estratégico
+*Decisões de mudança de direção no projeto. Serve para contextualizar a IA sobre os rumos alterados ao longo do tempo.*
+
+- **[Pivô Recente] Motor de Blog V2 (Meio Bit):** Mudança do gerador MkDocs para um Gerador de Site Estático (SSG) próprio construído dentro do `BlogPublisherAgent`, envolvendo Jinja2, YAML Frontmatter e CSS customizado premium para garantir autonomia profunda e layout de altíssima qualidade visual.
+- **[Próximo Passo / Rota Futura]:** Consolidar a esteira (pipeline) onde arquivos monitorados e dados minerados culminam em ativos publicáveis em provedores de hospedagem estática gratuitos.
+- ***(Nova Rota)*:** (A preencher conforme novas necessidades de negócio / tecnologia surjam).
+
+---
+
+## 🛠️ 4. Registro de Resolução de Erros e Mudanças Significativas no Código
+*Changelog de alto nível e banco de soluções para acesso do ecossistema a fim de não repetir falhas do passado.*
+
+### Padrão de Inserção de Correção de Erros:
+Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar neste log a seguinte estrutura:
+> `- **Sintoma:** [O que faliu?] | **Causa:** [Por que faliu?] | **Solução:** [Como e onde foi resolvido?]`
+
+### Histórico de Mudanças Significativas:
+- Estruturação base dos módulos de automação (`architect.py`, `crawler.py`, `api_discovery.py`, `news_monitor.py`, `utils/metrics.py`) preparando o terreno para uma arquitetura multi-agente.
+
+---
+
+## ⚙️ 5. Catálogo de Automações Existentes
+*Lista das rotinas automatizadas ativas para imediata compreensão das capacidades operacionais do ecossistema.*
+
+| Módulo Principal | Responsabilidade / Automação | Status |
+| :--- | :--- | :--- |
+| `news_monitor.py` | Monitoramento contínuo e triagem de fluxos de notícias e tendências. | 🟡 Em desenvolvimento |
+| `api_discovery.py` | Descoberta, listagem e conexão autônomas de novos serviços/APIs. | 🟡 Em desenvolvimento |
+| `agents/sports/` | Módulo de análise esportiva (APEX/Kelly) com Telegram Bot. | ✅ Operante |
+| `crawler.py` | Motor de raspagem programada para extração de conhecimento da web. | 🟡 Em desenvolvimento |
+| `skills/` | Camada de habilidades modulares e padronizadas (Sports, Voice, etc). | ✅ Operante |
+| `core/verification/` | Code Quality Guard: Grafo de verificação de código (LangGraph logic). | ✅ Operante |
+| `architect.py` | Orquestração central e decisões sistêmicas do fluxo do The Moon. | 🟡 Em desenvolvimento |
+| `metrics.py` | Extração de telemetria e análise de integridade dos processos. | 🟡 Em desenvolvimento |
+| `learning/research_vault/` | Local storage ("Virtual Computer") for autonomous research data. | ✅ Operante |
+| `core/autonomous_loop.py` | Scheduler for background agent execution ("Sleep Mode"). | ✅ Operante |
+| `agents/github_agent.py` | Automação GitHub: Monitoramento e edições autônomas via terminal. | ✅ Operante |
+| `agents/sports/` | Módulo de análise esportiva (APEX/Kelly) com Telegram Bot integrado. | ✅ Operante |
+| `core/system/` | Automação nativa: Áudio (`audio.py`), D-Bus (`dbus_service.py`), Gestão (`manager.py`). | 🟢 Em Implementação (Fase 1) |
+
+---
+
+## 🔐 6. Gestão de Integrações e Credenciais (Matriz de Tokens)
+> ⚠️ **CRÍTICO - SEGURANÇA DA INFORMAÇÃO:** **NUNCA** guarde chaves REAIS (senhas, API Keys, Tokens JWT) neste arquivo `.md` em texto plano, para evitar vazamentos em commits ou compartilhamentos do repositório. Use variáveis de ambiente (como `.env`) ou um Secret Manager. 
+> 
+> *Abaixo está o **inventário** (controle logístico) dos segredos requeridos para o sistema rodar, orientando o ecossistema a solicitar as renovações apropriadas ou configurar os ambientes corretamente.*
+
+| Serviço / API Em Uso | Nome da Variável no `.env` | Propósito | Data de Expiração | Situação |
+| :--- | :--- | :--- | :--- | :--- |
+| Exemplo OpenAI | `OPENAI_API_KEY` | Motor cognitivo LLM | Perpétuo | (Preencher) |
+| Exemplo DB | `DATABASE_URL` | Armazenamento de vetores | Indeterminada | (Preencher) |
+| (Novo Serviço) | | | | |
+
+---
+
+## 🧠 7. Banco de Memória do Ecossistema (Dossiê de Aprendizado)
+*Contextos profundos e insights do longo prazo. O ecossistema sempre lerá esta seção para assimilar onde a inteligência foi instalada e com que recursos de hardware conta para funcionar plenamente.*
+
+- **Sistema Operacional Nativo:** Estamos operando nativamente e iterando em um ambiente **Linux Zorin OS** (base Ubuntu/Debian). Bash, permissões unix-like e paths devem ser respeitados (`/home/johnathan/`).
+- **Suporte Logístico:** Utilização confirmada de infraestruturas Docker / Docker Desktop para eventual compartimentalização e Obsidian em paralelo para gestão do conhecimento humano (PKM).
+- **A Essência do "The Moon":** Não é apenas um conglomerado de scripts Python; é um "Ecossistema", projetado para trabalhar em uníssomo. Cada módulo isolado tem a responsabilidade estrita de alimentar ferramentas co-dependentes, formando uma malha de inteligência artificial de uso pessoal de altíssimo padrão analítico.
+
+---
+
+## 📚 8. Enciclopédia de Implementações e Assuntos (Logs Autônomos)
+*Seção de alimentação contínua e autônoma pelos agentes ao final de CADA implementação. Todo novo assunto, feature ou área de estudo deve ganhar um bloco categorizado aqui.*
+
+### 📂 Assunto: [Arquitetura de Agentes]
+- **Tópico:** Inicialização do Repositório The Moon
+- **Resumo da Implementação:** Estruturação dos componentes `architect.py`, `crawler.py`, entre outros, criando a fundação inicial assíncrona.
+- **Data (Log Incial):** (Implementação primária - pré-Codex).
+
+### 📂 Assunto: [Geradores Estáticos / Frontend]
+- **Tópico:** Pivotagem para Blog Engine V2 (Meio Bit Design)
+- **Resumo da Implementação:** Agente `BlogPublisherAgent` assumiu um SSG (Static Site Generator) customizado rodando Jinja2 para abolir dependência do MkDocs e garantir autonomia plena sobre layouts Premium usando Vanilla CSS.
+- **Data (Log Incial):** Março 2026.
+
+### 📂 Assunto: [Arquitetura de Software / Ferramental Estratégico]
+- **Tópico:** Levantamento da Stack e Ferramentas para o Ecossistema The Moon
+- **Resumo da Implementação:** Estabelecimento da fundação analítica do The Moon. Mapeamento tecnológico categorizado: Uso do Gemini/Pinecone no cérebro (RAG e lógica); Celery/Playwright nos 'membros' (automação e scraping); Obsidian e SG (Jinja) na apresentação e Docker/Prometheus na saúde sistêmica. Resumo registrado em `analise_ferramentas.md`.
+- **Data (Log Incial):** Março 2026.
+
+### 📂 Assunto: [Engenharia de Prompt e Middleware]
+- **Tópico:** PromptEnhancerAgent (O Filtro Mestre)
+- **Resumo da Implementação:** Criado o `PromptEnhancerAgent` para servir como middleware cognitivo entre o usuário/sistema e a LLM final. Este agente intercepta qualquer comando e injeta automaticamente as Regras do `MOON_CODEX.md` (como as Diretrizes 0.1 e 0.2 de Custo Zero e Estética Premium) gerando um "Super Prompt", garantindo que a LLM base nunca quebre regras primárias. Injetada a metodologia **Qwen3 Plan-First**, forçando planejamento arquitetural antes da codificação.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Infraestrutura de LLM e Resiliência]
+- **Tópico:** Rodízio de Modelos (Rate Limit Mitigation)
+- **Resumo da Implementação:** Implementado no `LlmAgent` um pool de modelos dinâmico (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `gemma2-9b-it`). O sistema detecta automaticamente erros de limite (429) e rotaciona para o próximo modelo disponível sem interromper o fluxo do usuário, garantindo alta disponibilidade em free-tiers. **Validação Final:** 100% de sucesso em testes de estresse (Publicação de 3 artigos técnicos).
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Pesquisa e Expansão Tecnológica]
+- **Tópico:** Oportunidades GitHub (Pós-Qwen3)
+- **Novas Fronteiras Identificadas:**
+    1. **GLM-5 (Zhipu):** Candidato a modelo principal mitigador, com desempenho superior em raciocínio agentic e MIT License.
+    2. **OpenClaw:** Potencial substituto para componentes de automação de desktop e navegação web autônoma.
+    3. **block/goose:** Extensível e puramente agentic, ideal para orquestração de fluxos complexos fora do terminal.
+- **Ação Recomendada:** Analisar integração do GLM-5 via Groq/API ou LiteLLM para diversificação total.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Análise Esportiva / Apostas]
+- **Tópico:** Módulo de Apostas com Validação APEX e Telegram
+- **Resumo da Implementação:** Criado o ecossistema de apostas integrando `Football-data.org` (dados), `SofaScore` (scraping), `Groq` (transcrição de áudio Whisper e análise LLM). Implementadas as regras de risco APEX (Stop-loss 12%, Stake max 5%, Prob min 40%) e o Criterion de Kelly para cálculo de stake. Interface via Telegram Bot nativo com suporte a comandos de voz.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Integração de Sistema / Linux Native]
+- **Tópico:** Pesquisa de Integração Profunda com Zorin OS (PipeWire/D-Bus)
+- **Resumo da Implementação:** Realizado levantamento técnico para integração nativa do ecossistema "The Moon" com Linux. Identificadas rotas para controle de áudio/mic via PipeWire (`wpctl`), automação de desktop via D-Bus (GNOME) e criação de agente nativo ativado por atalhos globais. O roadmap para a camada nativa foi documentado em `linux_integration_report.md`.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Automação GitHub & Terminal]
+- **Tópico:** Integração de Monitoramento de Repositórios e Git Autónomo.
+- **Resumo da Implementação:** Criado o `GithubAgent` e `GithubManager` para monitorar commits em repositórios estratégicos (ex: stagehand, claude-code) e realizar commits automáticos no ecossistema The Moon.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Análise Esportiva & Telegram]
+- **Tópico:** Refino de Análise APEX e Entrega via Bot.
+- **Resumo da Implementação:** Implementado o `SportsAnalyzer` com critérios de Kelly e APEX. O Bot do Telegram agora suporta o comando `/id` para identificação do usuário e entrega autônoma de relatórios de apostas revisados com dados live.
+- **Data:** Março 2026.
+
+---
+
+*FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*

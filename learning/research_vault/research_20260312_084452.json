@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:44:52.140348",
+    "topic": "New AI reasoning techniques (innovation-focused)",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Beyond GPT-4: New AI System With Step-by-Step External Reasoning",
+            "link": "https://www.youtube.com/watch?v=ygDDd98UMF8&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp0gcJCcUKAYcqIYzv"
+        },
+        {
+            "title": "New AI Model Mimics Human Mind With Energy Based Reasoning",
+            "link": "https://www.youtube.com/watch?v=ZHXjw_-ypLg&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        },
+        {
+            "title": "OpenAI's 01 Model Explained: The Future of AI Reasoning and Problem-Solving!",
+            "link": "https://www.youtube.com/watch?v=gftV0xjZ44E&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data includes YouTube results discussing new AI reasoning techniques, such as a system with step-by-step external reasoning, an AI model that mimics the human mind with energy-based reasoning, and OpenAI's 01 model. These results suggest innovations in AI reasoning and problem-solving. | Integrity Check: Pass \n\nNote: The integrity check passes because the summary is based on the provided YouTube results and does not introduce any unsubstantiated claims or hallucinations. However, the accuracy of the information in the YouTube results themselves is not verified and may require further fact-checking.",
+    "status": "completed"
+}

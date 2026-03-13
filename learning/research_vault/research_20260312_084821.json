@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:48:21.937377",
+    "topic": "Autonomous Skill Agents development",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Intro to Agent Skills",
+            "link": "https://www.youtube.com/watch?v=4mnP1lRdUm8&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        },
+        {
+            "title": "Como criar habilidades de agente do Claude Code em 2026",
+            "link": "https://www.youtube.com/watch?v=nbqqnl3JdR0&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        },
+        {
+            "title": "STOP Building AI Agents. Do THIS Instead.",
+            "link": "https://www.youtube.com/watch?v=wqH1hTkA6qg&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnTSBwkJxQoBhyohjO8%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data for the topic \"Autonomous Skill Agents development\" includes three YouTube video results with titles related to agent skills, creating agent skills, and an alternative approach to building AI agents. The videos are titled \"Intro to Agent Skills\", \"Como criar habilidades de agente do Claude Code em 2026\", and \"STOP Building AI Agents. Do THIS Instead.\". | Integrity Check: Fail \n\nReason for failing the integrity check: \n- The search results provided are limited to YouTube links without any web results, which may not provide a comprehensive overview of the topic.\n- There is no deep content snippet provided to support the factual summary.\n- The titles of the YouTube videos seem to be related to the topic, but their content and accuracy cannot be verified without watching the videos.\n- The second video title is in Portuguese, which may indicate a lack of diversity in the search results or a potential language bias.\n- The third video title appears to be clickbait, which may indicate a lack of credibility or accuracy in the content.",
+    "status": "completed"
+}

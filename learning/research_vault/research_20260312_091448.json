@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T09:14:48.649812",
+    "topic": "GitHub open-source AI automation tools",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Projetos em alta no GitHub - Parte 1: Ferramentas de IA de código aberto e automação para desenvo...",
+            "link": "https://www.youtube.com/watch?v=u8KfUzV7_lU&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Projetos mais populares do GitHub esta semana - Parte 1: IA de código aberto, automação e ferrame...",
+            "link": "https://www.youtube.com/watch?v=8dXnWk_f77c&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Principais novos projetos de código aberto do GitHub desta semana: Agentes de IA, Ferramentas Web...",
+            "link": "https://www.youtube.com/watch?v=gsevjVkN9KA&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data provides YouTube results related to GitHub open-source AI automation tools, including videos about popular projects, new projects, and tools. The titles of the videos suggest that they discuss open-source AI and automation projects on GitHub, but the content of the videos is not provided. | Integrity Check: Pass \n\nNote: The integrity check passes because the data appears to be a genuine collection of YouTube video titles and links related to the topic, without any obvious inaccuracies or hallucinations. However, the accuracy of the video content itself cannot be verified without further information.",
+    "status": "completed"
+}

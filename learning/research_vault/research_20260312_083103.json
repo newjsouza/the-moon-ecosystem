@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:31:03.595894",
+    "topic": "Autonomous Skill Agents development",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Intro to Agent Skills",
+            "link": "https://www.youtube.com/watch?v=4mnP1lRdUm8&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        },
+        {
+            "title": "5 Types of AI Agents: Autonomous Functions & Real-World Applications",
+            "link": "https://www.youtube.com/watch?v=fXizBc03D7E&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnTSBwkJxQoBhyohjO8%3D"
+        },
+        {
+            "title": "Não construa agentes, construa habilidades – Barry Zhang e Mahesh Murag, Anthropic",
+            "link": "https://www.youtube.com/watch?v=CEvIs9y1uog&pp=ygUjQXV0b25vbW91cyBTa2lsbCBBZ2VudHMgZGV2ZWxvcG1lbnQ%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data on Autonomous Skill Agents development includes YouTube videos discussing introductory topics, types of AI agents, and expert insights from Anthropic. The videos cover autonomous functions, real-world applications, and the importance of building skills rather than just agents. | Integrity Check: Pass \n\nNote: The provided data is limited to YouTube video titles and links, and does not contain any specific research findings or data that can be verified for accuracy. However, the topics and titles appear to be relevant to the subject of Autonomous Skill Agents development, and there are no obvious hallucinations or inaccuracies present.",
+    "status": "completed"
+}

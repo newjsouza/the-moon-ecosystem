@@ -1,0 +1,38 @@
+[project]
+name = "the-moon-framework"
+version = "1.0.0"
+description = "Autonomous AI System - The Moon"
+requires-python = ">=3.10"
+
+[project.scripts]
+themoon = "main:run"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["Super-Agente"]
+omit = [
+    "*/tests/*",
+    "*/mcp-servers/*",
+    "*/skills/*",
+    "*/antigravity-kit/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"

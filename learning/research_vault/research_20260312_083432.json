@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:34:32.253651",
+    "topic": "GitHub open-source AI automation tools",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Projetos em alta no GitHub - Parte 1: Ferramentas de IA de código aberto e automação para desenvo...",
+            "link": "https://www.youtube.com/watch?v=u8KfUzV7_lU&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Projetos mais populares do GitHub esta semana - Parte 1: IA de código aberto, automação e ferrame...",
+            "link": "https://www.youtube.com/watch?v=8dXnWk_f77c&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        },
+        {
+            "title": "Principais novos projetos de código aberto do GitHub desta semana: Agentes de IA, Ferramentas Web...",
+            "link": "https://www.youtube.com/watch?v=gsevjVkN9KA&pp=ygUmR2l0SHViIG9wZW4tc291cmNlIEFJIGF1dG9tYXRpb24gdG9vbHM%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data includes YouTube results with titles and links related to open-source AI automation tools on GitHub, such as \"Projetos em alta no GitHub - Parte 1: Ferramentas de IA de código aberto e automação para desenvo...\", \"Projetos mais populares do GitHub esta semana - Parte 1: IA de código aberto, automação e ferrame...\", and \"Principais novos projetos de código aberto do GitHub desta semana: Agentes de IA, Ferramentas Web...\". These results suggest that there are various open-source AI automation tools available on GitHub. | Integrity Check: Pass \n\nNote: The integrity check passes because the provided data appears to be a genuine collection of YouTube results related to the topic, without any obvious inaccuracies or hallucinations. However, the actual content and accuracy of the information in the linked videos cannot be verified without further examination.",
+    "status": "completed"
+}

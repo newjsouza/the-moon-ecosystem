@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T09:12:27.129033",
+    "topic": "Multi-Agent System orchestration frameworks",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "AI powered automation & multi-agent orchestration in Foundry",
+            "link": "https://www.youtube.com/watch?v=v1Q7rEE3StM&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        },
+        {
+            "title": "AutoGen vs CrewAI vs LangGraph – Best AI Agent Framework In 2025!",
+            "link": "https://www.youtube.com/watch?v=8HqeY5v0ohM&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        },
+        {
+            "title": "Multi Agent Systems - a complete guide with hands-on using LangGraph | Agent Design Pattern",
+            "link": "https://www.youtube.com/watch?v=RXOvZIn-oSA&t=140s&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data on Multi-Agent System orchestration frameworks includes YouTube results with titles related to AI-powered automation, multi-agent orchestration, and comparisons of AI agent frameworks. The titles suggest a focus on Foundry, AutoGen, CrewAI, LangGraph, and Agent Design Pattern. | Integrity Check: Pass \n\nNote: The provided data does not contain any obvious inaccuracies or hallucinations, as it only includes titles and links to YouTube videos. However, a more in-depth analysis of the video content would be necessary to fully verify the accuracy of the information presented.",
+    "status": "completed"
+}

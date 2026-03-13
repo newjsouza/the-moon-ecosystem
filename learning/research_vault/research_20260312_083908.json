@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:39:08.535389",
+    "topic": "New AI reasoning techniques (innovation-focused)",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "OpenAI's Reasoning AI: The Future is Now?",
+            "link": "https://www.youtube.com/shorts/SI0-SAQZVF8"
+        },
+        {
+            "title": "By popular request- Apple’s disruptive new AI reasoning model research paper, “The Illusion of",
+            "link": "https://www.youtube.com/shorts/gdmOG8_BJGQ"
+        },
+        {
+            "title": "How to Master AI Powered Creativity in Just 13 Minutes | Jeremy Utley",
+            "link": "https://www.youtube.com/watch?v=wv779vmyPVY&pp=ygUwTmV3IEFJIHJlYXNvbmluZyB0ZWNobmlxdWVzIChpbm5vdmF0aW9uLWZvY3VzZWQp"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data on new AI reasoning techniques includes YouTube results with titles such as \"OpenAI's Reasoning AI: The Future is Now?\", \"Apple’s disruptive new AI reasoning model research paper\", and \"How to Master AI Powered Creativity in Just 13 Minutes\". These titles suggest a focus on innovative AI reasoning techniques, including those from notable companies like OpenAI and Apple. | Integrity Check: Fail\n\nReasons for failing the integrity check:\n1. Lack of web results to provide a more comprehensive overview of the topic.\n2. The YouTube results, while relevant in title, may not provide accurate or up-to-date information on new AI reasoning techniques.\n3. The titles of the YouTube results may be sensationalized or clickbait, which could indicate a lack of credibility or academic rigor.\n4. There is no deep content snippet provided to support the factual summary, which could lead to a lack of context or understanding of the topic.\n5. The provided information does not include any specific details about the AI reasoning techniques, such as their applications, limitations, or potential impact, which could be considered a hallucination or inaccuracy.",
+    "status": "completed"
+}

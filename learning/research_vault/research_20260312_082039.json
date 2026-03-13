@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:20:39.068186",
+    "topic": "Multi-Agent System orchestration frameworks",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "AI powered automation & multi-agent orchestration in Foundry",
+            "link": "https://www.youtube.com/watch?v=v1Q7rEE3StM&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        },
+        {
+            "title": "Python + Agents: Orchestrating advanced multi-agent workflows",
+            "link": "https://www.youtube.com/watch?v=WtZbDrd-RJg&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        },
+        {
+            "title": "Arquitetos de Poltrona: Orquestração e Padrões Multiagentes",
+            "link": "https://www.youtube.com/watch?v=Dwyx8GomVvQ&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data on Multi-Agent System orchestration frameworks includes YouTube results with titles such as \"AI powered automation & multi-agent orchestration in Foundry\", \"Python + Agents: Orchestrating advanced multi-agent workflows\", and \"Arquitetos de Poltrona: Orquestração e Padrões Multiagentes\". These results suggest that there are various frameworks and approaches to orchestrating multi-agent systems, including the use of AI and Python. | Integrity Check: Pass \n\nNote: The integrity check passes because the provided data is a simple list of YouTube results and does not contain any factual claims that can be verified or disproven. The summary is a neutral representation of the provided data. However, a more in-depth analysis of the content of the YouTube videos would be necessary to verify the accuracy of the information presented in the videos.",
+    "status": "completed"
+}

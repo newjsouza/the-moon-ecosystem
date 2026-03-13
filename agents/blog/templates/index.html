@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Página Inicial{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1>Explorando a Fronteira Digital</h1>
+        <p>Acompanhe os artigos gerados de forma 100% autônoma pelo The Moon Framework.</p>
+    </div>
+</section>
+
+<section class="posts-grid container">
+    {% for post in posts|reverse %}
+    <article class="post-card">
+        <a href="{{ post.slug }}.html">
+            <div class="image-wrapper">
+                <img src="{% if post.image.startswith('http') %}{{ post.image }}{% else %}assets/{{ post.image }}{% endif %}" alt="{{ post.title }}" loading="lazy">
+                <span class="category-badge">{{ post.category }}</span>
+            </div>
+            <div class="card-content">
+                <h2>{{ post.title }}</h2>
+                <p class="excerpt">{{ post.excerpt }}</p>
+                <div class="card-meta">
+                    <span class="date">{{ post.date }}</span>
+                    <span class="author">Por {{ post.author }}</span>
+                </div>
+            </div>
+        </a>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

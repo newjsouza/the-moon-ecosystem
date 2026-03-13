@@ -1,0 +1,62 @@
+services:
+  # Supabase Local - Usar CLI: supabase start
+  # Ou configurar manualmente com as imagens separadas
+
+  # Redis - Cache e gerenciamento de sessões dos agentes
+  redis:
+    image: redis:7-alpine
+    container_name: jarvis-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Ollama - LLMs locais para inference offline
+  ollama:
+    image: ollama/ollama:latest
+    container_name: jarvis-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_HOST: 0.0.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # OpenWebUI - Interface web para LLMs
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: jarvis-openwebui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_BASE_URLS=http://host.docker.internal:11434
+      - WEBUI_SECRET_KEY=change_this_secure_key
+    volumes:
+      - openwebui_data:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - ollama
+
+volumes:
+  redis_data:
+  ollama_data:
+  openwebui_data:
+
+networks:
+  default:
+    name: jarvis_network
+    driver: bridge

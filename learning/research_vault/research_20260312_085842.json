@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:58:42.502318",
+    "topic": "Machine Learning innovation 2026",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "Best AI/ML Project Ideas",
+            "link": "https://www.youtube.com/shorts/3rBtdgUe7Ks"
+        },
+        {
+            "title": "Machine Learning Full Course 2026 | Complete Machine Learning Training in 24 Hours | Simplilearn",
+            "link": "https://www.youtube.com/watch?v=osa03zFjL3c&pp=ygUgTWFjaGluZSBMZWFybmluZyBpbm5vdmF0aW9uIDIwMjY%3D"
+        },
+        {
+            "title": "NRF 2026: Full AI in Retail Conference Recap!",
+            "link": "https://www.youtube.com/watch?v=I8UELtI7QjA&pp=ygUgTWFjaGluZSBMZWFybmluZyBpbm5vdmF0aW9uIDIwMjbSBwkJxQoBhyohjO8%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The provided research data for the topic \"Machine Learning innovation 2026\" includes YouTube results with titles related to machine learning project ideas, a full machine learning course for 2026, and a conference recap on AI in retail for 2026. | Integrity Check: Fail \n\nReason for Fail: \n- The data lacks web results, which could provide a more comprehensive overview of the topic.\n- The YouTube results, while relevant, may not represent the most accurate or up-to-date information on machine learning innovations for 2026, as they could be subjective or promotional in nature.\n- There is no deep content snippet provided to analyze for factual accuracy.\n- The sources are limited to YouTube, which might not be sufficient for a thorough analysis of the topic, potentially leading to inaccuracies or hallucinations.",
+    "status": "completed"
+}

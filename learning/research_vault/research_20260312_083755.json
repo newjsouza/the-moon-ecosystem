@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-12T08:37:55.484970",
+    "topic": "Multi-Agent System orchestration frameworks",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "AI powered automation & multi-agent orchestration in Foundry",
+            "link": "https://www.youtube.com/watch?v=v1Q7rEE3StM&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrc9IHCQnFCgGHKiGM7w%3D%3D"
+        },
+        {
+            "title": "Multi Agent Systems - a complete guide with hands-on using LangGraph | Agent Design Pattern",
+            "link": "https://www.youtube.com/watch?v=RXOvZIn-oSA&t=140s&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        },
+        {
+            "title": "AI powered automation & multi-agent orchestration in Microsoft Foundry | BRK197",
+            "link": "https://www.youtube.com/watch?v=U20tVialbao&pp=ygUrTXVsdGktQWdlbnQgU3lzdGVtIG9yY2hlc3RyYXRpb24gZnJhbWV3b3Jrcw%3D%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The research data on Multi-Agent System orchestration frameworks includes YouTube videos discussing AI-powered automation and multi-agent orchestration in Foundry, a complete guide to Multi-Agent Systems using LangGraph, and AI-powered automation in Microsoft Foundry. The videos provide information on agent design patterns and orchestration frameworks. | Integrity Check: Pass\n\nNote: The provided data is limited to YouTube video titles and links, and does not contain any explicit research data or claims that can be verified for accuracy. However, the information appears to be related to the topic of Multi-Agent System orchestration frameworks and does not contain any obvious inaccuracies or hallucinations. Therefore, the integrity check passes based on the available information.",
+    "status": "completed"
+}
