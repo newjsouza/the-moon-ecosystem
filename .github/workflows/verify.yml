@@ -1,0 +1,60 @@
+name: Moon Ecosystem — Verificação de Agentes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-agents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instalar dependências mínimas
+        run: |
+          pip install groq httpx python-dotenv PyGithub --quiet
+
+      - name: Verificar imports críticos
+        run: |
+          python3 -c "
+          import sys
+          sys.path.insert(0, '.')
+
+          modules = [
+              'core.agent_base',
+              'core.message_bus',
+          ]
+          errors = []
+          for m in modules:
+              try:
+                  __import__(m)
+                  print(f'✅ {m}')
+              except Exception as e:
+                  errors.append(f'❌ {m}: {e}')
+                  print(f'❌ {m}: {e}')
+          if errors:
+              sys.exit(1)
+          "
+
+      - name: Verificar ausência de secrets commitados
+        run: |
+          if git log --all --full-history -- "**/.env" | grep -q commit; then
+            echo "❌ ALERTA: arquivo .env encontrado no histórico git"
+            exit 1
+          fi
+          echo "✅ Nenhum secret detectado no histórico"
+
+      - name: Verificar syntax Python
+        run: |
+          find agents/ core/ channels/ skills/ -name "*.py" \
+            -exec python3 -m py_compile {} \; && \
+          echo "✅ Todos os arquivos Python têm sintaxe válida" || \
+          echo "❌ Erro de sintaxe detectado"

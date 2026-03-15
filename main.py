@@ -31,49 +31,60 @@ class MoonSystem:
         self.orchestrator = Orchestrator()
         
     def register_agents(self) -> None:
+        # 1. Core / Critical
+        self.orchestrator.register_agent(WatchdogAgent(message_bus=self.orchestrator.message_bus))
+        self.orchestrator.register_agent(LlmAgent(groq_client=self.orchestrator.llm))
+        self.orchestrator.register_agent(TerminalAgent())
+        self.orchestrator.register_agent(FileManagerAgent())
+        
+        # 2. Infra / Base
         self.orchestrator.register_agent(ArchitectAgent())
         self.orchestrator.register_agent(ProactiveAgent())
         self.orchestrator.register_agent(NewsMonitorAgent())
         self.orchestrator.register_agent(VaultAgent())
         self.orchestrator.register_agent(ApiDiscoveryAgent())
         self.orchestrator.register_agent(DesktopAgent())
-        self.orchestrator.register_agent(LlmAgent(groq_client=self.orchestrator.llm))
         self.orchestrator.register_agent(ContextAgent())
         self.orchestrator.register_agent(CrawlerAgent())
         self.orchestrator.register_agent(ResearcherAgent())
-        self.orchestrator.register_agent(TerminalAgent())
+        
+        # 3. Content / Writing
         self.orchestrator.register_agent(BlogManagerAgent())
         self.orchestrator.register_agent(BlogWriterAgent())
         self.orchestrator.register_agent(BlogPublisherAgent())
         self.orchestrator.register_agent(PromptEnhancerAgent())
         self.orchestrator.register_agent(DirectWriterAgent())
         self.orchestrator.register_agent(YoutubeManagerAgent())
-        self.orchestrator.register_agent(BettingAnalystAgent())
         self.orchestrator.register_agent(EmailAgent())
-        self.orchestrator.register_agent(FileManagerAgent())
-        self.orchestrator.register_agent(GithubAgent())
-        self.orchestrator.register_agent(OpenCodeAgent(groq_client=self.orchestrator.llm))
-        self.orchestrator.register_agent(WatchdogAgent(message_bus=self.orchestrator.message_bus))
         
-        # ── OmniChannelStrategist ──────────────────────────────
+        # 4. Mandatory / Specialized (ORDERED)
+        self.orchestrator.register_agent(OpenCodeAgent(groq_client=self.orchestrator.llm))
+        self.orchestrator.register_agent(GithubAgent())
+        self.orchestrator.register_agent(BettingAnalystAgent())
+        self.orchestrator.register_agent(EconomicSentinel())
+        
+        # SemanticMemoryWeaver — Skip (not implemented)
+        
         self.orchestrator.register_agent(OmniChannelStrategist(
             message_bus=self.orchestrator.message_bus
         ))
-        from agents.system_agent import SystemAgent
+        
         from agents.hardware_synergy_bridge import HardwareSynergyBridge
-        self.orchestrator.register_agent(SystemAgent())
         self.orchestrator.register_agent(HardwareSynergyBridge(
             groq_client=self.orchestrator.llm,
             message_bus=self.orchestrator.message_bus,
             orchestrator=self.orchestrator
         ))
+        
         self.orchestrator.register_agent(AutonomousDevOpsRefactor(
             groq_client=self.orchestrator.llm,
             message_bus=self.orchestrator.message_bus,
             github_agent=self.orchestrator.get_agent("GithubAgent")
         ))
-        self.orchestrator.register_agent(EconomicSentinel())
+        
         self.orchestrator.register_agent(SkillAlchemist(orchestrator=self.orchestrator))
+        
+        # NexusIntelligence — SEMPRE POR ÚLTIMO
         self.orchestrator.register_agent(NexusIntelligence())
         
         # OpenClaw Architecture: Register Channels

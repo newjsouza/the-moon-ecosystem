@@ -1,30 +1,58 @@
-groq>=0.4.0
+# ─────────────────────────────────────────────────────────────
+#  The Moon Ecosystem — requirements.txt
+# ─────────────────────────────────────────────────────────────
+
+# Core LLM
+groq>=0.9.0
 openai>=1.0.0
 anthropic>=0.18.0
-supabase>=2.0.0
-python-dotenv>=1.0.0
+
+# HTTP async
+httpx>=0.27.0
+aiohttp>=3.9.0
+requests>=2.31.0
+
+# Telegram Bot (OBRIGATÓRIO v20+)
+python-telegram-bot[job-queue]>=20.0
+
+# Audio Processing
+pydub>=0.25.1
+edge-tts>=6.1.9
+sounddevice>=0.4.6
+
+# GitHub & Source Control
+PyGithub>=2.1.1
+
+# AI / ML / Semantic Memory
+sentence-transformers>=2.7.0
+scikit-learn>=1.4.0
+numpy>=1.26.0
+
+# Web & scraping
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
 playwright>=1.40.0
+
+# API / Web Services
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-frontmatter>=1.0.0
+
+# DevOps & Security
+pip-audit>=2.7.0
 pytest>=7.4.0
 pytest-cov>=4.1.0
 pytest-asyncio>=0.21.0
 ruff>=0.1.0
 bandit>=1.7.0
 safety>=3.0.0
-pip-audit>=1.0.0
+
+# Infrastructure & Utils
+python-dotenv>=1.0.0
 pyyaml>=6.0
 asyncio-throttle>=1.0.2
-aiohttp>=3.9.0
-httpx>=0.25.0
-requests>=2.31.0
-beautifulsoup4>=4.12.0
-lxml>=4.9.0
+psutil>=5.9.0
+supabase>=2.0.0
 pyautogui>=0.9.54
-pygetwindow>=0.0.9
-numpy>=1.24.0
-scikit-learn>=1.3.0
-google-auth>=2.20.0
-google-auth-oauthlib>=1.0.0
-google-auth-httplib2>=0.1.0
-google-api-python-client>=2.80.0
-python-telegram-bot>=20.0
-psutil
+pynput>=1.7.6
+yfinance>=0.2.37

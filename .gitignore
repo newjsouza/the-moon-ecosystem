@@ -1,44 +1,97 @@
-# Secrets — NUNCA commitar
+# ═══════════════════════════════════════════════
+#  The Moon Ecosystem — .gitignore
+# ═══════════════════════════════════════════════
+
+# ── Secrets (NUNCA commitar) ──────────────────
 .env
 *.env
+.env.*
 config/keys.json
+config/secrets.json
+**/secrets/
+**/*_secret*
+**/*_credentials*
+
+# ── Dados em tempo de execução ────────────────
 data/nexus/
 data/bot_tasks/
+data/devops_reports/auto_heal_backups/
 data/economic_sentinel/
 data/omni_channel/
-data/devops_reports/auto_heal_backups/
+data/hardware_bridge/
+data/knowledge_graph/
+learning/workspaces/alchemist/quarantine/
+learning/knowledge_graph/embeddings.npz
+learning/research_vault/
 
-# Python
+# ── Binários e arquivos grandes ───────────────
+*.tar.xz
+*.tar.gz
+*.zip
+*.7z
+infrastructure/ffmpeg
+infrastructure/ffprobe
+infrastructure/ffplay
+ffmpeg-release-*
+
+# ── Python ────────────────────────────────────
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+
+# ── Ambientes virtuais ────────────────────────
 venv/
 .venv/
 env/
-*.egg-info/
-dist/
-build/
-.pytest_cache/
+ENV/
+.env.bak
 
-# Aprendizado e workspaces temporários
-learning/workspaces/alchemist/quarantine/
-learning/knowledge_graph/embeddings.npz
+# ── Node / TypeScript (workspace_monitor) ────
+node_modules/
+apps/workspace_monitor/dist/
+apps/workspace_monitor/.next/
+apps/workspace_monitor/build/
+*.tsbuildinfo
+.npm/
 
-# Binários de infraestrutura (pesados)
-infrastructure/ffmpeg
-infrastructure/ffprobe
-
-# IDEs
+# ── IDEs ──────────────────────────────────────
 .idea/
 .vscode/
 *.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.cursor/
 
-# OS
+# ── SO ────────────────────────────────────────
 .DS_Store
 Thumbs.db
+desktop.ini
+*~
 
-# Logs
+# ── Logs ──────────────────────────────────────
 *.log
 logs/
+*.pid
+
+# ── Temporários ───────────────────────────────
+tmp/
+temp/
+.tmp/
+*.tmp
+*.bak
+*.bak_*
