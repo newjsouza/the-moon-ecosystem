@@ -1,0 +1,372 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0da6f2",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#0a0f12",
+                        "accent-neon": "#ccff00",
+                        "surface-dark": "#162026",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "header": ["Orbitron", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(22, 32, 38, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(11, 218, 87, 0.3);
+        }
+        .neon-text {
+            color: #ccff00;
+            text-shadow: 0 0 8px rgba(204, 255, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Seção do Cabeçalho -->
+<header class="flex items-center justify-between border-b border-white/10 bg-background-dark/80 backdrop-blur-md px-8 py-4 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-4xl">hexagon</span>
+</div>
+<h1 class="font-header text-xl font-bold tracking-wider text-white">APEX <span class="text-primary">SPORTS</span></h1>
+</div>
+<nav class="flex items-center gap-10">
+<a class="text-white text-sm font-medium hover:text-primary transition-colors uppercase tracking-widest" href="index.html">Painel</a>
+<a class="text-slate-400 text-sm font-medium hover:text-primary transition-colors uppercase tracking-widest" href="live.html">Ao Vivo</a>
+<a class="text-slate-400 text-sm font-medium hover:text-primary transition-colors uppercase tracking-widest" href="teams.html">Equipes</a>
+<a class="text-slate-400 text-sm font-medium hover:text-primary transition-colors uppercase tracking-widest" href="#">Perfil</a>
+</nav>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-surface-dark border border-white/5 px-4 py-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-sm">schedule</span>
+<span class="font-header text-xs text-slate-300">22:45:12 GMT</span>
+</div>
+<div class="size-10 rounded-full border-2 border-primary/50 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Avatar do usuário" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0sbXJKx6uMf7AZrc4jFkbMzT0g458hKQmOjfawr8RGIdI7vb7fa_QGubMR3HlcOTnfvTnRe7rqKcMdotvgMgi_ulCpw_k_G-kHiaV4J1-tmwCdw1WKeb4AlkWpbWYmJiCJMuReOw38ZkihHK6WXbNlShIlDIRTycqbB_MGuTT0pj7uyayZ8I0LvfAT7uPdWNhN-GU46qTukNrFhOqbsExOk9edm0eX4ogLUh6lfKJPgQuzMsTtPm9No7HNBgIGGTQ9DR5sbEoN9ZH"/>
+</div>
+</div>
+</header>
+<main class="flex flex-1 p-8 gap-8">
+<!-- Menu Lateral Esquerdo -->
+<aside class="w-72 flex flex-col gap-6">
+<div class="glass p-6 rounded-xl flex flex-col gap-4">
+<h3 class="font-header text-xs text-slate-500 uppercase tracking-widest">Mercados Ativos</h3>
+<a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 border border-primary/30">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="text-sm font-medium">Principais Ligas</span>
+</a>
+<a href="markets/football.html" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-slate-400">sports_soccer</span>
+<span class="text-sm font-medium">Futebol</span>
+</a>
+</div>
+<div class="glass p-6 rounded-xl">
+<h3 class="font-header text-xs text-slate-500 uppercase tracking-widest mb-4">Estatísticas Rápidas</h3>
+<div class="space-y-6">
+<div>
+<p class="text-xs text-slate-400 mb-1">Taxa de Vitória</p>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[68%]"></div>
+</div>
+<p class="text-right text-[10px] mt-1 text-primary">68.4%</p>
+</div>
+<div>
+<p class="text-xs text-slate-400 mb-1">ROI (Mensal)</p>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-accent-neon h-full w-[24%]"></div>
+</div>
+<p class="text-right text-[10px] mt-1 text-accent-neon">+24.2%</p>
+</div>
+</div>
+</div>
+<div class="glass p-6 rounded-xl flex-grow">
+    <h3 class="font-header text-xs text-slate-500 uppercase tracking-widest mb-4">Próximas Ligas</h3>
+    <div class="space-y-3">
+        <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-300">Premier League</span>
+            <span class="text-[10px] bg-primary/10 text-primary px-2 rounded">24 Partidas</span>
+        </div>
+        <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-300">La Liga</span>
+            <span class="text-[10px] text-slate-500 px-2">12 Partidas</span>
+        </div>
+    </div>
+</div>
+</aside>
+<!-- Área de Conteúdo Principal -->
+<div class="flex-1 flex flex-col gap-8">
+<!-- Métricas Hero -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="glass p-8 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-7xl text-primary">account_balance_wallet</span>
+</div>
+<div class="flex justify-between items-center mb-2">
+    <p class="font-header text-xs text-slate-500 uppercase tracking-widest">Banca Total</p>
+    <button onclick="editBanca()" class="material-symbols-outlined text-slate-500 hover:text-primary text-sm transition-colors">edit</button>
+</div>
+<h2 id="banca-value" class="font-header text-4xl font-bold text-white mb-4">R$ 1.250,40</h2>
+<div class="flex items-center gap-3">
+<span class="text-[#0bda57] text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span> +12%
+                            </span>
+<span class="text-slate-500 text-xs tracking-tight">vs. última sessão</span>
+</div>
+<div class="mt-6 h-24 w-full">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 100">
+<defs>
+<lineargradient id="lineGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#0bda57;stop-opacity:0.2"></stop>
+<stop offset="100%" style="stop-color:#0bda57;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,80 Q50,70 100,85 T200,40 T300,60 T400,20 V100 H0 Z" fill="url(#lineGrad)"></path>
+<path class="glow-green" d="M0,80 Q50,70 100,85 T200,40 T300,60 T400,20" fill="none" stroke="#0bda57" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div class="glass p-8 rounded-xl relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="font-header text-xs text-slate-500 uppercase tracking-widest mb-1">Desempenho Hoje</p>
+<h2 class="font-header text-4xl font-bold text-white tracking-tight">+R$ 142,00</h2>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">military_tech</span>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="bg-white/5 rounded-lg p-3 flex-1 text-center border border-white/5">
+<p class="text-[10px] uppercase text-slate-500 mb-1">Apostas Realizadas</p>
+<p class="text-lg font-bold">14</p>
+</div>
+<div class="bg-white/5 rounded-lg p-3 flex-1 text-center border border-white/5">
+<p class="text-[10px] uppercase text-slate-500 mb-1">Sucessos</p>
+<p class="text-lg font-bold text-primary">9</p>
+</div>
+<div class="bg-white/5 rounded-lg p-3 flex-1 text-center border border-white/5">
+<p class="text-[10px] uppercase text-slate-500 mb-1">Lucratividade</p>
+<p class="text-lg font-bold text-[#0bda57]">18.4%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card de Partida em Destaque -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a href="live.html" class="block relative rounded-xl overflow-hidden border border-white/10 group min-h-[200px] flex transition-all hover:scale-[1.01] hover:border-primary/50 shadow-2xl">
+    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-lxXI6YLdpTQ3y4jOKIzDxcpJPRjMZlZq0zien-63s4A2CcJH1S7O7673SVXc9jIe44tz8ZkJOe_F6M8D980hr4Rtyv-8NBNLzv_SyPeo2wORQ4zid1UtNHN0XDZSG36ZI7GvyR0mPmyRmZo1g3G570tmoPvnOa0igzZ7sbhqAXfR629mtmYI-eA4g2_JpLpzxCUj6uYpI46lQbuJQL25e1_-nwPaQXUTId5RehrvTNt4Fx8Q1R7xmsdyZm_gzoBaTyLG7mN78xyk');"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/80 to-transparent"></div>
+    <div class="relative z-10 p-6 flex flex-col justify-between w-full">
+    <div>
+    <div class="flex items-center gap-2 mb-2">
+    <span class="bg-primary px-2 py-0.5 rounded text-[8px] font-bold uppercase">Ao Vivo</span>
+    <span class="bg-white/10 backdrop-blur px-2 py-0.5 rounded text-[8px] font-medium text-slate-300">PREMIER LEAGUE</span>
+    </div>
+    <h2 class="font-header text-2xl font-bold text-white mb-1">West Ham <span class="text-primary">vs</span> Man City</h2>
+    <p class="text-slate-400 text-xs line-clamp-2">Algoritmos Apex projetam 84% de confiança para alta frequência de gols no Estádio de Londres.</p>
+    </div>
+    <div class="flex items-center justify-between mt-4">
+    <div class="bg-primary hover:bg-primary/90 text-white font-header text-xs px-6 py-2 rounded-lg transition-all shadow-lg shadow-primary/20">
+        ABRIR CENTRO DE COMANDO
+    </div>
+    <p class="font-header text-xl font-bold neon-text">84% CONF</p>
+    </div>
+    </div>
+    </a>
+    
+    <div class="glass p-6 rounded-xl flex flex-col justify-between">
+        <h3 class="font-header text-xs text-slate-500 uppercase tracking-widest mb-4">Insights Apex</h3>
+        <div class="space-y-4">
+            <div class="flex items-center gap-4">
+                <div class="size-10 bg-white/5 rounded-lg flex items-center justify-center border border-white/5">
+                    <span class="material-symbols-outlined text-primary">lightbulb</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-slate-300">"Oportunidade identificada em azarões na Bundesliga para a Rodada 24. Expectativa de alto ROI."</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="size-10 bg-white/5 rounded-lg flex items-center justify-center border border-white/5">
+                    <span class="material-symbols-outlined text-accent-neon">trending_up</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-slate-300">"Mudança de momentum detectada em relatórios de scouting da La Liga. Real Madrid no pico físico."</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-white/5 flex justify-between items-center">
+            <span class="text-[8px] font-header text-slate-500">SAÚDE DO SISTEMA: OTIMIZADA</span>
+            <span class="text-[8px] font-header text-primary">ESCANEANDO 426 MERCADOS...</span>
+        </div>
+    </div>
+</div>
+<!-- Status do Rodapé -->
+<footer class="mt-auto border-t border-white/5 pt-6 flex items-center justify-between text-[10px] font-header text-slate-500 tracking-widest uppercase">
+<div class="flex gap-8">
+<div class="flex items-center gap-2">
+<span class="size-1.5 bg-[#0bda57] rounded-full shadow-[0_0_5px_#0bda57]"></span>
+                            Status Node.js: ESTÁVEL
+                        </div>
+<div class="flex items-center gap-2">
+<span class="size-1.5 bg-[#0bda57] rounded-full shadow-[0_0_5px_#0bda57]"></span>
+                            Núcleo Python: ESTÁVEL
+                        </div>
+<div class="flex items-center gap-2">
+<span class="size-1.5 bg-[#0bda57] rounded-full shadow-[0_0_5px_#0bda57]"></span>
+                            API Groq: ESTÁVEL
+                        </div>
+</div>
+<p>© 2026 APEX ELITE v4.2.0</p>
+</footer>
+</div>
+<!-- Menu Lateral Direito: Feed ao Vivo -->
+<aside class="w-80 flex flex-col gap-6">
+<div class="glass rounded-xl flex flex-col h-full overflow-hidden">
+<div class="p-6 border-b border-white/5 flex items-center justify-between">
+<h3 class="font-header text-xs text-white uppercase tracking-widest">Feed ao Vivo</h3>
+<span class="flex items-center gap-2 text-[10px] text-primary">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                            TRANSMITINDO
+                        </span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Partida 1: Arsenal vs Everton -->
+<a href="live.html" class="block bg-white/5 rounded-lg border border-white/5 p-4 hover:bg-white/10 hover:border-primary/30 transition-all cursor-pointer group hover:scale-[1.02]">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold text-primary px-2 py-0.5 border border-primary/30 rounded uppercase">Agendado</span>
+<span class="text-[10px] text-slate-500">15:00 GMT</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<div class="size-6 overflow-hidden rounded-sm bg-white/5 flex items-center justify-center">
+    <img src="assets/logos/arsenal-fc.png" class="w-full h-full object-contain" alt="Arsenal">
+</div>
+<span class="text-xs font-medium">Arsenal</span>
+<span class="text-xs font-bold text-white">0</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="size-6 overflow-hidden rounded-sm bg-white/5 flex items-center justify-center">
+    <img src="assets/logos/everton-fc.png" class="w-full h-full object-contain" alt="Everton">
+</div>
+<span class="text-xs font-medium">Everton</span>
+<span class="text-xs font-bold text-white">0</span>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<div class="bg-background-dark/50 rounded flex-1 py-1 text-center text-[10px] border border-white/5">
+<span class="block text-slate-500 mb-0.5 uppercase">Casa</span>
+<span class="text-primary font-bold">1.25</span>
+</div>
+<div class="bg-background-dark/50 rounded flex-1 py-1 text-center text-[10px] border border-white/5">
+<span class="block text-slate-500 mb-0.5 uppercase">Empate</span>
+<span class="text-white font-bold">5.50</span>
+</div>
+<div class="bg-background-dark/50 rounded flex-1 py-1 text-center text-[10px] border border-white/5">
+<span class="block text-slate-500 mb-0.5 uppercase">Fora</span>
+<span class="text-white font-bold">12.00</span>
+</div>
+</div>
+</a>
+<!-- Partida 2: Real Madrid vs Elche -->
+<a href="teams.html" class="block bg-white/5 rounded-lg border border-white/5 p-4 hover:bg-white/10 hover:border-primary/30 transition-all cursor-pointer group hover:scale-[1.02]">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold text-primary px-2 py-0.5 border border-primary/30 rounded uppercase">Agendado</span>
+<span class="text-[10px] text-slate-500">18:00 GMT</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<div class="size-6 overflow-hidden rounded-sm bg-white/5 flex items-center justify-center">
+    <img src="assets/logos/real-madrid-cf.png" class="w-full h-full object-contain" alt="Logo Real Madrid">
+</div>
+<span class="text-xs font-medium">Real Madrid</span>
+<span class="text-xs font-bold text-white">0</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="size-6 overflow-hidden rounded-sm bg-white/5 flex items-center justify-center">
+    <img src="assets/logos/elche-cf.png" class="w-full h-full object-contain" alt="Elche">
+</div>
+<span class="text-xs font-medium">Elche</span>
+<span class="text-xs font-bold text-white">0</span>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<div class="bg-background-dark/50 rounded flex-1 py-1 text-center text-[10px] border border-white/5">
+<span class="block text-slate-500 mb-0.5 uppercase">C</span>
+<span class="text-primary font-bold">1.15</span>
+</div>
+<div class="bg-background-dark/50 rounded flex-1 py-1 text-center text-[10px] border border-white/5">
+<span class="block text-slate-500 mb-0.5 uppercase">E</span>
+<span class="text-white font-bold">7.00</span>
+</div>
+<div class="bg-background-dark/50 rounded flex-1 py-1 text-center text-[10px] border border-white/5">
+<span class="block text-slate-500 mb-0.5 uppercase">F</span>
+<span class="text-white font-bold">18.00</span>
+</div>
+</div>
+</a>
+<!-- Partida 3: West Ham vs Man City (Indicador Ao Vivo) -->
+<a href="live.html" class="block bg-primary/5 rounded-lg border border-primary/20 p-4 hover:bg-primary/10 transition-all cursor-pointer group hover:scale-[1.02]">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded uppercase pulse">Ao Vivo 12'</span>
+<span class="text-[10px] text-primary font-bold">COMANDO</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<div class="size-6 overflow-hidden rounded-sm bg-white/5 flex items-center justify-center">
+    <img src="assets/logos/west-ham-united-fc.png" class="w-full h-full object-contain" alt="West Ham">
+</div>
+<span class="text-xs font-medium">West Ham</span>
+<span class="text-xs font-bold text-white">0</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="size-6 overflow-hidden rounded-sm bg-white/5 flex items-center justify-center">
+    <img src="assets/logos/manchester-city-fc.png" class="w-full h-full object-contain" alt="Man City">
+</div>
+<span class="text-xs font-medium">Man City</span>
+<span class="text-xs font-bold text-white">0</span>
+</div>
+</div>
+</a>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<script>
+    function editBanca() {
+        const currentBanca = document.getElementById('banca-value').innerText.replace('R$ ', '').replace('.', '').replace(',', '.');
+        const newVal = prompt("Digite o novo valor da banca:", currentBanca);
+        if (newVal !== null && !isNaN(newVal)) {
+            const formatted = parseFloat(newVal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('banca-value').innerText = formatted;
+            // Recalculate suggested stake (example 2% of bankroll)
+            const stake = (parseFloat(newVal) * 0.02).toFixed(2);
+            console.log("Nova aposta sugerida (2%): R$", stake);
+        }
+    }
+</script>
+</body></html>

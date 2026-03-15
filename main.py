@@ -11,9 +11,13 @@ from agents import (
     ApiDiscoveryAgent, DesktopAgent, LlmAgent, ContextAgent,
     CrawlerAgent, ResearcherAgent, TerminalAgent,
     BlogManagerAgent, BlogWriterAgent, BlogPublisherAgent,
-    PromptEnhancerAgent, DirectWriterAgent,
-    YoutubeManagerAgent, BettingAnalystAgent, EmailAgent
+    PromptEnhancerAgent, DirectWriterAgent, GithubAgent,
+    YoutubeManagerAgent, BettingAnalystAgent, EmailAgent,
+    FileManagerAgent, OpenCodeAgent, WatchdogAgent,
+    OmniChannelStrategist, AutonomousDevOpsRefactor, SkillAlchemist,
+    NexusIntelligence
 )
+from agents.economic_sentinel import EconomicSentinel
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -33,7 +37,7 @@ class MoonSystem:
         self.orchestrator.register_agent(VaultAgent())
         self.orchestrator.register_agent(ApiDiscoveryAgent())
         self.orchestrator.register_agent(DesktopAgent())
-        self.orchestrator.register_agent(LlmAgent())
+        self.orchestrator.register_agent(LlmAgent(groq_client=self.orchestrator.llm))
         self.orchestrator.register_agent(ContextAgent())
         self.orchestrator.register_agent(CrawlerAgent())
         self.orchestrator.register_agent(ResearcherAgent())
@@ -46,8 +50,35 @@ class MoonSystem:
         self.orchestrator.register_agent(YoutubeManagerAgent())
         self.orchestrator.register_agent(BettingAnalystAgent())
         self.orchestrator.register_agent(EmailAgent())
+        self.orchestrator.register_agent(FileManagerAgent())
+        self.orchestrator.register_agent(GithubAgent())
+        self.orchestrator.register_agent(OpenCodeAgent(groq_client=self.orchestrator.llm))
+        self.orchestrator.register_agent(WatchdogAgent(message_bus=self.orchestrator.message_bus))
+        
+        # ── OmniChannelStrategist ──────────────────────────────
+        self.orchestrator.register_agent(OmniChannelStrategist(
+            message_bus=self.orchestrator.message_bus
+        ))
         from agents.system_agent import SystemAgent
+        from agents.hardware_synergy_bridge import HardwareSynergyBridge
         self.orchestrator.register_agent(SystemAgent())
+        self.orchestrator.register_agent(HardwareSynergyBridge(
+            groq_client=self.orchestrator.llm,
+            message_bus=self.orchestrator.message_bus,
+            orchestrator=self.orchestrator
+        ))
+        self.orchestrator.register_agent(AutonomousDevOpsRefactor(
+            groq_client=self.orchestrator.llm,
+            message_bus=self.orchestrator.message_bus,
+            github_agent=self.orchestrator.get_agent("GithubAgent")
+        ))
+        self.orchestrator.register_agent(EconomicSentinel())
+        self.orchestrator.register_agent(SkillAlchemist(orchestrator=self.orchestrator))
+        self.orchestrator.register_agent(NexusIntelligence())
+        
+        # OpenClaw Architecture: Register Channels
+        from channels.telegram import TelegramChannel
+        self.orchestrator.register_channel(TelegramChannel())
 
     async def start(self) -> None:
         self.register_agents()

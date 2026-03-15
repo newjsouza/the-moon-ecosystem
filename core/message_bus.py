@@ -56,3 +56,8 @@ class MessageBus:
 
     def get_history(self) -> List[Message]:
         return self.history
+
+    def reset(self):
+        """Resets the bus status (subscribers and history)."""
+        self.subscribers = {}
+        self.history = []

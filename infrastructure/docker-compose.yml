@@ -2,6 +2,33 @@ services:
   # Supabase Local - Usar CLI: supabase start
   # Ou configurar manualmente com as imagens separadas
 
+  # Filesystem MCP Server - Secure filesystem access for AI agents
+  filesystem-mcp:
+    build:
+      context: ../Super-Agente/mcp-servers/filesystem-mcp
+      dockerfile: Dockerfile
+    container_name: jarvis-filesystem-mcp
+    restart: unless-stopped
+    volumes:
+      - ../:/workspace  # Monta o projeto inteiro no container
+    command: ["node", "packages/filesystem-mcp/dist/src/index.js", "/workspace"]
+    environment:
+      - NODE_ENV=production
+
+  # Git MCP Server - Git repository access for AI agents
+  git-mcp:
+    build:
+      context: ../Super-Agente/mcp-servers/git-mcp
+      dockerfile: Dockerfile
+    container_name: jarvis-git-mcp
+    restart: unless-stopped
+    volumes:
+      - ../:/workspace
+      - ~/.gitconfig:/home/app/.gitconfig:ro  # Para manter configurações Git
+    command: ["mcp-server-git"]
+    environment:
+      - PYTHONUNBUFFERED=1
+
   # Redis - Cache e gerenciamento de sessões dos agentes
   redis:
     image: redis:7-alpine

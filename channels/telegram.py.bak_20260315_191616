@@ -1,0 +1,173 @@
+"""
+channels/telegram.py - Telegram Channel for The Moon
+Uses subprocess+curl for maximum reliability with Telegram API.
+"""
+
+import os
+import asyncio
+import subprocess
+import json
+import logging
+from typing import Any, Dict, Optional
+from dotenv import load_dotenv
+
+from .base import ChannelBase
+
+load_dotenv()
+
+logger = logging.getLogger("moon.channels.telegram")
+
+
+def _curl_api(token: str, method: str, data: Optional[dict] = None, timeout: int = 10) -> dict:
+    """Calls the Telegram Bot API via curl (most reliable transport)."""
+    url = f"https://api.telegram.org/bot{token}/{method}"
+    if data:
+        cmd = [
+            "curl", "-s", "--max-time", str(timeout),
+            "-X", "POST", url,
+            "-H", "Content-Type: application/json",
+            "-d", json.dumps(data)
+        ]
+    else:
+        cmd = ["curl", "-s", "--max-time", str(timeout), url]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout + 5)
+        if result.stdout:
+            return json.loads(result.stdout)
+        return {"ok": False, "description": f"No response from curl. stderr: {result.stderr}"}
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "description": "curl timeout"}
+    except Exception as e:
+        return {"ok": False, "description": str(e)}
+
+
+class TelegramChannel(ChannelBase):
+    """
+    Telegram Channel for The Moon.
+    Uses subprocess+curl for direct API calls.
+    """
+
+    def __init__(self, token: Optional[str] = None, chat_id: Optional[str] = None):
+        super().__init__(name="telegram")
+        self.token = token or os.getenv("TELEGRAM_BOT_TOKEN")
+        self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")
+        self._polling_task: Optional[asyncio.Task] = None
+        self._last_update_id: int = 0
+        self._running: bool = False
+
+    async def start(self) -> None:
+        """Starts the Telegram channel polling loop."""
+        if not self.token:
+            logger.error("TELEGRAM_BOT_TOKEN not set. Channel disabled.")
+            return
+
+        # Verify bot identity
+        loop = asyncio.get_event_loop()
+        me = await loop.run_in_executor(None, _curl_api, self.token, "getMe")
+        if me.get("ok"):
+            bot_name = me["result"]["first_name"]
+            logger.info(f"Telegram bot connected: {bot_name} (@{me['result']['username']})")
+        else:
+            logger.error(f"Invalid bot token: {me}")
+            return
+
+        self._running = True
+        self._polling_task = asyncio.create_task(self._poll_updates())
+        logger.info("Telegram channel started (polling mode).")
+
+    async def stop(self) -> None:
+        """Stops polling."""
+        self._running = False
+        if self._polling_task and not self._polling_task.done():
+            self._polling_task.cancel()
+            try:
+                await self._polling_task
+            except asyncio.CancelledError:
+                pass
+        logger.info("Telegram channel stopped.")
+
+    async def send_message(self, text: str, recipient_id: Optional[str] = None, **kwargs) -> bool:
+        """Sends a message to the target chat via curl."""
+        target = recipient_id or self.chat_id
+        if not target:
+            logger.warning("No recipient_id or default chat_id set.")
+            return False
+
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            None, _curl_api, self.token, "sendMessage",
+            {"chat_id": target, "text": text, "parse_mode": "Markdown"}
+        )
+
+        if result.get("ok"):
+            return True
+
+        # Retry without Markdown if parse fails
+        desc = result.get("description", "")
+        if "can't parse entities" in desc.lower() or "parse" in desc.lower():
+            logger.warning("Markdown parse failed, retrying as plain text.")
+            result2 = await loop.run_in_executor(
+                None, _curl_api, self.token, "sendMessage",
+                {"chat_id": target, "text": text}
+            )
+            return result2.get("ok", False)
+
+        logger.error(f"sendMessage failed: {result}")
+        return False
+
+    async def _poll_updates(self) -> None:
+        """Polls for new messages."""
+        logger.info("Starting update polling...")
+        loop = asyncio.get_event_loop()
+
+        while self._running:
+            try:
+                data = await loop.run_in_executor(
+                    None, _curl_api, self.token, "getUpdates",
+                    {"offset": self._last_update_id + 1, "timeout": 15,
+                     "allowed_updates": ["message"]},
+                    20  # curl timeout
+                )
+
+                if data.get("ok") and data.get("result"):
+                    for update in data["result"]:
+                        self._last_update_id = update["update_id"]
+                        await self._process_update(update)
+
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Polling error: {e}")
+                await asyncio.sleep(5)
+
+    async def _process_update(self, update: dict) -> None:
+        """Processes a single incoming Telegram update."""
+        message = update.get("message")
+        if not message or not message.get("text"):
+            return
+
+        text = message["text"]
+        chat = message["chat"]
+        chat_id = str(chat["id"])
+
+        # Handle /start locally
+        if text == "/start":
+            await self.send_message(
+                "🌙 *The Moon — Assistente Onipresente*\n\n"
+                "Conexão estabelecida.\n"
+                "Envie qualquer mensagem ou use /status.",
+                recipient_id=chat_id
+            )
+            return
+
+        metadata = {
+            "source": "telegram",
+            "chat_id": chat_id,
+            "username": chat.get("username", "unknown"),
+            "message_id": message["message_id"],
+            "first_name": chat.get("first_name", "")
+        }
+
+        logger.info(f"Incoming [{metadata['username']}]: {text[:50]}")
+        await self.handle_incoming(text, metadata)

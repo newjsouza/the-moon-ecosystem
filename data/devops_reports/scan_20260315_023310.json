@@ -1,0 +1,938 @@
+{
+    "version": "1.0",
+    "timestamp": "2026-03-15T02:33:10.237193",
+    "issues": [
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: Orchestrator",
+            "context": "Orchestrator",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: Config",
+            "context": "Config",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: TaskResult",
+            "context": "TaskResult",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: MessageBus",
+            "context": "MessageBus",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: AgentPriority",
+            "context": "AgentPriority",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: StateManager",
+            "context": "StateManager",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: AgentBase",
+            "context": "AgentBase",
+            "file": "core/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: Orchestrator",
+            "context": "Orchestrator",
+            "file": "core/autonomous_loop.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: field",
+            "context": "field",
+            "file": "core/orchestrator.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: annotations",
+            "context": "annotations",
+            "file": "core/orchestrator.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: set_key",
+            "context": "set_key",
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 255,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 258,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 287,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 293,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 340,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "core/services/key_vault.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "core/services/workspace_monitor.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "core/services/workspace_monitor.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "core/system/dbus_service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: sys",
+            "context": "sys",
+            "file": "core/system/dbus_service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: VerificationStatus",
+            "context": "VerificationStatus",
+            "file": "core/verification/nodes.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "agents/proactive.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "agents/github_agent.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: HardwareSynergyBridge",
+            "context": "HardwareSynergyBridge",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BettingAnalystAgent",
+            "context": "BettingAnalystAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BlogPublisherAgent",
+            "context": "BlogPublisherAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: DirectWriterAgent",
+            "context": "DirectWriterAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: EmailAgent",
+            "context": "EmailAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: FileManagerAgent",
+            "context": "FileManagerAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: LlmAgent",
+            "context": "LlmAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: AutonomousDevOpsRefactor",
+            "context": "AutonomousDevOpsRefactor",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: VaultAgent",
+            "context": "VaultAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: ApiDiscoveryAgent",
+            "context": "ApiDiscoveryAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: OmniChannelStrategist",
+            "context": "OmniChannelStrategist",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: ContextAgent",
+            "context": "ContextAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: OpenCodeAgent",
+            "context": "OpenCodeAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: ResearcherAgent",
+            "context": "ResearcherAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BlogWriterAgent",
+            "context": "BlogWriterAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: CrawlerAgent",
+            "context": "CrawlerAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: YoutubeManagerAgent",
+            "context": "YoutubeManagerAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: ArchitectAgent",
+            "context": "ArchitectAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: WatchdogAgent",
+            "context": "WatchdogAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: TerminalAgent",
+            "context": "TerminalAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BlogManagerAgent",
+            "context": "BlogManagerAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: ProactiveAgent",
+            "context": "ProactiveAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: SystemAgent",
+            "context": "SystemAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: PromptEnhancerAgent",
+            "context": "PromptEnhancerAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: NewsMonitorAgent",
+            "context": "NewsMonitorAgent",
+            "file": "agents/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: annotations",
+            "context": "annotations",
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 74,
+            "msg": "Uso de modelo pago detectado (\"gpt-4\",). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 75,
+            "msg": "Uso de modelo pago detectado (\"gpt-3.5\",). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 76,
+            "msg": "Uso de modelo pago detectado (\"claude-3-opus\",). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 77,
+            "msg": "Uso de modelo pago detectado (\"claude-3-sonnet\",). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 78,
+            "msg": "Uso de modelo pago detectado (\"claude-3-haiku\",). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 79,
+            "msg": "Uso de modelo pago detectado (\"gemini-1.5-pro\",). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/watchdog.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: logging",
+            "context": "logging",
+            "file": "agents/opencode.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: json",
+            "context": "json",
+            "file": "agents/opencode.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 52,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/opencode.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "agents/desktop.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "agents/desktop.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "agents/llm.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 24,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/llm.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 28,
+            "msg": "Uso de modelo pago detectado (# Previne o erro \"The model `gpt-4` does not exist\" na Groq e aplica a ordem de uso exclusivo de Free-Tiers.). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/llm.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 34,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/llm.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 60,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/llm.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 103,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/llm.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: annotations",
+            "context": "annotations",
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asdict",
+            "context": "asdict",
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 201,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 238,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 239,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 240,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 241,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 295,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/omni_channel_strategist.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "agents/file_manager.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: subprocess",
+            "context": "subprocess",
+            "file": "agents/file_manager.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: difflib",
+            "context": "difflib",
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: timedelta",
+            "context": "timedelta",
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: MessageBus",
+            "context": "MessageBus",
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: hashlib",
+            "context": "hashlib",
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "paid_model_usage",
+            "severity": "MEDIUM",
+            "line": 28,
+            "msg": "Uso de modelo pago detectado (PAID_MODEL_PATTERNS = [\"gpt-4\", \"gpt-3.5\", \"claude-3\", \"gemini-1.5-pro\"]). Priorize modelos locais se poss\u00edvel.",
+            "fixable": false,
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 114,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 247,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/autonomous_devops_refactor.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: dbus.mainloop.glib",
+            "context": "dbus.mainloop.glib",
+            "file": "agents/hardware_synergy_bridge.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: field",
+            "context": "field",
+            "file": "agents/hardware_synergy_bridge.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: json",
+            "context": "json",
+            "file": "agents/hardware_synergy_bridge.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: np",
+            "context": "np",
+            "file": "agents/hardware_synergy_bridge.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: annotations",
+            "context": "annotations",
+            "file": "agents/hardware_synergy_bridge.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "agents/researcher.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: urllib.parse",
+            "context": "urllib.parse",
+            "file": "agents/blog/writer.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BlogWriterAgent",
+            "context": "BlogWriterAgent",
+            "file": "agents/blog/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: DirectWriterAgent",
+            "context": "DirectWriterAgent",
+            "file": "agents/blog/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BlogManagerAgent",
+            "context": "BlogManagerAgent",
+            "file": "agents/blog/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: BlogPublisherAgent",
+            "context": "BlogPublisherAgent",
+            "file": "agents/blog/__init__.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "agents/telegram/bot.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 44,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/telegram/bot.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 45,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "agents/telegram/bot.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: DBRecord",
+            "context": "DBRecord",
+            "file": "skills/supabase/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: Enum",
+            "context": "Enum",
+            "file": "skills/supabase/models.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: EmailProvider",
+            "context": "EmailProvider",
+            "file": "skills/gmail/setup.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: json",
+            "context": "json",
+            "file": "skills/gmail/setup.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 24,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/setup.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 57,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/setup.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 59,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/setup.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: EmailFolderType",
+            "context": "EmailFolderType",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: datetime",
+            "context": "datetime",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: EmailFolder",
+            "context": "EmailFolder",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: MIMEBase",
+            "context": "MIMEBase",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: encoders",
+            "context": "encoders",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: os",
+            "context": "os",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: EmailAttachment",
+            "context": "EmailAttachment",
+            "file": "skills/gmail/service.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: email",
+            "context": "email",
+            "file": "skills/gmail/models.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 28,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/credential_manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 29,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/credential_manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 30,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/credential_manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 32,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/credential_manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 36,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/credential_manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 138,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/credential_manager.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: asyncio",
+            "context": "asyncio",
+            "file": "skills/gmail/manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 46,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 50,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/gmail/manager.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 15,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/voice/transcriber.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 34,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/voice/transcriber.py"
+        },
+        {
+            "id": "hardcoded_secret",
+            "severity": "CRITICAL",
+            "line": 15,
+            "msg": "Poss\u00edvel segredo hardcoded detectado.",
+            "fixable": false,
+            "file": "skills/sports/api_client.py"
+        },
+        {
+            "id": "unused_import",
+            "severity": "LOW",
+            "msg": "Importa\u00e7\u00e3o possivelmente n\u00e3o utilizada: urllib.parse",
+            "context": "urllib.parse",
+            "file": "skills/sports/scraper.py"
+        }
+    ],
+    "actions_taken": [],
+    "summary": {
+        "critical": 34,
+        "high": 0,
+        "medium": 8,
+        "low": 84,
+        "fixable": 32
+    }
+}

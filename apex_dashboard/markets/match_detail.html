@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalhes da Partida Apex</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#0da6f2",
+                    "background-dark": "#0a0f12",
+                    "surface-dark": "#162026",
+                    "accent-neon": "#ccff00",
+                },
+                fontFamily: {
+                    "display": ["Inter", "sans-serif"],
+                    "header": ["Orbitron", "sans-serif"]
+                },
+            },
+        },
+    }
+</script>
+<style>
+    .glass {
+        background: rgba(22, 32, 38, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen p-6">
+    <div class="max-w-4xl mx-auto flex flex-col gap-8">
+        <header class="flex items-center gap-4">
+            <a href="football.html" class="material-symbols-outlined text-primary hover:text-white transition-colors">arrow_back</a>
+            <h1 class="font-header text-xl font-bold tracking-wider text-white">INTELIGÊNCIA DA <span class="text-primary">PARTIDA</span></h1>
+        </header>
+
+        <div class="glass p-8 rounded-xl flex flex-col items-center text-center">
+            <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-8">
+                <div class="flex flex-col items-center gap-4">
+                    <img src="../assets/logos/west-ham-united-fc.png" class="size-20 object-contain" alt="WHU">
+                    <h2 class="text-2xl font-bold">West Ham</h2>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-5xl font-black font-header">0 - 0</span>
+                    <span class="text-xs text-slate-500 mt-2 uppercase">Agendado: 20:00 GMT</span>
+                </div>
+                <div class="flex flex-col items-center gap-4">
+                    <img src="../assets/logos/manchester-city-fc.png" class="size-20 object-contain" alt="MCI">
+                    <h2 class="text-2xl font-bold">Man City</h2>
+                </div>
+            </div>
+
+            <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/5 p-6 rounded-xl border border-white/5">
+                    <h3 class="text-xs font-header text-slate-500 mb-2 uppercase">Confiança Apex</h3>
+                    <p class="text-3xl font-black text-primary">84%</p>
+                </div>
+                <div class="bg-white/5 p-6 rounded-xl border border-white/5">
+                    <h3 class="text-xs font-header text-slate-500 mb-2 uppercase">Gols Projetados</h3>
+                    <p class="text-3xl font-black text-white">3.2</p>
+                </div>
+                <div class="bg-white/5 p-6 rounded-xl border border-white/5">
+                    <h3 class="text-xs font-header text-slate-500 mb-2 uppercase">Aposta Rec (Kelly)</h3>
+                    <p class="text-3xl font-black text-accent-neon">2.4%</p>
+                </div>
+            </div>
+
+            <div class="w-full mt-8 p-6 bg-primary/10 rounded-xl border border-primary/20 text-left">
+                <h3 class="font-header text-sm text-primary mb-2 uppercase">Raciocínio da IA</h3>
+                <p class="text-sm text-slate-300 leading-relaxed">O sistema detectou uma vulnerabilidade significativa na transição defensiva do West Ham pelo lado esquerdo. O índice de eficiência ofensiva do Manchester City está atualmente em 9.4/10. Alta probabilidade de Mais de 1.5 Gols para a equipe visitante.</p>
+            </div>
+        </div>
+    </div>
+</body></html>

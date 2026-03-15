@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-13T00:27:43.396265",
+    "topic": "Latest AI and automation news",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "AI Trends 2026: Quantum, Agentic AI & Smarter Automation",
+            "link": "https://www.youtube.com/watch?v=zt0JA5rxdfM&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        },
+        {
+            "title": "Combination of AI and automation is very powerful, says UiPath CEO Daniel Dines",
+            "link": "https://www.youtube.com/watch?v=6KlyuPD8Kx0&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        },
+        {
+            "title": "How artificial intelligence is changing Amazon’s workforce",
+            "link": "https://www.youtube.com/watch?v=EpfbrD0AVZ4&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The latest AI and automation news includes trends such as quantum AI, agentic AI, and smarter automation. Industry leaders like UiPath CEO Daniel Dines highlight the powerful combination of AI and automation. Additionally, companies like Amazon are leveraging artificial intelligence to change their workforce dynamics. | Integrity Check: Pass \n\nNote: The summary is based on the provided YouTube results and does not contain any obvious inaccuracies or hallucinations. However, the accuracy of the information depends on the credibility of the sources and the videos' content, which is not fully verified in this response.",
+    "status": "completed"
+}

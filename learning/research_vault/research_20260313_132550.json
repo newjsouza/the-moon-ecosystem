@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-13T13:25:50.514279",
+    "topic": "Latest AI and automation news",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "AI Trends 2026: Quantum, Agentic AI & Smarter Automation",
+            "link": "https://www.youtube.com/watch?v=zt0JA5rxdfM&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        },
+        {
+            "title": "Combination of AI and automation is very powerful, says UiPath CEO Daniel Dines",
+            "link": "https://www.youtube.com/watch?v=6KlyuPD8Kx0&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        },
+        {
+            "title": "Top 17 New Technology Trends That Will Define 2026",
+            "link": "https://www.youtube.com/watch?v=Otim2mDjsYM&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The latest AI and automation news includes trends such as quantum AI, agentic AI, and smarter automation. According to UiPath CEO Daniel Dines, the combination of AI and automation is very powerful. Additionally, 2026 is expected to be defined by 17 new technology trends. | Integrity Check: Pass \n\nNote: The summary is based on the provided YouTube results and does not contain any obvious inaccuracies or hallucinations. However, the accuracy of the information depends on the credibility of the sources and the content of the videos, which is not provided in the snippet.",
+    "status": "completed"
+}

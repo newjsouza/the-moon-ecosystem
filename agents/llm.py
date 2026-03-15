@@ -9,12 +9,13 @@ from groq import AsyncGroq
 import os
 
 class LlmAgent(AgentBase):
-    def __init__(self):
+    def __init__(self, groq_client=None):
         super().__init__()
         self.priority = AgentPriority.HIGH
         self.description = "LLM Orchestrator (Groq Powered)"
         self.logger = setup_logger("LlmAgent")
         self._config = Config()
+        self.llm = groq_client
 
     async def _execute(self, task: str, **kwargs) -> TaskResult:
         prompt = kwargs.get("prompt", task)
@@ -74,7 +75,7 @@ class LlmAgent(AgentBase):
         for current_model in models_pool:
             try:
                 self.logger.info(f"Tentando execução LLM com modelo: {current_model}")
-                client = AsyncGroq(api_key=api_key)
+                client = self.llm or AsyncGroq(api_key=api_key)
                 completion = await client.chat.completions.create(
                     messages=messages,
                     model=current_model,

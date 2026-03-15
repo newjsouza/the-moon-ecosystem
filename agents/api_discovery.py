@@ -11,19 +11,30 @@ class ApiDiscoveryAgent(AgentBase):
         self.description = "API Discovery - Busca Estrita por Open Source e Free-Tiers"
 
     async def _execute(self, task: str, **kwargs) -> TaskResult:
-        self.logger.info(f"Procurando por API free-tier ou self-hosted para: {task}")
-        # DIRETRIZ 0.2: Apenas serviços válidos que não exigem cartão
+        self.logger.info(f"KeyVault Bridge: Buscando APIs/Keys para: {task}")
         
-        if "health" in task.lower():
-            return TaskResult(success=True, data={"status": "healthy"})
-            
-        # Mock de retorno forçando "free plan" no payload
-        return TaskResult(
-            success=True, 
-            data={
-                "endpoints": ["/api/v1/mock"],
-                "pricing": "100% Free / Open Source",
-                "auth": "No credit card required"
-            }
-        )
+        import httpx
+        try:
+            async with httpx.AsyncClient() as client:
+                if "discover" in task.lower():
+                    # Triggers background discovery in KeyVault
+                    response = await client.post("http://localhost:8080/api/keys/discover", json={"query": task})
+                    return TaskResult(success=True, data=response.json())
+                
+                # Default behavior: list keys
+                response = await client.get("http://localhost:8080/api/keys")
+                keys = response.json()
+                
+                # Find best match for the task
+                matches = [k for k in keys if k['name'].lower() in task.lower() or k.get('provider', '').lower() in task.lower()]
+                
+                return TaskResult(
+                    success=True, 
+                    data={
+                        "matches": matches,
+                        "total_vault_keys": len(keys)
+                    }
+                )
+        except Exception as e:
+            return TaskResult(success=False, error=f"KeyVault Bridge Error: {str(e)}")
 

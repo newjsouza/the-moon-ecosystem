@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-03-13T12:55:40.113088",
+    "topic": "Latest AI and automation news",
+    "web_results": [],
+    "video_results": [
+        {
+            "title": "AI Trends 2026: Quantum, Agentic AI & Smarter Automation",
+            "link": "https://www.youtube.com/watch?v=zt0JA5rxdfM&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        },
+        {
+            "title": "Combination of AI and automation is very powerful, says UiPath CEO Daniel Dines",
+            "link": "https://www.youtube.com/watch?v=6KlyuPD8Kx0&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        },
+        {
+            "title": "How AI is breaking the SaaS business model...",
+            "link": "https://www.youtube.com/watch?v=cxcb55zr2Q8&pp=ygUdTGF0ZXN0IEFJIGFuZCBhdXRvbWF0aW9uIG5ld3M%3D"
+        }
+    ],
+    "deep_content_snippet": "",
+    "llm_synthesis": "Factual Summary: The latest AI and automation news includes trends such as quantum AI, agentic AI, and smarter automation. Additionally, industry leaders like UiPath CEO Daniel Dines believe that the combination of AI and automation is very powerful. There are also discussions on how AI is impacting the SaaS business model. | Integrity Check: Pass \n\nNote: The summary is based on the provided YouTube results and does not contain any obvious inaccuracies or hallucinations. However, without access to the actual content of the videos, it's difficult to fully verify the information. The summary should be considered a brief overview of the topic rather than an in-depth analysis.",
+    "status": "completed"
+}

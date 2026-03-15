@@ -1,157 +1,44 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-bin/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so may not be desired in the
-#  repository.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypotheses/
-.pytest_cache/
-pytestdebuglog
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or binary, you shouldn't ignore these files, but for a specific project, it can be useful.
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or even
-#   fail to install them.
-# Pipfile.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-# poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-# pdm.lock
-
-# PEP 582; used by e.g. github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# Secrets — NUNCA commitar
 .env
-.venv
-env/
+*.env
+config/keys.json
+data/nexus/
+data/bot_tasks/
+data/economic_sentinel/
+data/omni_channel/
+data/devops_reports/auto_heal_backups/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 venv/
-ENV/
-env.bak/
-venv.bak/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# Aprendizado e workspaces temporários
+learning/workspaces/alchemist/quarantine/
+learning/knowledge_graph/embeddings.npz
 
-# Rope project settings
-.ropeproject
+# Binários de infraestrutura (pesados)
+infrastructure/ffmpeg
+infrastructure/ffprobe
 
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
+# IDEs
 .idea/
-
-# VS Code
 .vscode/
+*.swp
 
-# The Moon specific
-.moon/
-brain/
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
 logs/

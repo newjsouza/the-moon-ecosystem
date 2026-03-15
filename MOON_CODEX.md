@@ -8,7 +8,7 @@ O "The Moon" é um **Middleware Cognitivo Universal** projetado para orquestrar 
 2. **YouTube & Vídeo:** Automação de roteiros, SEO e análise de tendências. (STATUS: Planejamento)
 3. **Hedge & Apostas:** Extração de odds, análise probabilística e gestão de banca. (STATUS: Operante)
 4. **Comunicação & Email:** Triagem inteligente, rascunhos automáticos e alertas críticos. (STATUS: Exploration)
-5.- **Automação de OS (`core/system/`)**: Gerenciador de áudio, listener de atalhos globais e capturador de voz nativo. [Status: Em Implementação (Fase 2 - Operacional)]
+5. **Automação de OS (`core/system/`)**: Gerenciador de áudio, listener de atalhos globais e capturador de voz nativo. [Status: Em Implementação (Fase 2 - Operacional)]
 
 ---
 
@@ -92,6 +92,10 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 > `- **Sintoma:** [O que faliu?] | **Causa:** [Por que faliu?] | **Solução:** [Como e onde foi resolvido?]`
 
 ### Histórico de Mudanças Significativas:
+- **Resolução de Persistência de Sessão (Linux):** Criado o script `utils/fix_chrome_sessions.sh` para forçar o Google Chrome a usar o `password-store=basic`, resolvendo o problem de login recorrente causado por falhas na integração com o GNOME Keyring no Zorin OS.
+- **Sintoma:** WatchdogAgent bloqueava modelo "opencode" do próprio Orchestrator | **Causa:** `_is_model_free()` usava blocklist-first; desconhecidos passavam, mas "opencode" não estava em nenhuma lista | **Solução:** Migrado para allowlist-first em `agents/watchdog.py`. "opencode" adicionado explicitamente à `_ALLOWED_MODEL_PATTERNS`.
+- **Sintoma:** Alertas de CPU disparando em loop a cada 60s sem parar | **Causa:** Ausência de deduplicação + CPU fallback com fator de cores fixo em 4 | **Solução:** `_fire_alert()` com `ALERT_COOLDOWN=300s` + fallback corrigido para `os.cpu_count()` em `agents/watchdog.py`.
+- **Implementação do Moon Watchdog:** Criado o agente de monitoramento e proteção sistêmica para garantir o cumprimento da Diretriz de Custo Zero e a integridade dos recursos do SO.
 - Estruturação base dos módulos de automação (`architect.py`, `crawler.py`, `api_discovery.py`, `news_monitor.py`, `utils/metrics.py`) preparando o terreno para uma arquitetura multi-agente.
 
 ---
@@ -109,11 +113,18 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 | `core/verification/` | Code Quality Guard: Grafo de verificação de código (LangGraph logic). | ✅ Operante |
 | `architect.py` | Orquestração central e decisões sistêmicas do fluxo do The Moon. | 🟡 Em desenvolvimento |
 | `metrics.py` | Extração de telemetria e análise de integridade dos processos. | 🟡 Em desenvolvimento |
+| `agents/opencode.py` | Integração com modelos locais via OpenCode (MiniMax, Nemotron). | ✅ Operante |
 | `learning/research_vault/` | Local storage ("Virtual Computer") for autonomous research data. | ✅ Operante |
 | `core/autonomous_loop.py` | Scheduler for background agent execution ("Sleep Mode"). | ✅ Operante |
 | `agents/github_agent.py` | Automação GitHub: Monitoramento e edições autônomas via terminal. | ✅ Operante |
 | `agents/sports/` | Módulo de análise esportiva (APEX/Kelly) com Telegram Bot integrado. | ✅ Operante |
-| `core/system/` | Automação nativa: Áudio (`audio.py`), D-Bus (`dbus_service.py`), Gestão (`manager.py`). | 🟢 Em Implementação (Fase 1) |
+| `agents/watchdog.py` | Guardian: Monitoramento de saúde, recursos e compliance de Custo Zero. | ✅ Operante |
+| `agents/hardware_synergy_bridge.py` | Hardware Bridge: Áudio, Voz, GTK3 Overlay e Eventos de Sistema (D-Bus/Udev). | ✅ Operante |
+| `agents/omni_channel_strategist.py` | OmniChannel: Distribuição automática para Telegram, Twitter e LinkedIn. | ✅ Operante |
+| `agents/autonomous_devops_refactor.py` | DevOps Guard: Auditoria de dependências e refatoração autônoma de código. | ✅ Operante |
+| `agents/economic_sentinel.py` | Economic Sentinel: Inteligência financeira, monitoramento de mercados e relatórios. | ✅ Operante |
+| `agents/skill_alchemist.py` | Skill Alchemist: Descoberta, teste e síntese autônoma de novas habilidades Open Source. | ✅ Operante |
+| `agents/nexus_intelligence.py` | Nexus Intelligence: Mente de convergência, detecção de padrões cross-domain e briefings. | ✅ Operante |
 
 ---
 
@@ -126,6 +137,10 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 | :--- | :--- | :--- | :--- | :--- |
 | Exemplo OpenAI | `OPENAI_API_KEY` | Motor cognitivo LLM | Perpétuo | (Preencher) |
 | Exemplo DB | `DATABASE_URL` | Armazenamento de vetores | Indeterminada | (Preencher) |
+| Telegram Bot | `TELEGRAM_BOT_TOKEN` | Envio de mensagens via Bot | Perpétuo | ✅ Configurado |
+| Twitter API | `TWITTER_API_KEY` | Automação de Tweets/Threads | Perpétuo | ✅ Configurado |
+| LinkedIn API | `LINKEDIN_ACCESS_TOKEN`| Posts profissionais | 60 dias | ✅ Configurado |
+| Groq Cloud | `GROQ_API_KEY` | LLM para adaptação de conteúdo | Perpétuo | ✅ Configurado |
 | (Novo Serviço) | | | | |
 
 ---
@@ -135,7 +150,7 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 
 - **Sistema Operacional Nativo:** Estamos operando nativamente e iterando em um ambiente **Linux Zorin OS** (base Ubuntu/Debian). Bash, permissões unix-like e paths devem ser respeitados (`/home/johnathan/`).
 - **Suporte Logístico:** Utilização confirmada de infraestruturas Docker / Docker Desktop para eventual compartimentalização e Obsidian em paralelo para gestão do conhecimento humano (PKM).
-- **A Essência do "The Moon":** Não é apenas um conglomerado de scripts Python; é um "Ecossistema", projetado para trabalhar em uníssomo. Cada módulo isolado tem a responsabilidade estrita de alimentar ferramentas co-dependentes, formando uma malha de inteligência artificial de uso pessoal de altíssimo padrão analítico.
+- **A Essência do "The Moon":** Não é apenas um conglomerado de scripts Python; é um "Ecossistema", projetado para trabalhar em uníssono. Cada módulo isolado tem a responsabilidade estrita de alimentar ferramentas co-dependentes, formando uma malha de inteligência artificial de uso pessoal de altíssimo padrão analítico.
 
 ---
 
@@ -152,6 +167,20 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 - **Resumo da Implementação:** Agente `BlogPublisherAgent` assumiu um SSG (Static Site Generator) customizado rodando Jinja2 para abolir dependência do MkDocs e garantir autonomia plena sobre layouts Premium usando Vanilla CSS.
 - **Data (Log Incial):** Março 2026.
 
+### 📂 Assunto: [Workspace Monitor (Observabilidade em Tempo Real)]
+- **Tópico:** Monitor Visual do Ecossistema
+- **Resumo da Implementação:** O Monitor Visual (`apps/workspace_monitor`) fornece uma interface de alta fidelidade para supervisionar o ecossistema "The Moon".
+    - **Tecnologias**: FastAPI (Backend), WebSockets, React + Vite (Frontend), Framer Motion (Animações).
+    - **Funcionalidades**:
+        - Mapa dinâmico de salas (Agentes/Skills).
+        - Visualização de pacotes de dados em tempo real (Pulsos Neon).
+        - Log consolidado de interações da `MessageBus`.
+        - Atalho dedicado no desktop para acesso rápido via porta 3000.
+- **Data:** Março 2026.
+
+---
+*Este documento é a fonte única de verdade para a arquitetura do The Moon.*
+
 ### 📂 Assunto: [Arquitetura de Software / Ferramental Estratégico]
 - **Tópico:** Levantamento da Stack e Ferramentas para o Ecossistema The Moon
 - **Resumo da Implementação:** Estabelecimento da fundação analítica do The Moon. Mapeamento tecnológico categorizado: Uso do Gemini/Pinecone no cérebro (RAG e lógica); Celery/Playwright nos 'membros' (automação e scraping); Obsidian e SG (Jinja) na apresentação e Docker/Prometheus na saúde sistêmica. Resumo registrado em `analise_ferramentas.md`.
@@ -159,12 +188,12 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 
 ### 📂 Assunto: [Engenharia de Prompt e Middleware]
 - **Tópico:** PromptEnhancerAgent (O Filtro Mestre)
-- **Resumo da Implementação:** Criado o `PromptEnhancerAgent` para servir como middleware cognitivo entre o usuário/sistema e a LLM final. Este agente intercepta qualquer comando e injeta automaticamente as Regras do `MOON_CODEX.md` (como as Diretrizes 0.1 e 0.2 de Custo Zero e Estética Premium) gerando um "Super Prompt", garantindo que a LLM base nunca quebre regras primárias. Injetada a metodologia **Qwen3 Plan-First**, forçando planejamento arquitetural antes da codificação.
+- **Groq-First:** Comando a IA executora a SEMPRE iniciar a resposta com uma seção `### Planejamento e Arquitetura`, descrevendo a lógica e os passos técnicos antes de escrever qualquer código.
 - **Data:** Março 2026.
 
 ### 📂 Assunto: [Infraestrutura de LLM e Resiliência]
-- **Tópico:** Rodízio de Modelos (Rate Limit Mitigation)
-- **Resumo da Implementação:** Implementado no `LlmAgent` um pool de modelos dinâmico (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `gemma2-9b-it`). O sistema detecta automaticamente erros de limite (429) e rotaciona para o próximo modelo disponível sem interromper o fluxo do usuário, garantindo alta disponibilidade em free-tiers. **Validação Final:** 100% de sucesso em testes de estresse (Publicação de 3 artigos técnicos).
+- **Tópico:** Migração para Groq Cloud (Exclusividade de Custo Zero)
+- **Resumo da Implementação:** Removido o agente local Ollama/Qwen3 para simplificar o ecossistema e garantir o uso exclusivo de infraestrutura de alta performance via Groq. Toda a lógica de fallback agora reside no rodízio de modelos Cloud (Llama 3.3, 3.1, Gemma 2).
 - **Data:** Março 2026.
 
 ### 📂 Assunto: [Pesquisa e Expansão Tecnológica]
@@ -194,6 +223,59 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 ### 📂 Assunto: [Análise Esportiva & Telegram]
 - **Tópico:** Refino de Análise APEX e Entrega via Bot.
 - **Resumo da Implementação:** Implementado o `SportsAnalyzer` com critérios de Kelly e APEX. O Bot do Telegram agora suporta o comando `/id` para identificação do usuário e entrega autônoma de relatórios de apostas revisados com dados live.
+- **Data:** Março 2026.
+### 📂 Assunto: [Integração de LLMs Especializados]
+
+- **Tópico:** OpenCode & Modelos Locais de Alta Performance
+- **Resumo da Implementação:** Integrado o `OpenCodeAgent` para orquestrar modelos especializados: `minimax-m2.5` (Coding), `nemotron-3-super` (Research), `gpt-5-nano` (Fast/General). A infraestrutura utiliza a porta `59974` (ou fallback para Groq se indisponível) para fornecer o melhor modelo para a tarefa específica sem custos.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Gestão de Credenciais / Segurança]
+
+- **Tópico:** Integração do Gerenciador de APIs KeyVault
+- **Resumo da Implementação:** O aplicativo KeyVault foi integrado como o Hub central de credenciais do ecossistema. Hospedado em `core/services/key_vault.py` (FastAPI), ele sincroniza automaticamente chaves do `.env` para `config/keys.json`. Implementada lógica de auto-verificação para Groq/GitHub e busca proativa de novas APIs via GitHub API Proxy. O `ApiDiscoveryAgent` agora utiliza este bridge para orquestração de segredos.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Colaboração Autônoma / Workspace]
+- **Tópico:** Salas de Reunião Hipotéticas e Computadores Agentes
+- **Resumo da Implementação:** Criada a infraestrutura de `Workspaces` onde cada Skill possui uma `AgentRoom` e uma `AgentMachine` (computador virtual). O sistema permite que agentes colaborem via `AgentNetwork` e desenvolvam código de forma isolada em seus diretórios de workspace (`learning/workspaces/rooms/`). O Orchestrator gerencia a criação automática desses espaços ao registrar novas habilidades.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Segurança & Compliance / Custo Zero]
+  - **Tópico:** Moon Watchdog (O Guardião) — v2
+  - **Resumo da Implementação:** WatchdogAgent refatorado com arquitetura de segurança allowlist-first (modelos desconhecidos negados por default), integração com MessageBus (tópico `watchdog.alert`), deduplicação de alertas por chave com cooldown de 5 minutos, loop de monitoramento com asyncio.Event para parada limpa, cost accumulator funcional com alerta de violação, ping() para health check do Orchestrator, fallbacks /proc nativos com CPU normalizado por os.cpu_count(). Cobre: CPU, RAM, Disco, Custo acumulado.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Social Media & Distribuição de Conteúdo]
+- **Tópico:** OmniChannelStrategist (A voz do Ecossistema)
+- **Resumo da Implementação:** Criado o agente de distribuição multicanal para automatizar a presença social do "The Moon". 
+    - **Capacidades**: Adaptação inteligente de conteúdo via Groq (`llama-3.1-8b`), suporte a Threads no Twitter, deduplicação via fingerprint (SHA256) e agendamento em janelas ótimas (UTC 09h, 12h, 18h, 21h).
+    - **Tecnologias**: `python-telegram-bot` (Telegram), `tweepy` (Twitter/X), `httpx` (LinkedIn REST API).
+    - **Persistência**: Local em `data/omni_channel/` (fingerprints e fila de agendamento).
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Qualidade de Código & DevOps / Self-Healing]
+- **Tópico:** AutonomousDevOpsRefactor (O Curador de Código)
+- **Resumo da Implementação:** Criado o agente de DevOps para combater o débito técnico.
+    - **Pipeline**: Scan (AST/Bandit/Pip-Audit) -> Prioritization -> Fix Generation (Deterministic/LLM) -> Remediation.
+    - **Capacidades**: Remoção de imports mortos, inserção de `await` ausentes em eventos, compliance com MOON_CODEX (bloqueio de modelos pagos, remoção de logs poluidores), auditoria de CVEs e atualização de dependências obsoletas.
+    - **PR Bridge**: Criação automática de pull requests no GitHub para correções de alta prioridade.
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Inteligência Financeira & Gestão de Risco]
+- **Tópico:** EconomicSentinel (A Sentinela Financeira)
+- **Resumo da Implementação:** Criado o agente de inteligência econômica para monitorar mercados globais e fornecer insights financeiros ao ecossistema.
+    - **Capacidades**: Coleta de dados via `yfinance` e `Alpha Vantage`, análise de tendências (SMA), geração automática de relatórios JSON e integração com a `MessageBus` (tópico `economics.report_generated`).
+    - **Tecnologias**: `pandas` (análise), `yfinance`, `alpha_vantage` (dados).
+    - **Integração**: Fornece suporte de risco para apostas e monitoramento de ativos estratégicos (S&P 500, BTC).
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Mente de Convergência / Inteligência Holística]
+- **Tópico:** NexusIntelligence (A Mente de Convergência)
+- **Resumo da Implementação:** Criado o agente central de inteligência para observar o ecossistema como um organismo único.
+    - **Capacidades**: Agregação de fluxo de eventos (24h sliding window), `CrossDomainPatternEngine` para correlações entre domínios, `UserIntentModeler` (Bayesian), `CascadePredictor` (previsão de falhas) e `BriefingGenerator` (síntese via Groq).
+    - **Tecnologias**: Python stdlib (statistics/collections), Groq Cloud (`llama-3.3-70b`) para briefings, MessageBus (wildcard subscription).
+    - **Persistência**: Local em `data/nexus/` (JSON).
 - **Data:** Março 2026.
 
 ---

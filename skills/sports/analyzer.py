@@ -26,39 +26,73 @@ class SportsAnalyzer:
         # Ensure minimum stake or clamp to zero if negative
         return max(0.0, recommended_stake)
 
-    def validate_bet(self, stake: float, probability: float, current_loss: float = 0.0) -> Tuple[bool, List[str], float]:
+    def validate_bet(self, match_data: Dict, live_data: Dict, qualitative_score: float = 5.0) -> Dict:
         """
-        Validates a bet based on APEX rules.
-        Returns: (is_approved, messages, adjusted_stake)
+        Validates a bet based on combined data:
+        1. Base probability from odds.
+        2. Adjust with qualitative score (AI reasoning).
+        3. Check APEX safety rules.
         """
         messages = []
         is_approved = True
-        adjusted_stake = stake
+        
+        # 1. Base Probability (Implied from Odds)
+        # Assuming odds are for 'Home Win'
+        odds = 2.0 # Default if not found
+        try:
+             # Basic extraction for football-data.org structure
+             if 'odds' in match_data:
+                 odds = match_data['odds'].get('homeWin', 2.0)
+        except:
+             pass
+             
+        implied_prob = 1 / odds
+        
+        # 2. Adjust with Qualitative Score (1-10)
+        # 5 is neutral, >5 increases prob, <5 decreases
+        adjustment = (qualitative_score - 5) * 0.05
+        adjusted_prob = implied_prob + adjustment
+        
+        # Rules validation
+        # Rule 1: Minimum Adjusted Probability
+        if adjusted_prob < self.min_probability:
+            messages.append(f"❌ Probabilidade ajustada baixa ({adjusted_prob*100:.1f}% < {self.min_probability*100:.0f}%)")
+            is_approved = False
 
-        # Rule 1: Stop-Loss (12%)
-        if current_loss >= self.stop_loss_limit:
-            return False, ["❌ STOP-LOSS DIÁRIO ATINGIDO (12%). Operações suspensas!"], 0.0
-
-        # Rule 2: Minimum Probability (40%)
-        if probability < self.min_probability:
-            return False, [f"❌ Probabilidade muito baixa ({probability*100:.1f}% < 40%)"], 0.0
-
-        # Rule 3: Max Stake (5%)
-        if stake > self.max_stake_limit:
-            messages.append(f"⚠️ Stake ajustado: R${stake:.2f} → R${self.max_stake_limit:.2f} (Limite 5%)")
-            adjusted_stake = self.max_stake_limit
+        # Rule 2: Kelly Criterion
+        final_stake = 0.0
+        if is_approved:
+            final_stake = self.calculate_kelly_stake(adjusted_prob, odds)
+            if final_stake <= 0:
+                messages.append("❌ Valor de aposta Kelly insuficiente (valor esperado negativo)")
+                is_approved = False
+        
+        # Rule 3: Max Stake Limit
+        if final_stake > self.max_stake_limit:
+            messages.append(f"⚠️ Stake reduzido para o limite de 5% (R${self.max_stake_limit:.2f})")
+            final_stake = self.max_stake_limit
 
         if is_approved:
-            messages.append("✅ Aprovado pela validação APEX")
+            messages.append(f"✅ APROVADO: Probabilidade {adjusted_prob*100:.1f}%, Stake R${final_stake:.2f}")
 
-        return is_approved, messages, adjusted_stake
+        return {
+            "approved": is_approved,
+            "messages": messages,
+            "probability": adjusted_prob,
+            "kelly_stake": final_stake,
+            "odds": odds
+        }
 
-    def analyze_opportunity(self, probability: float, odds: float, current_loss: float = 0.0) -> Dict:
+    def analyze_opportunity(self, match_data: Dict, live_data: Dict, qualitative_score: float = 5.0) -> Dict:
         """
-        Full analysis of a betting opportunity.
+        Full analysis of a betting opportunity, incorporating qualitative score.
         """
-        raw_stake = self.calculate_kelly_stake(probability, odds)
-        is_approved, messages, final_stake = self.validate_bet(raw_stake, probability, current_loss)
+        validation_result = self.validate_bet(match_data, live_data, qualitative_score)
+        
+        is_approved = validation_result["approved"]
+        messages = validation_result["messages"]
+        final_stake = validation_result["kelly_stake"]
+        odds = validation_result["odds"] # Odds used for calculation in validate_bet
         
         return {
             "approved": is_approved,

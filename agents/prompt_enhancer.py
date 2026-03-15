@@ -52,7 +52,7 @@ INSTRUÇÃO ORIGINAL:
 O QUE VOCÊ DEVE DEVOLVER:
 Devolva ÚNICA E EXCLUSIVAMENTE o novo prompt aprimorado. 
 
-REGRAS CRÍTICAS DE PRESERVAÇÃO E ENGENHARIA (METODOLOGIA QWEN3):
+REGRAS CRÍTICAS DE PRESERVAÇÃO E ENGENHARIA (METODOLOGIA GROQ-FIRST):
 - **Plan-First:** Comando a IA executora a SEMPRE iniciar a resposta com uma seção `### Planejamento e Arquitetura`, descrevendo a lógica e os passos técnicos antes de escrever qualquer código.
 - **Gratuidade (Diretriz 0.2):** Exija que qualquer biblioteca ou API sugerida seja estritamente 100% Gratuita e Open Source.
 - Se a INSTRUÇÃO ORIGINAL continha exigências de formatação (YAML Frontmatter, "---", subtítulos, número de parágrafos ou contagem de palavras), VOCÊ DEVE MANTER ESSAS EXIGÊNCIAS EXATAS NO SEU PROMPT.

@@ -1,0 +1,35 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Orbitron:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .glass {
+        background: rgba(22, 32, 38, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>
+</head>
+<body class="bg-[#0a0f12] text-slate-100 font-sans min-h-screen p-8">
+    <div class="max-w-4xl mx-auto flex flex-col gap-8">
+        <header class="flex items-center gap-4">
+            <a href="../index.html" class="material-symbols-outlined text-primary hover:text-white transition-colors">arrow_back</a>
+            <h1 class="font-header text-3xl font-bold tracking-wider text-white">BASKETBALL <span class="text-[#0da6f2]">MARKETS</span></h1>
+        </header>
+        <div class="glass p-8 rounded-xl">
+            <p class="text-slate-400 mb-6">High stakes AI-assisted basketball analysis.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white/5 p-4 rounded-lg border border-white/5">
+                    <h3 class="font-bold text-white mb-2">NBA</h3>
+                    <p class="text-xs text-slate-500">8 Live Markets</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg border border-white/5">
+                    <h3 class="font-bold text-white mb-2">EuroLeague</h3>
+                    <p class="text-xs text-slate-500">Scheduled: 4 Matches</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body></html>

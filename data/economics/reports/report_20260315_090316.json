@@ -1,0 +1,24 @@
+{
+    "timestamp": "2026-03-15T09:03:16.378876",
+    "market_summary": {
+        "^GSPC": {
+            "price": 6632.19,
+            "change": -0.60591155,
+            "currency": "USD"
+        },
+        "BTC-USD": {
+            "price": 71832.77,
+            "change": 1.4936078,
+            "currency": "USD"
+        },
+        "EURUSD=X": {
+            "price": 1.1423349,
+            "change": -0.81105626,
+            "currency": "USD"
+        }
+    },
+    "highlight": {
+        "asset": "AAPL",
+        "trend": "Tend\u00eancia de BAIXA (Bearish)"
+    }
+}
