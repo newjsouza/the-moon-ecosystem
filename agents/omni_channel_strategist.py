@@ -629,7 +629,7 @@ class OmniChannelStrategist(AgentBase):
 
         if self._message_bus:
             for topic in ("blog.published", "youtube.published", "content.published"):
-                await self._message_bus.subscribe(topic, self._on_content_published)
+                self._message_bus.subscribe(topic, self._on_content_published)
             logger.info(f"{self.name}: subscribed to content publication topics.")
 
         self._stop_event.clear()

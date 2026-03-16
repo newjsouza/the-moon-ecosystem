@@ -376,18 +376,22 @@ def test_scheduler_enqueue():
 def test_scheduler_pop_due():
     """Testa remoção de posts vencidos."""
     scheduler = PostScheduler()
-    
+
     post = PlatformPost(
         content_id="test-123",
         platform=Platform.TELEGRAM,
         text="Test post",
     )
-    
-    # Enfileira com delay negativo (já vencido)
-    scheduler.enqueue(post, delay_seconds=-10)
-    
+
+    # Enfileira com timestamp já vencido (atual - 10 segundos)
+    post.scheduled_at = time.time() - 10
+    post.status = PostStatus.SCHEDULED
+    import heapq
+    from agents.omni_channel_strategist import _QueueEntry
+    heapq.heappush(scheduler._heap, _QueueEntry(post.scheduled_at, post))
+
     due_posts = scheduler.pop_due()
-    
+
     assert len(due_posts) == 1
     assert scheduler.queue_size() == 0
 

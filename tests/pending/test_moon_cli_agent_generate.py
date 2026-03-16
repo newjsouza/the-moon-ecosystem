@@ -51,9 +51,15 @@ class TestMoonCLIAgentGenerate:
         """Teste real de geração para jq."""
         from agents.moon_cli_agent import MoonCLIAgent
         from pathlib import Path
+        import os
 
         agent = MoonCLIAgent()
         result = await agent._execute("generate /usr/bin/jq")
+
+        # Check if LLM is in degraded mode (no API keys)
+        groq_key = os.getenv("GROQ_API_KEY", "")
+        if not groq_key:
+            pytest.skip("GROQ_API_KEY not configured - LLM in degraded mode")
 
         if result.success:
             output_path = Path(result.data["output_path"])

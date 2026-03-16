@@ -111,6 +111,15 @@ class OpenCodeAgent(AgentBase):
     Circuit breaker prevents cascade failures when server is down.
     """
 
+    # Class-level attribute for test access
+    SPECIALIZED_MODELS = {
+        "coding": "minimax-m2.5",
+        "research": "nemotron-3-super",
+        "fast": "gpt-5-nano",
+        "free": "big-pickle",
+        "moe": "mimo-v2-flash",
+    }
+
     def __init__(self, groq_client=None) -> None:
         super().__init__()
         self.name        = "OpenCodeAgent"

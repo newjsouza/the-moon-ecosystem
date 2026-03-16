@@ -130,6 +130,8 @@ class EconomicSentinel(AgentBase):
     def save_report(self, report: Dict[str, Any]):
         filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         path = os.path.join(self.report_path, filename)
+        # Create directory if it doesn't exist
+        os.makedirs(self.report_path, exist_ok=True)
         with open(path, "w") as f:
             json.dump(report, f, indent=4)
         logger.info(f"Relatório salvo em: {path}")

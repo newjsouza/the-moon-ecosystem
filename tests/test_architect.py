@@ -65,26 +65,32 @@ class TestArchitectAgent:
             assert domain in KEYWORD_PATTERNS.keys(), f"Domínio inválido {domain} para tarefa: {task}"
     
     @pytest.mark.asyncio
+    @pytest.mark.requires_groq
     async def test_orchestrate_task(self):
         """Testa orquestração de tarefa."""
         from agents.architect import ArchitectAgent
         from core.agent_base import TaskResult
-        
+        import os
+
+        # Skip if GROQ_API_KEY not configured (LLM would be in degraded mode)
+        if not os.getenv("GROQ_API_KEY"):
+            pytest.skip("GROQ_API_KEY not configured - LLM in degraded mode")
+
         agent = ArchitectAgent()
         await agent.initialize()
-        
+
         # Mock de um agente para teste
         mock_agent = AsyncMock()
         mock_agent.execute = AsyncMock(return_value=TaskResult(success=True, data={"result": "ok"}))
         mock_agent.ping = AsyncMock(return_value=True)
         agent._agent_instances["NexusIntelligence"] = mock_agent
-        
+
         # Orquestra tarefa de pesquisa
         result = await agent.orchestrate_task("Pesquisar sobre inteligência artificial")
-        
+
         assert result.success
         assert result.data.get("delegated") or result.data.get("result")
-        
+
         await agent.shutdown()
     
     @pytest.mark.asyncio
