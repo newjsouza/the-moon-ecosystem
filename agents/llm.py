@@ -496,12 +496,12 @@ class LlmAgent(AgentBase):
         try:
             from groq import Groq
             api_key = self._config.get("llm.api_key")
-            
+
             if not api_key or api_key == "COLE_O_SEU_TOKEN_AQUI":
                 return "Erro: Groq API Key não configurada no .env"
-            
+
             client = Groq(api_key=api_key)
-            
+
             with open(audio_path, "rb") as file:
                 transcription = client.audio.transcriptions.create(
                     file=(audio_path, file.read()),
@@ -509,7 +509,150 @@ class LlmAgent(AgentBase):
                     language="pt"
                 )
             return transcription.text
-            
+
         except Exception as e:
             self.logger.error(f"Transcription failed: {e}")
             return f"Error: {e}"
+
+
+# ─────────────────────────────────────────────────────────────
+#  Utility Functions — Environment Validation
+# ─────────────────────────────────────────────────────────────
+
+def validate_llm_env() -> Dict[str, Any]:
+    """
+    Valida configuração de ambiente para LLM providers.
+
+    Returns:
+        Dict com status de cada provider e recomendações.
+
+    Example:
+        >>> status = validate_llm_env()
+        >>> print(status["groq"]["configured"])
+        True
+    """
+    config = Config()
+
+    groq_key = config.get("llm.api_key") or os.getenv("GROQ_API_KEY")
+    gemini_key = config.get("gemini.api_key") or os.getenv("GEMINI_API_KEY")
+    openrouter_key = config.get("openrouter.api_key") or os.getenv("OPENROUTER_API_KEY")
+
+    def is_valid_key(key: Optional[str]) -> bool:
+        return bool(key and key not in ["", "COLE_O_SEU_TOKEN_AQUI", None])
+
+    groq_valid = is_valid_key(groq_key)
+    gemini_valid = is_valid_key(gemini_key)
+    openrouter_valid = is_valid_key(openrouter_key)
+
+    providers_configured = []
+    providers_available = []
+
+    if groq_valid:
+        providers_configured.append("Groq")
+        providers_available.append("Groq (llama-3.3-70b, llama-3.1-8b)")
+
+    if gemini_valid:
+        providers_configured.append("Gemini")
+        providers_available.append("Gemini (gemini-2.0-flash)")
+
+    if openrouter_valid:
+        providers_configured.append("OpenRouter")
+        providers_available.append("OpenRouter (open-source models)")
+
+    return {
+        "configured": {
+            "groq": groq_valid,
+            "gemini": gemini_valid,
+            "openrouter": openrouter_valid,
+        },
+        "providers_configured": providers_configured,
+        "providers_available": providers_available,
+        "fallback_chain": providers_configured.copy() if providers_configured else ["degraded_mode"],
+        "fully_configured": groq_valid,  # Groq é obrigatório
+        "recommendations": _get_env_recommendations(groq_valid, gemini_valid, openrouter_valid),
+    }
+
+
+def _get_env_recommendations(
+    groq: bool, gemini: bool, openrouter: bool
+) -> List[str]:
+    """Gera recomendações baseadas na configuração atual."""
+    recommendations = []
+
+    if not groq:
+        recommendations.append(
+            "⚠️ GROQ_API_KEY não configurada. "
+            "Obter em: https://console.groq.com/keys"
+        )
+    else:
+        recommendations.append("✅ Groq configurado (provider primário)")
+
+    if not gemini:
+        recommendations.append(
+            "ℹ️ GEMINI_API_KEY não configurada (opcional). "
+            "Recomendado para fallback. Obter em: https://makersuite.google.com/app/apikey"
+        )
+    else:
+        recommendations.append("✅ Gemini configurado (fallback secundário)")
+
+    if not openrouter:
+        recommendations.append(
+            "ℹ️ OPENROUTER_API_KEY não configurada (opcional). "
+            "Recomendado para fallback terciário. Obter em: https://openrouter.ai/keys"
+        )
+    else:
+        recommendations.append("✅ OpenRouter configurado (fallback terciário)")
+
+    if not groq and not gemini and not openrouter:
+        recommendations.append(
+            "🚨 Nenhum provider configurado! Sistema operará em MODO DEGRADADO."
+        )
+
+    return recommendations
+
+
+def get_available_llm_providers() -> List[str]:
+    """
+    Retorna lista de providers de LLM disponíveis (configurados e válidos).
+
+    Returns:
+        Lista de nomes de providers na ordem de fallback.
+
+    Example:
+        >>> providers = get_available_llm_providers()
+        >>> print(providers)
+        ['Groq', 'Gemini', 'OpenRouter']
+    """
+    validation = validate_llm_env()
+    return validation["providers_configured"]
+
+
+def print_llm_status() -> None:
+    """
+    Imprime status formatado da configuração de LLM.
+
+    Útil para debugging e verificação de ambiente.
+    """
+    status = validate_llm_env()
+
+    print("\n" + "=" * 60)
+    print("  🌕 THE MOON — LLM Provider Status")
+    print("=" * 60)
+    print()
+
+    print("Providers Configurados:")
+    for provider in status["providers_configured"] or ["Nenhum"]:
+        print(f"  ✅ {provider}")
+
+    print()
+    print("Cadeia de Fallback:")
+    for i, provider in enumerate(status["fallback_chain"], 1):
+        print(f"  {i}. {provider}")
+
+    print()
+    print("Recomendações:")
+    for rec in status["recommendations"]:
+        print(f"  {rec}")
+
+    print()
+    print("=" * 60)
