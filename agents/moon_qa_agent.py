@@ -30,6 +30,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from core.agent_base import AgentBase, AgentPriority, TaskResult
 from core.message_bus import MessageBus
+from core.ai_jail_bridge import run_bash_safe, JAIL_AVAILABLE
 
 logger = logging.getLogger("moon.agents.qa")
 
@@ -191,17 +192,33 @@ class MoonQAAgent(AgentBase):
         return await self._run_qa_pass(online, trigger="manual")
     
     def _get_affected_files(self) -> List[str]:
-        """Obtém arquivos afetados do git diff."""
+        """Obtém arquivos afetados do git diff (sandboxed)."""
         try:
-            result = subprocess.run(
-                ["git", "diff", "main", "--name-only"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-                cwd=str(Path(__file__).resolve().parent.parent)
+            # Usa AIJail para execução segura do comando git
+            jail_result = run_bash_safe(
+                "git diff main --name-only",
+                timeout=30
             )
-            return result.stdout.strip().split('\n') if result.stdout else []
-        except (subprocess.TimeoutExpired, FileNotFoundError):
+
+            # Publica evento de auditoria no MessageBus
+            if hasattr(self, '_message_bus') and self._message_bus:
+                asyncio.create_task(
+                    self._message_bus.publish(
+                        "moon_qa",
+                        "qa.git_diff",
+                        {
+                            "command": "git diff main --name-only",
+                            "success": jail_result.success,
+                            "sandbox_active": JAIL_AVAILABLE,
+                            "blocked_ops": jail_result.blocked_operations,
+                            "files_count": len(jail_result.stdout.strip().split('\n')) if jail_result.stdout else 0,
+                        }
+                    )
+                )
+
+            return jail_result.stdout.strip().split('\n') if jail_result.stdout else []
+        except Exception as e:
+            logger.warning(f"QA git diff failed: {e}")
             return []
     
     def _identify_affected_apps(self, files: List[str]) -> List[Dict[str, str]]:
