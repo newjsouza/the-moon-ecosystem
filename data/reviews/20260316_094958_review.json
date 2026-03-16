@@ -1,0 +1,17 @@
+{
+  "critical_count": 1,
+  "high_count": 0,
+  "medium_count": 0,
+  "health_score": 80,
+  "files_reviewed": [
+    "test.py"
+  ],
+  "ast_issues": [
+    {
+      "severity": "CRITICAL",
+      "type": "TEST"
+    }
+  ],
+  "llm_issues": [],
+  "timestamp": "2026-03-16T00:00:00"
+}

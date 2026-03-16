@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "name": "untitled",
+  "type": "writer",
+  "settings": {
+    "page_width": "21cm",
+    "page_height": "29.7cm",
+    "margin_top": "2cm",
+    "margin_bottom": "2cm",
+    "margin_left": "2cm",
+    "margin_right": "2cm"
+  },
+  "styles": {},
+  "metadata": {
+    "title": "",
+    "author": "",
+    "description": "",
+    "subject": "",
+    "created": "2026-03-16T10:17:13.858820",
+    "modified": "2026-03-16T10:17:13.858843",
+    "software": "libreoffice-cli 1.0"
+  },
+  "content": []
+}

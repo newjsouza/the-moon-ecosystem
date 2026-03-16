@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "output": "Usage: cli-anything-mermaid [OPTIONS] COMMAND [ARGS]...\n\n  CLI harness for Mermaid Live Editor state files and renderer URLs.\n\nOptions:\n  --json          Emit machine-readable JSON\n  --project TEXT  Open a Mermaid project file\n  --help          Show this message and exit.\n\nCommands:\n  diagram  Diagram source commands.\n  export   Render and share commands.\n  project  Project lifecycle commands.\n  repl     Interactive REPL.\n  session  Session state commands.",
+  "exit_code": 0,
+  "command": [
+    "cli-anything-mermaid",
+    "--help"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 234.42,
+  "timestamp": "2026-03-16T08:36:32.745433",
+  "stderr_preview": null
+}

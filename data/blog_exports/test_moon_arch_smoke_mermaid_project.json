@@ -1,0 +1,8 @@
+{
+  "code": "graph TD\n    Moon[The Moon] --> CLI[MoonCLIAgent]\n    CLI --> LO[LibreOffice]\n    CLI --> MM[Mermaid]",
+  "mermaid": "{\n  \"theme\": \"default\"\n}",
+  "updateDiagram": true,
+  "rough": false,
+  "panZoom": true,
+  "grid": true
+}

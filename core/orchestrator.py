@@ -817,6 +817,67 @@ class Orchestrator:
                 logger.error(f"Broadcast error on '{channel.name}': {exc}")
 
     # ═══════════════════════════════════════════════════════════
+    #  GitHub Auto-Sync Hook
+    # ═══════════════════════════════════════════════════════════
+
+    async def _post_execution_sync(
+        self,
+        task_description: str = "",
+        force: bool = False
+    ) -> None:
+        """
+        Hook pós-execução: sincroniza com GitHub se houver mudanças.
+        Chamado automaticamente após cada ciclo de execução do Orchestrator.
+        Falha silenciosamente — nunca interrompe o fluxo principal.
+        """
+        try:
+            from core.services.auto_sync import get_auto_sync
+            sync = get_auto_sync()
+
+            if not force and not sync.is_dirty():
+                return  # Nada a fazer
+
+            # Montar mensagem baseada na task executada
+            msg = None
+            if task_description:
+                # Limitar a 72 chars (convenção de commits)
+                short_desc = task_description[:50].replace("\n", " ")
+                msg = f"auto: {short_desc}"
+
+            result = await sync.sync_now(message=msg)
+
+            if result.success and result.committed:
+                logger.info(
+                    f"Orchestrator: auto-sync OK — "
+                    f"{len(result.files_changed)} arquivo(s) "
+                    f"commit={result.commit_sha}"
+                )
+                # Publicar evento na MessageBus para rastreabilidade
+                await self._publish_sync_event(result)
+            elif not result.success:
+                logger.warning(f"Orchestrator: auto-sync falhou: {result.error}")
+
+        except Exception as exc:
+            logger.warning(f"Orchestrator._post_execution_sync: {exc}")
+
+    async def _publish_sync_event(self, result) -> None:
+        """Publica evento de sync na MessageBus."""
+        try:
+            payload = {
+                "type": "github_sync",
+                "committed": result.committed,
+                "pushed": result.pushed,
+                "files": result.files_changed,
+                "sha": result.commit_sha,
+                "timestamp": result.timestamp,
+            }
+            await self.message_bus.publish(
+                "orchestrator", "system.sync", payload
+            )
+        except Exception:
+            pass  # Não crítico
+
+    # ═══════════════════════════════════════════════════════════
     #  Status
     # ═══════════════════════════════════════════════════════════
 

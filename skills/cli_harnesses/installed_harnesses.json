@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-03-16T08:28:19.407683",
+  "generator": "moon_cli_stack_phase1",
+  "python_version": "3.12.3 (main, Mar  3 2026, 12:15:18) [GCC 13.3.0]",
+  "harnesses": [
+    {
+      "name": "libreoffice",
+      "binary": "cli-anything-libreoffice",
+      "installed": true,
+      "path": "/home/johnathan/.local/bin/cli-anything-libreoffice",
+      "version": "Usage: cli-anything-libreoffice [OPTIONS] COMMAND [ARGS]...\nTry 'cli-anything-libreoffice --help' fo",
+      "help_preview": "Usage: cli-anything-libreoffice [OPTIONS] COMMAND [ARGS]...\n\n  LibreOffice CLI -- Stateful document editing from the command line.\n\n  Run without a subcommand to enter interactive REPL mode.\n\nOptions:\n  --json          Output as JSON\n  --project TEXT  Path to .lo-cli.json project file\n  --help      ",
+      "skipped": false
+    },
+    {
+      "name": "mermaid",
+      "binary": "cli-anything-mermaid",
+      "installed": true,
+      "path": "/home/johnathan/.local/bin/cli-anything-mermaid",
+      "version": "Usage: cli-anything-mermaid [OPTIONS] COMMAND [ARGS]...\nTry 'cli-anything-mermaid --help' for help.\n",
+      "help_preview": "Usage: cli-anything-mermaid [OPTIONS] COMMAND [ARGS]...\n\n  CLI harness for Mermaid Live Editor state files and renderer URLs.\n\nOptions:\n  --json          Emit machine-readable JSON\n  --project TEXT  Open a Mermaid project file\n  --help          Show this message and exit.\n\nCommands:\n  diagram  Diagr",
+      "skipped": false
+    },
+    {
+      "name": "obs-studio",
+      "binary": "cli-anything-obs-studio",
+      "installed": false,
+      "path": null,
+      "version": null,
+      "skipped": true,
+      "skip_reason": "Software alvo não instalado no sistema"
+    },
+    {
+      "name": "drawio",
+      "binary": "cli-anything-drawio",
+      "installed": false,
+      "path": null,
+      "version": null,
+      "skipped": true,
+      "skip_reason": "Software alvo não instalado no sistema"
+    },
+    {
+      "name": "kdenlive",
+      "binary": "cli-anything-kdenlive",
+      "installed": false,
+      "path": null,
+      "version": null,
+      "skipped": true,
+      "skip_reason": "Software alvo não instalado no sistema"
+    }
+  ]
+}

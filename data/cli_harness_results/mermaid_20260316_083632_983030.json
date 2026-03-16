@@ -1,0 +1,18 @@
+{
+  "success": false,
+  "output": null,
+  "exit_code": 2,
+  "command": [
+    "cli-anything-mermaid",
+    "diagram",
+    "render",
+    "--input",
+    "/tmp/tmpyhr8r08g/moon_arch.mmd",
+    "--output",
+    "/tmp/tmpyhr8r08g/moon_arch.png"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 234.76,
+  "timestamp": "2026-03-16T08:36:32.983008",
+  "stderr_preview": "Usage: cli-anything-mermaid diagram [OPTIONS] COMMAND [ARGS]...\nTry 'cli-anything-mermaid diagram --help' for help.\n\nError: No such command 'render'.\n"
+}

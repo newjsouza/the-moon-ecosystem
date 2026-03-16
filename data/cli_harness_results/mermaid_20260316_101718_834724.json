@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "output": "Created Mermaid project\naction: new_project\nsample: flowchart\ntheme: default\nline_count: 4\npath: /home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_arquitetura_mermaid_project.json",
+  "exit_code": 0,
+  "command": [
+    "cli-anything-mermaid",
+    "project",
+    "new",
+    "-o",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_arquitetura_mermaid_project.json"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 236.65,
+  "timestamp": "2026-03-16T10:17:18.834703",
+  "stderr_preview": null
+}

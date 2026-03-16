@@ -2,6 +2,8 @@
 core/autonomous_loop.py
 Manages the background research cycles.
 Connected to the Orchestrator for channel broadcasts.
+
+Updated: Moon-Stack QA automático integrado (FASE 6)
 """
 
 import asyncio
@@ -34,9 +36,16 @@ class MoonSleepManager:
         self.is_running = False
         self.cycle_count = 0
 
+        # Moon-Stack QA Settings
+        self.qa_interval_hours = 6  # QA automático a cada 6 horas
+        self._qa_task: Optional[asyncio.Task] = None
+
     async def start_cycle(self, interval_minutes: int = 60) -> None:
         self.is_running = True
         logger.info(f"Starting autonomous research loop. Interval: {interval_minutes}m")
+
+        # Start QA scheduled loop
+        await self._start_qa_loop()
 
         try:
             while self.is_running:
@@ -91,10 +100,65 @@ class MoonSleepManager:
             logger.error(f"Autonomous loop crashed: {e}")
         finally:
             self.is_running = False
+            self.stop_qa_loop()
+
+    async def _start_qa_loop(self) -> None:
+        """Inicia loop de QA automático do Moon-Stack."""
+        async def qa_cycle():
+            logger.info(f"Moon-Stack QA started (interval: {self.qa_interval_hours}h)")
+
+            while self.is_running:
+                await asyncio.sleep(self.qa_interval_hours * 3600)
+
+                if not self.is_running:
+                    break
+
+                logger.info("=== Moon-Stack QA Cycle ===")
+
+                try:
+                    # Run QA via MoonQAAgent if available
+                    if self.orchestrator and "MoonQAAgent" in self.orchestrator._agents:
+                        qa_agent = self.orchestrator._agents["MoonQAAgent"]
+                        result = await qa_agent.execute("diff-aware")
+
+                        if result.success:
+                            health = result.data.get("overall_health", 0)
+                            apps = result.data.get("apps_tested", [])
+
+                            # Report via MessageBus
+                            from core.message_bus import MessageBus
+                            message_bus = MessageBus()
+                            await message_bus.publish(
+                                sender="AutonomousLoop",
+                                topic="qa.scheduled",
+                                payload={
+                                    "health": health,
+                                    "apps_tested": apps,
+                                    "timestamp": datetime.now().isoformat(),
+                                }
+                            )
+
+                            logger.info(f"QA completed: health={health}, apps={apps}")
+                        else:
+                            logger.warning(f"QA failed: {result.error}")
+                    else:
+                        logger.debug("MoonQAAgent not available for scheduled QA")
+
+                except Exception as e:
+                    logger.error(f"Scheduled QA failed: {e}")
+
+        self._qa_task = asyncio.create_task(qa_cycle(), name="moon.qa.autonomous")
+
+    def stop_qa_loop(self) -> None:
+        """Para o loop de QA automático."""
+        if self._qa_task and not self._qa_task.done():
+            self._qa_task.cancel()
+            logger.info("Moon-Stack QA loop stopped.")
 
     def stop(self) -> None:
         self.is_running = False
         logger.info("Stopping autonomous loop.")
+        self.stop_qa_loop()
 
 
 if __name__ == "__main__":

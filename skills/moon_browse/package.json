@@ -1,0 +1,17 @@
+{
+  "name": "moon-browse-daemon",
+  "version": "0.1.0",
+  "description": "Moon-Stack Playwright Browser Daemon",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun run src/server.ts"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "success": false,
+  "output": null,
+  "exit_code": 2,
+  "command": [
+    "cli-anything-libreoffice",
+    "export",
+    "render",
+    "--project",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_20260316_100642_project.json",
+    "--output",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_20260316_100642.odt",
+    "--format",
+    "odt",
+    "--overwrite"
+  ],
+  "harness": "libreoffice",
+  "duration_ms": 176.02,
+  "timestamp": "2026-03-16T10:06:43.406754",
+  "stderr_preview": "Usage: cli-anything-libreoffice export render [OPTIONS] OUTPUT_PATH\nTry 'cli-anything-libreoffice export render --help' for help.\n\nError: No such option: --project Did you mean --preset?\n"
+}

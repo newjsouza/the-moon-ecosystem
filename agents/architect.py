@@ -57,6 +57,16 @@ DOMAIN_AGENT_MAP = {
     "github": "GithubAgent",
     "watchdog": "WatchdogAgent",
     "opencode": "OpenCodeAgent",
+    # Moon-Stack Agents
+    "browser": "MoonBrowserAgent",
+    "plan": "MoonPlanAgent",
+    "review": "MoonReviewAgent",
+    "qa": "MoonQAAgent",
+    "ship": "MoonShipAgent",
+    "cli": "MoonCLIAgent",
+    "harness": "MoonCLIAgent",
+    "libreoffice": "MoonCLIAgent",
+    "mermaid": "MoonCLIAgent",
 }
 
 # Palavras-chave para fallback (regex)
@@ -74,6 +84,14 @@ KEYWORD_PATTERNS = {
     "github": r"(github|repositório|commit|pull|issue|branch|merge|clone|repo)",
     "watchdog": r"(saúde|monitor|alerta|cpu|ram|disco|recurso|vigia|guardião|watchdog)",
     "opencode": r"(opencode|local|modelo|llm|inferência|groq|gemini|openrouter|fallback)",
+    # Moon-Stack patterns
+    "browser": r"(navegar|browser|url|snapshot|screenshot|click|preencher|fill|goto|web|página)",
+    "plan": r"(planejar|estratégia|ceo|eng|arquitetura|design|produto|análise|planejamento)",
+    "review": r"(review|revisão|código|bug|erro|ast|lint|qualidade|health score)",
+    "qa": r"(qa|teste|qualidade|visual|dashboard|interface|frontend|screenshot)",
+    "ship": r"(ship|deploy|release|pr|pull request|changelog|push|merge|entrega)",
+    # MoonCLIAgent patterns
+    "cli": r"(cli|harness|libreoffice|mermaid|diagrama|documento|pdf|exportar|render|cli-anything)",
 }
 
 
@@ -624,11 +642,19 @@ class ArchitectAgent(AgentBase):
             "SkillAlchemist": ("agents.skill_alchemist", ["skill.command"]),
             "GithubAgent": ("agents.github_agent", ["github.command"]),
             "OpenCodeAgent": ("agents.opencode", ["opencode.command"]),
+            # Moon-Stack Agents
+            "MoonBrowserAgent": ("agents.moon_browser_agent", ["browser.command"]),
+            "MoonPlanAgent": ("agents.moon_plan_agent", ["plan.command"]),
+            "MoonReviewAgent": ("agents.moon_review_agent", ["review.command"]),
+            "MoonQAAgent": ("agents.moon_qa_agent", ["qa.command"]),
+            "MoonShipAgent": ("agents.moon_ship_agent", ["ship.command"]),
+            # MoonCLIAgent
+            "MoonCLIAgent": ("agents.moon_cli_agent", ["cli.command", "cli.execute", "cli.generate", "cli.discover"]),
         }
-        
+
         for name, (module_path, topics) in known_agents.items():
             await self.register_agent(name, module_path, topics)
-        
+
         logger.info(f"{len(known_agents)} agentes conhecidos registrados.")
 
     # ═══════════════════════════════════════════════════════════

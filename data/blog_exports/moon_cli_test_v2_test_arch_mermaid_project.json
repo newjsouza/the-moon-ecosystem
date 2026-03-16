@@ -1,0 +1,8 @@
+{
+  "code": "graph TD\n    A[Moon] --> B[CLI]",
+  "mermaid": "{\n  \"theme\": \"default\"\n}",
+  "updateDiagram": true,
+  "rough": false,
+  "panZoom": true,
+  "grid": true
+}

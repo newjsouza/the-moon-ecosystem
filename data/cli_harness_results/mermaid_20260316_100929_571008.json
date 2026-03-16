@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "output": "Updated Mermaid source\naction: set_diagram\nline_count: 2",
+  "exit_code": 0,
+  "command": [
+    "cli-anything-mermaid",
+    "--project",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/moon_cli_test_v2_test_arch_mermaid_project.json",
+    "diagram",
+    "set",
+    "--text",
+    "graph TD\n    A[Moon] --> B[CLI]"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 257.52,
+  "timestamp": "2026-03-16T10:09:29.570987",
+  "stderr_preview": null
+}

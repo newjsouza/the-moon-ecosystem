@@ -1,0 +1,21 @@
+{
+  "success": false,
+  "output": null,
+  "exit_code": 2,
+  "command": [
+    "cli-anything-mermaid",
+    "export",
+    "render",
+    "--project",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_moon_arch_smoke_mermaid_project.json",
+    "--output",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_moon_arch_smoke.svg",
+    "-f",
+    "svg",
+    "--overwrite"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 299.45,
+  "timestamp": "2026-03-16T10:06:42.488893",
+  "stderr_preview": "Usage: cli-anything-mermaid export render [OPTIONS] OUTPUT_PATH\nTry 'cli-anything-mermaid export render --help' for help.\n\nError: No such option: --project\n"
+}

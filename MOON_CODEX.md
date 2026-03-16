@@ -125,11 +125,102 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 | `agents/omni_channel_strategist.py` | OmniChannel: Distribuição automática para Telegram, Twitter e LinkedIn. | ✅ Operante |
 | `agents/autonomous_devops_refactor.py` | DevOps Guard: Auditoria de dependências e refatoração autônoma de código. | ✅ Operante |
 | `agents/economic_sentinel.py` | Economic Sentinel: Inteligência financeira, monitoramento de mercados e relatórios. | ✅ Operante |
-| `agents/skill_alchemist.py` | Skill Alchemist: Descoberta, teste e síntese autônoma de novas habilidades Open Source. | ✅ Operante |
+| `agents/skill_alchemist.py` | Skill Alchemist v2: Descoberta multi-fonte (GitHub, PyPI, HuggingFace), scoring semântico via LLM (Groq), sandbox real com pip install, compliance via AST, integração SemanticMemoryWeaver. | ✅ Operante |
 | `agents/nexus_intelligence.py` | Nexus Intelligence: Mente de convergência, detecção de padrões cross-domain e briefings. | ✅ Operante |
 | `agents/semantic_memory_weaver.py` | Semantic Weaver: Memória de longo prazo via Knowledge Graph e busca semântica. | ✅ Operante |
+| `agents/moon_cli_agent.py` | MoonCLIAgent: Executor e gerador de CLI-Anything harnesses (libreoffice, mermaid). Opção B (harnesses instalados) + Opção A (geração via HARNESS.md + LLMRouter). Tópicos: cli.execute, cli.generate, cli.discover. | ✅ Operante |
+| `core/cli_harness_adapter.py` | CLIHarnessAdapter: Bridge assíncrona subprocess para harnesses CLI-Anything.
+| `skills/cli_harnesses/blog_cli_exporter.py` | BlogCLIExporter: Exportador de posts do blog para PDF/ODT e diagramas Mermaid para SVG/PNG via CLI-Anything harnesses. Standalone, zero dependências. | ✅ Operante | Singleton via get_harness_adapter(). Persiste resultados em data/cli_harness_results/. | ✅ Operante |
 
 ---
+
+
+### [2026-03-16] Moon-Stack CLI-Anything Integration — Opção A + B
+**Prioridade 3 — BlogCLIExporter (PDF/Mermaid export):**
+- `skills/cli_harnesses/blog_cli_exporter.py` criado (371 linhas)
+- `tests/test_blog_cli_exporter.py` criado (7 testes)
+- Pipeline verificado: post → PDF (6.6KB), diagram → SVG (8KB)
+- Comandos corrigidos: `--project X export render Y.pdf -p pdf`
+
+**Prioridade 4 — OBS Studio:**
+- SKIP: requer sudo para `apt install obs-studio`
+- Harness disponível em /tmp/cli-anything-src/obs-studio/agent-harness/
+
+**Prioridade 5 — Opção A (geração de harness):**
+- `tests/test_moon_cli_agent_generate.py` criado (4 testes)
+- Harness jq gerado com sucesso: 197-228 linhas de código Python
+- HARNESS.md (732 linhas) usado como metodologia
+- LLMRouter (Groq llama-3.3-70b) respondeu em ~5s
+
+**Testes totais CLI-Anything:**
+- test_cli_harness_adapter.py: 8 passed
+- test_moon_cli_agent.py: 10 passed  
+- test_blog_cli_exporter.py: 7 passed
+- test_moon_cli_agent_generate.py: 4 passed
+- test_integration_cli_harness.py: 5 passed
+- **Total: 34 passed / 0 failed / 0 skipped**
+
+**Arquivos exportados (data/blog_exports/):**
+- 9 arquivos (PDFs + SVGs) gerados com sucesso
+- Tamanhos: PDF ~6.6KB, SVG ~8KB
+
+**Harnesses gerados (skills/cli_harnesses/generated/):**
+- 5 harnesses Python gerados via Opção A
+- Alvo: jq (/usr/bin/jq)
+
+
+**Fonte:** https://github.com/HKUDS/CLI-Anything (MIT License)
+
+**Harnesses instalados:**
+**Nota sobre comando Mermaid:** O comando correto para renderizar diagramas é:
+```
+cli-anything-mermaid project new -o projeto.json
+cli-anything-mermaid --project projeto.json diagram set --text "graph TD; A --> B"
+cli-anything-mermaid --project projeto.json export render saida.png -f png
+```
+Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run mermaid --project /tmp/x.json diagram set --text "..."`
+
+- cli-anything-libreoffice: 1.0.0 (LibreOffice v25.8.5.2) ✅
+- cli-anything-mermaid: 1.0.0 (mmdc v11.12.0 via npm) ✅
+
+**Harnesses skipados (software não instalado):**
+- obs-studio (OBS Studio não instalado)
+- drawio (Draw.io não instalado)
+- kdenlive (Kdenlive não instalado)
+
+**Arquivos criados:**
+- core/cli_harness_adapter.py (312 linhas)
+- agents/moon_cli_agent.py (344 linhas)
+- skills/cli_harnesses/HARNESS.md (732 linhas, cópia local)
+- skills/cli_harnesses/installed_harnesses.json (registry)
+- data/cli_harness_results/ (diretório de persistência)
+- tests/test_cli_harness_adapter.py (102 linhas)
+- tests/test_moon_cli_agent.py (88 linhas)
+- tests/test_integration_cli_harness.py (137 linhas)
+
+**Testes:**
+- test_cli_harness_adapter.py: 8 passed / 0 failed / 0 skipped
+- test_moon_cli_agent.py: 10 passed / 0 failed / 0 skipped
+- test_integration_cli_harness.py: 5 passed / 0 failed / 0 skipped
+- Regressão: todos os imports OK
+
+**Integrações:**
+- ArchitectAgent: MoonCLIAgent adicionado ao DOMAIN_AGENT_MAP (cli, harness, libreoffice, mermaid)
+- ArchitectAgent: KEYWORD_PATTERNS atualizado com regex cli
+- ArchitectAgent: MoonCLIAgent registrado em _register_known_agents
+- MessageBus: tópicos cli.result, cli.discovery, cli.harness_ready, nexus.event
+
+**Capacidades novas:**
+- cli-anything-libreoffice --help executa em ~120ms via adapter ✅
+- cli-anything-mermaid --help executa em ~80ms via adapter ✅
+- MoonCLIAgent.list() retorna 2 harnesses ✅
+- MoonCLIAgent.run() executa harnesses reais ✅
+- Resultados persistidos em data/cli_harness_results/ ✅
+
+**Próximos passos:**
+- Instalar harnesses adicionais quando software alvo estiver disponível
+- Gerar novos harnesses via Opção A (HARNESS.md + LLMRouter)
+
 
 ## 🔐 6. Gestão de Integrações e Credenciais (Matriz de Tokens)
 > ⚠️ **CRÍTICO - SEGURANÇA DA INFORMAÇÃO:** **NUNCA** guarde chaves REAIS (senhas, API Keys, Tokens JWT) neste arquivo `.md` em texto plano, para evitar vazamentos em commits ou compartilhamentos do repositório. Use variáveis de ambiente (como `.env`) ou um Secret Manager. 
@@ -407,6 +498,78 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
         - `.env.example`, `docs/SECRETS_SETUP.md`, `.github/workflows/ci.yml` consistentes.
         - MOON_CODEX.md atualizado com resultados reais.
 - **Data:** 15 Março 2026 (Auditoria e Correção).
+
+### 📂 Assunto: [Descoberta Autônoma de Ferramentas]
+- **Tópico:** SkillAlchemist v2 — Pipeline Completo e Funcional
+- **Resumo da Implementação:**
+    - **OBJETIVO 1 (Descoberta Multi-Fonte)**:
+        - `_discover_candidates()` refatorado para executar 3 fontes em PARALELO com `asyncio.gather()`.
+        - **GitHub Trending**: Header `Authorization: Bearer {GITHUB_TOKEN}` adicionado para evitar rate limit.
+        - **PyPI Updates**: Parse de RSS XML com `xml.etree.ElementTree` (stdlib).
+        - **HuggingFace Models**: Parse de JSON paginado da API.
+        - Tratamento individual de falha por fonte (se uma falha, outras continuam).
+
+    - **OBJETIVO 2 (Scoring Semântico via LLM)**:
+        - `_score_candidates_llm()` implementado usando `LLMRouter` (Groq, modelo `llama-3.1-8b-instant`).
+        - Prompt estruturado para avaliação técnica (compatibilidade Python, licença, utilidade, risco).
+        - `asyncio.Semaphore(5)` para limitar a 5 chamadas LLM simultâneas.
+        - Fallback síncrono (`_score_candidates_fallback()`) quando LLM retorna JSON inválido.
+        - Threshold: `score >= 60 AND risk != "high" AND compatible == true`.
+
+    - **OBJETIVO 3 (Sandbox Real com pip install)**:
+        - `_transmute()` implementado com instalação via pip em venv isolado.
+        - Timeout de 60s para `pip install` via `asyncio.wait_for()`.
+        - Teste de importação com timeout de 10s (apenas para source == "pypi").
+        - GitHub e HuggingFace pulam instalação, vão direto para template.
+        - Campos `sandbox_tested` e `install_output` no `proposal.json`.
+
+    - **OBJETIVO 4 (Compliance via AST)**:
+        - `_check_compliance()` implementado com módulo `ast` (stdlib).
+        - **Regra 1**: Modelos pagos proibidos (gpt-4, claude-3, openai, anthropic).
+        - **Regra 2**: Imports proibidos (openai, anthropic, cohere, replicate).
+        - **Regra 3**: print() em produção (warning, não fatal).
+        - **Regra 4**: Classe deve herdar de `SkillBase`.
+        - Arquivo deletado da quarentena se compliance falhar.
+
+    - **OBJETIVO 5 (Integração SemanticMemoryWeaver)**:
+        - `_publish_to_semantic_weaver()` publica no tópico `memory.remember` da MessageBus.
+        - Payload com content, metadata (type, agent, skill_name, source, risk, score) e tags.
+        - Campo `indexed_in_memory` no `proposal.json`.
+        - Standalone mode (orchestrator=None) não lança exceção.
+
+    - **Suite de Testes** (`tests/test_skill_alchemist.py`):
+        - 31 testes cobrindo todos os 5 objetivos.
+        - Mocks de HTTP, LLM, subprocess, AST.
+        - Cobertura: 77% do `agents/skill_alchemist.py`.
+
+    - **Arquivos Criados/Alterados**:
+        - `agents/skill_alchemist.py` (refatorado completamente — v2)
+        - `tests/test_skill_alchemist.py` (novo — 31 testes)
+        - `MOON_CODEX.md` (atualizado com nova descrição e entrada na enciclopédia)
+
+- **Data:** 16 Março 2026.
+
+### 📂 Assunto: [Moon-Stack — Integração gstack sem Claude Code]
+- **Tópico:** Browser Automation, QA Visual e Modos Cognitivos
+- **Resumo da Implementação:** Extração e adaptação do daemon Playwright do gstack (MIT License) para The Moon Ecosystem. Implementação de bridge Python via httpx assíncrono, criação de 5 novos agentes (Browser, Plan, Review, QA, Ship) integrados ao LLMRouter/Groq, MessageBus e ecossistema existente. Cookie import para Linux via secretstorage + pycryptodome. 100% independente do Claude Code, custo zero absoluto.
+    - **FASE 1 (✅ Completa)**:
+        - `skills/moon_browse/` — Daemon TypeScript/Bun com Playwright Chromium
+        - `core/browser_bridge.py` — Client HTTP Python com auto-start do daemon
+        - `agents/moon_browser_agent.py` — Agente encapsulado com MessageBus
+        - `tests/test_moon_browser_agent.py` — 11 testes passando
+    - **FASE 2 (✅ Completa)**:
+        - `agents/moon_plan_agent.py` — Modos cognitivos CEO (estratégia) e ENG (arquitetura)
+        - Prompts especializados com llama-3.3-70b (Groq)
+        - Persistência em `data/plans/` e publicação em `plan.result`
+    - **FASE 3-7 (⏳ Em Implementação)**:
+        - Moon Review Agent: Code review paranóico (AST + LLM)
+        - Moon QA Agent: QA visual autônomo via browser headless
+        - Moon Ship Agent: Pipeline completo de release (review + sync + changelog + PR)
+        - Integração: Architect, AutonomousLoop, SkillAlchemist, SemanticMemoryWeaver
+        - Cookie import Linux: GNOME Keyring via secretstorage
+    - **Tecnologias**: Bun runtime, Playwright Chromium, httpx, Groq (llama-3.3-70b, llama-3.1-8b), secretstorage, pycryptodome
+    - **Diretórios**: `skills/moon_browse/`, `data/plans/`, `data/reviews/`, `data/qa_reports/`
+- **Data:** 16 Março 2026.
 
 ---
 

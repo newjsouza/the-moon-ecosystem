@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "output": "Rendered output\noutput: /home/johnathan/Área de trabalho/The Moon/data/blog_exports/moon_cli_test_v2_test_arch.svg\nformat: svg\nmethod: mermaid-renderer\nfile_size: 8012\nurl: https://mermaid.ink/svg/pako:eNo9jDEOwyAQBL-CrrY_QBEpsZtISZcqxsUpnMGS4RCGyvLfczTealY72gN-bAk0uIzJq89oopLcpzdznFXf39RjGl7PGToIlAOuVuSjWQaKp0AGtKClBetWDJh4ilqTxULjinIbQJdcqYPM1XnQC267tITxy3yNLrfnxucfd9owYw\naction: render",
+  "exit_code": 0,
+  "command": [
+    "cli-anything-mermaid",
+    "--project",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/moon_cli_test_v2_test_arch_mermaid_project.json",
+    "export",
+    "render",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/moon_cli_test_v2_test_arch.svg",
+    "-f",
+    "svg",
+    "--overwrite"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 2502.64,
+  "timestamp": "2026-03-16T10:09:32.074192",
+  "stderr_preview": null
+}

@@ -1,0 +1,18 @@
+{
+  "success": false,
+  "output": null,
+  "exit_code": 2,
+  "command": [
+    "cli-anything-mermaid",
+    "diagram",
+    "set",
+    "--project",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_arquitetura_mermaid_project.json",
+    "--input",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_arquitetura.mmd"
+  ],
+  "harness": "mermaid",
+  "duration_ms": 495.79,
+  "timestamp": "2026-03-16T10:06:44.276904",
+  "stderr_preview": "Usage: cli-anything-mermaid diagram set [OPTIONS]\nTry 'cli-anything-mermaid diagram set --help' for help.\n\nError: No such option: --project\n"
+}

@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "output": "Created writer document: untitled\nname: untitled\nversion: 1.0\ntype: writer\nsettings:\n  page_width: 21cm\n  page_height: 29.7cm\n  margin_top: 2cm\n  margin_bottom: 2cm\n  margin_left: 2cm\n  margin_right: 2cm\nmetadata:\n  title: \n  author: \n  description: \n  subject: \n  created: 2026-03-16T10:06:43.064972\n  modified: 2026-03-16T10:06:43.064993\n  software: libreoffice-cli 1.0\nstyle_count: 0\ncontent_count: 0",
+  "exit_code": 0,
+  "command": [
+    "cli-anything-libreoffice",
+    "document",
+    "new",
+    "--type",
+    "writer",
+    "-o",
+    "/home/johnathan/Área de trabalho/The Moon/data/blog_exports/test_with_diagram_001_20260316_100642_project.json"
+  ],
+  "harness": "libreoffice",
+  "duration_ms": 257.95,
+  "timestamp": "2026-03-16T10:06:43.087091",
+  "stderr_preview": null
+}

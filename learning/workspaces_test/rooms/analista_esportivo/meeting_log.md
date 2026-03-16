@@ -4,3 +4,6 @@
 
 ## Histórico de Reuniões
 [15:02:03] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[08:41:47] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[09:47:48] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[09:50:47] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!

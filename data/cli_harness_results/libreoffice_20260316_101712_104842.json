@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "output": "Usage: cli-anything-libreoffice [OPTIONS] COMMAND [ARGS]...\n\n  LibreOffice CLI -- Stateful document editing from the command line.\n\n  Run without a subcommand to enter interactive REPL mode.\n\nOptions:\n  --json          Output as JSON\n  --project TEXT  Path to .lo-cli.json project file\n  --help          Show this message and exit.\n\nCommands:\n  calc      Calc (spreadsheet) commands.\n  document  Document management commands.\n  export    Export/render commands.\n  impress   Impress (presentation) commands.\n  repl      Start interactive REPL session.\n  session   Session management commands.\n  style     Style management commands.\n  writer    Writer (word processor) commands.",
+  "exit_code": 0,
+  "command": [
+    "cli-anything-libreoffice",
+    "--help"
+  ],
+  "harness": "libreoffice",
+  "duration_ms": 116.52,
+  "timestamp": "2026-03-16T10:17:12.104821",
+  "stderr_preview": null
+}

@@ -135,6 +135,9 @@ class WatchdogAgent(AgentBase):
         self._monitoring_task = asyncio.create_task(
             self._monitor_loop(), name="moon.watchdog.monitor"
         )
+        self._sync_task = asyncio.create_task(
+            self._periodic_github_sync(), name="moon.watchdog.github_sync"
+        )
         logger.info(f"{self.name} initialized — monitoring active.")
 
     async def shutdown(self) -> None:
@@ -143,6 +146,12 @@ class WatchdogAgent(AgentBase):
             self._monitoring_task.cancel()
             try:
                 await self._monitoring_task
+            except asyncio.CancelledError:
+                pass
+        if self._sync_task and not self._sync_task.done():
+            self._sync_task.cancel()
+            try:
+                await self._sync_task
             except asyncio.CancelledError:
                 pass
         await super().shutdown()
@@ -278,6 +287,39 @@ class WatchdogAgent(AgentBase):
                 pass  # normal tick — continue loop
 
         logger.info("Watchdog monitor loop stopped.")
+
+    # ═══════════════════════════════════════════════════════════
+    #  Periodic GitHub Sync
+    # ═══════════════════════════════════════════════════════════
+
+    async def _periodic_github_sync(self) -> None:
+        """Sync automático com GitHub a cada 30 minutos."""
+        logger.info("Watchdog periodic GitHub sync started (30 min interval).")
+        while not self._stop_event.is_set():
+            try:
+                # Aguarda 30 minutos ou até o stop_event ser setado
+                try:
+                    await asyncio.wait_for(
+                        asyncio.shield(self._stop_event.wait()),
+                        timeout=30 * 60,  # 30 minutos
+                    )
+                    break  # stop_event foi setado
+                except asyncio.TimeoutError:
+                    pass  # 30 minutos passaram — executar sync
+
+                from core.services.auto_sync import get_auto_sync
+                result = await get_auto_sync().sync_if_dirty(
+                    message="chore: periodic auto-sync from watchdog"
+                )
+                if result.committed:
+                    logger.info(f"Watchdog: sync periódico OK — {result.commit_sha}")
+
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                logger.warning(f"Watchdog: sync periódico falhou: {exc}")
+
+        logger.info("Watchdog periodic GitHub sync stopped.")
 
     # ═══════════════════════════════════════════════════════════
     #  Health Check

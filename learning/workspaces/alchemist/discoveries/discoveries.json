@@ -1,0 +1,162 @@
+[
+    {
+        "id": "c5a32632e586ab2c7c9c6b0311eaac2477d26a3be132e9c5b7f260a30728c0b7",
+        "name": "langchain",
+        "date": "2026-03-16 00:52:28.760075",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "24684c1ecca249c03e58e0d0192c9742b89e48498c3a1fac970d4d5c34874232",
+        "name": "gemini-cli",
+        "date": "2026-03-16 00:52:32.740295",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "e9dbf459bd01dca311934bf9c23476a4dc917077389c76cb16b4ad078517b65d",
+        "name": "firecrawl",
+        "date": "2026-03-16 00:52:37.609901",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "c1af6b58492f9bf434d283140c089cd8bec568302933f45108ba7657de9dd41a",
+        "name": "browser-use",
+        "date": "2026-03-16 00:52:42.312129",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "257ed09536576a0405556a39c1b7b9863b3ccb6d9798a92051e491a948c6e84f",
+        "name": "everything-claude-code",
+        "date": "2026-03-16 00:52:47.074478",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "ecccdc934bfc828f407935386c35530128658eea011f32788356986ff037da49",
+        "name": "Prompt-Engineering-Guide",
+        "date": "2026-03-16 00:52:51.722109",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "2e3cb77637616fce84828d59d2ae354d2c975d21bb3beb23d12a19b94a2e3787",
+        "name": "daytona",
+        "date": "2026-03-16 00:52:56.488989",
+        "source": "github",
+        "llm_score": 100,
+        "risk": "low"
+    },
+    {
+        "id": "85b23a6c94bb0832d0627c5b22a1d3028a18bdfaba29148ffffab5d85eceeb57",
+        "name": "anything-llm",
+        "date": "2026-03-16 00:53:00.955197",
+        "source": "github",
+        "llm_score": 100,
+        "risk": "low"
+    },
+    {
+        "id": "8ea7b5016269d351c8bec16a8ef7ac43a872b4ce974e5e5662f1915ffcfe0df2",
+        "name": "ai-agents-for-beginners",
+        "date": "2026-03-16 00:53:05.554482",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "cddc9a2d075a51037ba44e9147d87bac14f8ecee6231b07be5d63984cf63ee77",
+        "name": "mem0",
+        "date": "2026-03-16 00:53:10.186239",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "715b6bc81ab4b4ffcee5bb2150989321b00958a3da8b9307fbbd467d19cd4e11",
+        "name": "crewAI",
+        "date": "2026-03-16 00:53:15.071135",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "438a9b54b319a0a7884669f663b965681a23f4d118d227596b55e93c5c858e81",
+        "name": "awesome-claude-skills",
+        "date": "2026-03-16 00:53:20.222057",
+        "source": "github",
+        "llm_score": 100,
+        "risk": "low"
+    },
+    {
+        "id": "a90e1fa2514daead7766b3e7e33bd63cc5ad30c0b371a00e37b3633e76dfca22",
+        "name": "oh-my-openagent",
+        "date": "2026-03-16 00:53:25.570993",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "a36c4dfc0a7a1bb69b855321081cec11f51abeafce01a94c111982ebb7623db8",
+        "name": "agno",
+        "date": "2026-03-16 00:53:31.424323",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "383c0dddac0b5fbd074047dd8101611a12dac64c06e4cd85027d48fe712ce9c5",
+        "name": "AgentGPT",
+        "date": "2026-03-16 00:53:39.425235",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "853c63f738f0cecf3b918959597f2fe6b45198d548e4fb968b54eebfaeac3990",
+        "name": "claude-mem",
+        "date": "2026-03-16 00:53:48.545530",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "3e0cd32857014e6459d70f773bac1561984e7be84920a7a01f6788f7e8ca521c",
+        "name": "Vane",
+        "date": "2026-03-16 00:53:57.126212",
+        "source": "github",
+        "llm_score": 100,
+        "risk": "low"
+    },
+    {
+        "id": "16389f32495280ea98c7dc97d94e58609236d0b9919875016bc9d018f60ef5bf",
+        "name": "deer-flow",
+        "date": "2026-03-16 00:54:04.954991",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "6885ba6c5ca2158753bdaa36587ae1bf4a21f4858ab36416f879373bc31500e4",
+        "name": "composio",
+        "date": "2026-03-16 00:54:11.606618",
+        "source": "github",
+        "llm_score": 150,
+        "risk": "low"
+    },
+    {
+        "id": "6f70aa6d92f7f311e170531d52054d99bd39243815044456ce1368d6607f5e5f",
+        "name": "chroma",
+        "date": "2026-03-16 00:54:18.182405",
+        "source": "github",
+        "llm_score": 100,
+        "risk": "low"
+    }
+]
