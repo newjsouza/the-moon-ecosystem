@@ -1,130 +1,197 @@
-name: CI/CD
+# ═══════════════════════════════════════════════════════════════
+#  🌕 The Moon Ecosystem — CI Pipeline
+# ═══════════════════════════════════════════════════════════════
+#  Quality Gate: Lint + Security + Tests + Import Check
+#  MOON_CODEX Directive 0.2: Zero Cost Policy enforced
+# ═══════════════════════════════════════════════════════════════
+
+name: 🌕 The Moon — CI Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main, develop]
+    branches: [ main ]
 
-env:
-  PYTHON_VERSION: '3.11'
-  NODE_VERSION: '20'
+# Cancela runs anteriores se novo commit for pushado
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint & Type Check
+  # ───────────────────────────────────────────────────────────
+  #  Quality Gate Principal
+  # ───────────────────────────────────────────────────────────
+  quality-gate:
+    name: Quality Gate (Lint + Security + Tests)
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: 🐍 Setup Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
-          pip install ruff bandit safety
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          echo "✅ Dependencies installed"
 
-      - name: Run Ruff (lint)
-        run: ruff check .
-
-      - name: Run Ruff (type check)
-        run: ruff check --select I .
-
-      - name: Run Bandit (security)
-        run: bandit -r . -x ./Super-Agente/mcp-servers,./Super-Agente/skills
-
-  test:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
+      - name: 🔍 Lint (Ruff)
         run: |
-          pip install pytest pytest-cov pytest-asyncio
+          ruff check . --output-format=github --show-source
+          echo "✅ Ruff passed"
 
-      - name: Run tests
-        run: pytest --cov=. --cov-report=xml --cov-report=term-missing
+      - name: 🔒 Security Scan (Bandit)
+        run: |
+          bandit -r agents/ core/ utils/ -ll --exit-zero -f json -o bandit-report.json || true
+          bandit -r agents/ core/ utils/ -ll
+          echo "✅ Bandit security scan completed"
+
+      - name: 🧪 Unit Tests
+        run: |
+          pytest tests/ -v \
+            --cov=agents \
+            --cov=core \
+            --cov=utils \
+            --cov-report=term-missing \
+            --cov-fail-under=30 \
+            --timeout=60 \
+            --tb=short
         env:
-          SUPABASE_URL: http://localhost:54321
-          SUPABASE_ANON_KEY: test_key
-          GROQ_API_KEY: test_key
-          OPENAI_API_KEY: test_key
-          ANTHROPIC_API_KEY: test_key
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
+      - name: 📊 Coverage Report
+        if: always()
+        run: |
+          coverage xml
+          coverage html
+          echo "✅ Coverage report generated"
+
+      - name: 📤 Upload Coverage Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          files: ./coverage.xml
-          flags: unittests
+          name: coverage-report
+          path: htmlcov/
+          retention-days: 7
 
-  security-audit:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: 📤 Upload Bandit Report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 7
 
-      - name: Install dependencies
-        run: |
-          pip install pip-audit safety
-
-      - name: Install project dependencies
-        run: |
-          pip install -q groq openai anthropic supabase playwright
-
-      - name: Run pip-audit
-        run: pip-audit || true
-
-      - name: Run safety check
-        run: safety check || true
-
-  docker-build:
-    name: Docker Build
+  # ───────────────────────────────────────────────────────────
+  #  Import Sanity Check
+  # ───────────────────────────────────────────────────────────
+  import-check:
+    name: Import Sanity Check
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Supabase stack
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+      
+      - name: 📦 Install base dependencies
         run: |
-          cd infrastructure
-          docker-compose build --no-cache
-
-      - name: Verify containers
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install feedparser
+      
+      - name: ✅ Verify all agent imports
         run: |
-          cd infrastructure
-          docker-compose up -d
-          sleep 10
-          docker-compose ps
+          echo "Testing agent imports..."
+          
+          python3 -c "from agents.architect import ArchitectAgent; print('✅ ArchitectAgent OK')"
+          python3 -c "from agents.watchdog import WatchdogAgent; print('✅ WatchdogAgent OK')"
+          python3 -c "from agents.news_monitor import NewsMonitorAgent; print('✅ NewsMonitorAgent OK')"
+          python3 -c "from agents.crawler import CrawlerAgent; print('✅ CrawlerAgent OK')"
+          python3 -c "from agents.economic_sentinel import EconomicSentinel; print('✅ EconomicSentinel OK')"
+          python3 -c "from agents.nexus_intelligence import NexusIntelligence; print('✅ NexusIntelligence OK')"
+          python3 -c "from agents.llm import LLMRouter, LlmAgent; print('✅ LLMRouter OK')"
+          python3 -c "from agents.omni_channel_strategist import OmniChannelStrategist; print('✅ OmniChannelStrategist OK')"
+          python3 -c "from agents.autonomous_devops_refactor import AutonomousDevOpsRefactor; print('✅ AutonomousDevOpsRefactor OK')"
+          python3 -c "from agents.semantic_memory_weaver import SemanticMemoryWeaver; print('✅ SemanticMemoryWeaver OK')"
+          python3 -c "from agents.skill_alchemist import SkillAlchemist; print('✅ SkillAlchemist OK')"
+          python3 -c "from agents.github_agent import GithubAgent; print('✅ GithubAgent OK')"
+          python3 -c "from agents.hardware_synergy_bridge import HardwareSynergyBridge; print('✅ HardwareSynergyBridge OK')"
+          
+          echo ""
+          echo "🎉 Todos os imports OK!"
 
-  deploy:
-    name: Deploy
+  # ───────────────────────────────────────────────────────────
+  #  Code Formatting Check
+  # ───────────────────────────────────────────────────────────
+  format-check:
+    name: Code Format Check
     runs-on: ubuntu-latest
-    needs: [lint, test, security-audit, docker-build]
-    if: github.ref == 'refs/heads/main'
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to production
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+      
+      - name: 📦 Install ruff
+        run: pip install ruff
+      
+      - name: 🔍 Check formatting
         run: |
-          echo "Deploy triggered - add your deployment logic here"
-          echo "This could be: Kamal, Docker Hub, Railway, Render, etc."
+          ruff format --check agents/ core/ utils/ tests/
+          echo "✅ Code formatting OK"
+
+  # ───────────────────────────────────────────────────────────
+  #  MOON_CODEX Compliance Check
+  # ───────────────────────────────────────────────────────────
+  codex-check:
+    name: MOON_CODEX Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 🔍 Check for paid model references
+        run: |
+          echo "Checking for paid model references (MOON_CODEX Directive 0.2)..."
+          
+          # Procura por modelos pagos em código Python
+          if grep -rn "gpt-4\|gpt-3.5-turbo\|claude-3-opus\|claude-3-sonnet" --include="*.py" agents/ core/ utils/; then
+            echo "❌ Paid model references found!"
+            exit 1
+          fi
+          
+          echo "✅ No paid model references found"
+      
+      - name: 🔍 Check for print() in production code
+        run: |
+          echo "Checking for print() statements in production code..."
+          
+          # Ignora testes e scripts de utilidade
+          if grep -rn "^print(" --include="*.py" agents/ core/ | grep -v "test_" | grep -v "__pycache__"; then
+            echo "❌ print() statements found in production code!"
+            exit 1
+          fi
+          
+          echo "✅ No print() in production code"

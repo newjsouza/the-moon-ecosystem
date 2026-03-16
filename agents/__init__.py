@@ -11,7 +11,6 @@ from .researcher import ResearcherAgent
 from .terminal import TerminalAgent
 from .blog import BlogManagerAgent, BlogWriterAgent, BlogPublisherAgent, DirectWriterAgent
 from .prompt_enhancer import PromptEnhancerAgent
-from .system_agent import SystemAgent
 from .youtube_manager import YoutubeManagerAgent
 from .betting_analyst import BettingAnalystAgent
 from .email_agent import EmailAgent
@@ -19,8 +18,24 @@ from .file_manager import FileManagerAgent
 from .opencode import OpenCodeAgent
 from .watchdog import WatchdogAgent
 from .omni_channel_strategist import OmniChannelStrategist
-from .hardware_synergy_bridge import HardwareSynergyBridge
 from .autonomous_devops_refactor import AutonomousDevOpsRefactor
+from .semantic_memory_weaver import SemanticMemoryWeaver
+
+# The following agents may have GUI/hardware dependencies that fail in headless environments
+try:
+    from .system_agent import SystemAgent
+except ImportError:
+    SystemAgent = None
+
+try:
+    from .hardware_synergy_bridge import HardwareSynergyBridge
+except ImportError:
+    HardwareSynergyBridge = None
+
+# New agents
+from .nexus_intelligence import NexusIntelligence
+from .github_agent import GithubAgent
+from .skill_alchemist import SkillAlchemist
 
 __all__ = [
     'ArchitectAgent',
@@ -48,5 +63,6 @@ __all__ = [
     'WatchdogAgent',
     'OmniChannelStrategist',
     'HardwareSynergyBridge',
-    'AutonomousDevOpsRefactor'
+    'AutonomousDevOpsRefactor',
+    'SemanticMemoryWeaver'
 ]

@@ -15,7 +15,7 @@ from agents import (
     YoutubeManagerAgent, BettingAnalystAgent, EmailAgent,
     FileManagerAgent, OpenCodeAgent, WatchdogAgent,
     OmniChannelStrategist, AutonomousDevOpsRefactor, SkillAlchemist,
-    NexusIntelligence
+    NexusIntelligence, SemanticMemoryWeaver
 )
 from agents.economic_sentinel import EconomicSentinel
 import warnings
@@ -63,7 +63,8 @@ class MoonSystem:
         self.orchestrator.register_agent(BettingAnalystAgent())
         self.orchestrator.register_agent(EconomicSentinel())
         
-        # SemanticMemoryWeaver — Skip (not implemented)
+        # 5. Long-term Memory
+        self.orchestrator.register_agent(SemanticMemoryWeaver(groq_client=self.orchestrator.llm))
         
         self.orchestrator.register_agent(OmniChannelStrategist(
             message_bus=self.orchestrator.message_bus

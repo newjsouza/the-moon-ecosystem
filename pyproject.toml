@@ -36,3 +36,15 @@ exclude_lines = [
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+ignore = ["E501"]  # Line length handled by formatter
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

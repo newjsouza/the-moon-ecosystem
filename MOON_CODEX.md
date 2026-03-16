@@ -92,7 +92,8 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 > `- **Sintoma:** [O que faliu?] | **Causa:** [Por que faliu?] | **Solução:** [Como e onde foi resolvido?]`
 
 ### Histórico de Mudanças Significativas:
-- **Resolução de Persistência de Sessão (Linux):** Criado o script `utils/fix_chrome_sessions.sh` para forçar o Google Chrome a usar o `password-store=basic`, resolvendo o problem de login recorrente causado por falhas na integração com o GNOME Keyring no Zorin OS.
+- **Sintoma:** `TypeError: 'NoneType' object is not subscriptable` / `a coroutine was expected, got <Future>` em background tasks | **Causa:** Uso de `asyncio.create_task` em objetos `Future` retornados por `loop.run_in_executor` | **Solução:** Migrado para `asyncio.ensure_future()` em `agents/semantic_memory_weaver.py` para compatibilidade com Futures.
+- **Implementação do SemanticMemoryWeaver:** Agente de memória de longo prazo com Knowledge Graph local e busca híbrida (semântica/estrutural).
 - **Sintoma:** WatchdogAgent bloqueava modelo "opencode" do próprio Orchestrator | **Causa:** `_is_model_free()` usava blocklist-first; desconhecidos passavam, mas "opencode" não estava em nenhuma lista | **Solução:** Migrado para allowlist-first em `agents/watchdog.py`. "opencode" adicionado explicitamente à `_ALLOWED_MODEL_PATTERNS`.
 - **Sintoma:** Alertas de CPU disparando em loop a cada 60s sem parar | **Causa:** Ausência de deduplicação + CPU fallback com fator de cores fixo em 4 | **Solução:** `_fire_alert()` com `ALERT_COOLDOWN=300s` + fallback corrigido para `os.cpu_count()` em `agents/watchdog.py`.
 - **Implementação do Moon Watchdog:** Criado o agente de monitoramento e proteção sistêmica para garantir o cumprimento da Diretriz de Custo Zero e a integridade dos recursos do SO.
@@ -125,6 +126,7 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 | `agents/economic_sentinel.py` | Economic Sentinel: Inteligência financeira, monitoramento de mercados e relatórios. | ✅ Operante |
 | `agents/skill_alchemist.py` | Skill Alchemist: Descoberta, teste e síntese autônoma de novas habilidades Open Source. | ✅ Operante |
 | `agents/nexus_intelligence.py` | Nexus Intelligence: Mente de convergência, detecção de padrões cross-domain e briefings. | ✅ Operante |
+| `agents/semantic_memory_weaver.py` | Semantic Weaver: Memória de longo prazo via Knowledge Graph e busca semântica. | ✅ Operante |
 
 ---
 
@@ -276,6 +278,14 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
     - **Capacidades**: Agregação de fluxo de eventos (24h sliding window), `CrossDomainPatternEngine` para correlações entre domínios, `UserIntentModeler` (Bayesian), `CascadePredictor` (previsão de falhas) e `BriefingGenerator` (síntese via Groq).
     - **Tecnologias**: Python stdlib (statistics/collections), Groq Cloud (`llama-3.3-70b`) para briefings, MessageBus (wildcard subscription).
     - **Persistência**: Local em `data/nexus/` (JSON).
+- **Data:** Março 2026.
+
+### 📂 Assunto: [Memória Digital & Knowledge Graph]
+- **Tópico:** SemanticMemoryWeaver (O Tecelão de Memórias)
+- **Resumo da Implementação:** Criado o agente de memória de longa duração do ecossistema.
+    - **Tecnologias**: `sentence-transformers` (Local Embeddings), `scikit-learn` (Fallback), Knowledge Graph via JSON (Nós e Arestas).
+    - **Capacidades**: Hybrid Search (Texto + Grafos), Causal Tracing (`why`), Consolidação Automática de Insights, Auto-linking semântico.
+    - **Privacidade**: Processamento 100% local para embeddings; LLM (Groq) opcional apenas para metadados e resumos.
 - **Data:** Março 2026.
 
 ---

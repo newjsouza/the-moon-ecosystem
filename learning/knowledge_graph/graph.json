@@ -1,1 +1,92 @@
-{"nodes":[],"edges":[]}
+{
+  "nodes": [
+    {
+      "id": "20ce9112-7f03-4c2a-9091-eab4106cef06",
+      "type": "event",
+      "domain": "system",
+      "content": "Teste de integração do Weaver.",
+      "metadata": {},
+      "tags": [],
+      "timestamp": 1773619112.3670046,
+      "confidence": 1.0,
+      "source": "manual",
+      "embedding": null
+    },
+    {
+      "id": "79c0e709-e20a-45b7-8964-ba1b19fd525b",
+      "type": "event",
+      "domain": "system",
+      "content": "Teste de integração do Weaver.",
+      "metadata": {},
+      "tags": [],
+      "timestamp": 1773619195.1822433,
+      "confidence": 1.0,
+      "source": "manual",
+      "embedding": null
+    },
+    {
+      "id": "1156c014-d20b-4d12-b388-3d61d1d263ba",
+      "type": "event",
+      "domain": "system",
+      "content": "Teste de integração do Weaver.",
+      "metadata": {},
+      "tags": [],
+      "timestamp": 1773619218.400417,
+      "confidence": 1.0,
+      "source": "manual",
+      "embedding": null
+    },
+    {
+      "id": "7f434e7d-929f-426b-922a-2c751ef0fc6c",
+      "type": "concept",
+      "domain": "system",
+      "content": "Dependência: Knowledge Graph.",
+      "metadata": {},
+      "tags": [],
+      "timestamp": 1773619218.4580953,
+      "confidence": 1.0,
+      "source": "manual",
+      "embedding": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "79c0e709-e20a-45b7-8964-ba1b19fd525b",
+      "target": "20ce9112-7f03-4c2a-9091-eab4106cef06",
+      "relation": "related_to",
+      "weight": 1.0,
+      "metadata": {
+        "auto_linked": true
+      },
+      "timestamp": 1773619195.277459
+    },
+    {
+      "source": "1156c014-d20b-4d12-b388-3d61d1d263ba",
+      "target": "20ce9112-7f03-4c2a-9091-eab4106cef06",
+      "relation": "related_to",
+      "weight": 1.0,
+      "metadata": {
+        "auto_linked": true
+      },
+      "timestamp": 1773619218.457104
+    },
+    {
+      "source": "1156c014-d20b-4d12-b388-3d61d1d263ba",
+      "target": "79c0e709-e20a-45b7-8964-ba1b19fd525b",
+      "relation": "related_to",
+      "weight": 1.0,
+      "metadata": {
+        "auto_linked": true
+      },
+      "timestamp": 1773619218.457247
+    },
+    {
+      "source": "1156c014-d20b-4d12-b388-3d61d1d263ba",
+      "target": "7f434e7d-929f-426b-922a-2c751ef0fc6c",
+      "relation": "supports",
+      "weight": 1.0,
+      "metadata": {},
+      "timestamp": 1773619218.572017
+    }
+  ]
+}

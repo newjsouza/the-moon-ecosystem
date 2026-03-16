@@ -55,7 +55,10 @@ from telegram.ext import (
     ContextTypes,
 )
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("moon.bot")
+logging.getLogger("telegram").setLevel(logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # ─────────────────────────────────────────────────────────────
 #  Paths & constants
