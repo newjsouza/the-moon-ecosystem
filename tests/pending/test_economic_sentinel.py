@@ -171,15 +171,21 @@ async def test_alpha_vantage_data_success(mock_alpha_vantage_timeseries):
 @pytest.mark.unit
 @pytest.mark.economic_sentinel
 @pytest.mark.asyncio
-async def test_alpha_vantage_data_error():
+@patch('agents.economic_sentinel.TimeSeries')
+async def test_alpha_vantage_data_error(mock_ts):
     """Testa tratamento de erro na Alpha Vantage."""
-    with patch('alpha_vantage.timeseries.TimeSeries') as mock_ts:
-        mock_ts.side_effect = Exception("API Limit")
-        
-        engine = FinancialEngine(api_key="test_key")
-        data = await engine.get_alpha_vantage_data("AAPL")
-        
-        assert data.empty
+    import pandas as pd
+
+    # Configure the mock to raise an exception when get_daily is called
+    mock_instance = mock_ts.return_value
+    mock_instance.get_daily.side_effect = Exception("API Limit")
+
+    engine = FinancialEngine(api_key="test_key")
+    data = await engine.get_alpha_vantage_data("AAPL")
+
+    # Should return empty DataFrame on error
+    assert isinstance(data, pd.DataFrame)
+    assert data.empty
 
 
 # ─────────────────────────────────────────────────────────────

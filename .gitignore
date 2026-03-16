@@ -30,6 +30,11 @@ learning/workspaces/alchemist/quarantine/
 learning/workspaces/alchemist/discoveries/
 learning/knowledge_graph/embeddings.npz
 learning/research_vault/
+learning/workspaces_test/
+
+# ── Harnesses gerados automaticamente ─────────
+skills/cli_harnesses/generated/cli_abc123xyz_*.py
+skills/cli_harnesses/generated/cli_jq_*.py
 
 # ── Binários e arquivos grandes ───────────────
 *.tar.xz
