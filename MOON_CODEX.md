@@ -106,13 +106,14 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 
 | Módulo Principal | Responsabilidade / Automação | Status |
 | :--- | :--- | :--- |
-| `news_monitor.py` | Monitoramento contínuo e triagem de fluxos de notícias e tendências. | 🟡 Em desenvolvimento |
+| `architect.py` | Orquestração central: classificação LLM/regex, delegação de tarefas, health check de agentes. | ✅ Operante |
+| `news_monitor.py` | Monitoramento contínuo: RSS feeds + NewsData.io API, deduplicação SHA256, score de relevância. | ✅ Operante |
+| `crawler.py` | Motor de raspagem web: Playwright + aiohttp, rate limiting, UA rotation, extração estruturada. | ✅ Operante |
+| `llm.py` | LLMRouter: Fallback multi-provider (Groq → Gemini → OpenRouter → Degradado). | ✅ Operante |
 | `api_discovery.py` | Descoberta, listagem e conexão autônomas de novos serviços/APIs. | 🟡 Em desenvolvimento |
 | `agents/sports/` | Módulo de análise esportiva (APEX/Kelly) com Telegram Bot. | ✅ Operante |
-| `crawler.py` | Motor de raspagem programada para extração de conhecimento da web. | 🟡 Em desenvolvimento |
 | `skills/` | Camada de habilidades modulares e padronizadas (Sports, Voice, etc). | ✅ Operante |
 | `core/verification/` | Code Quality Guard: Grafo de verificação de código (LangGraph logic). | ✅ Operante |
-| `architect.py` | Orquestração central e decisões sistêmicas do fluxo do The Moon. | 🟡 Em desenvolvimento |
 | `metrics.py` | Extração de telemetria e análise de integridade dos processos. | 🟡 Em desenvolvimento |
 | `agents/opencode.py` | Integração com modelos locais via OpenCode (MiniMax, Nemotron). | ✅ Operante |
 | `learning/research_vault/` | Local storage ("Virtual Computer") for autonomous research data. | ✅ Operante |
@@ -142,7 +143,10 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
 | Telegram Bot | `TELEGRAM_BOT_TOKEN` | Envio de mensagens via Bot | Perpétuo | ✅ Configurado |
 | Twitter API | `TWITTER_API_KEY` | Automação de Tweets/Threads | Perpétuo | ✅ Configurado |
 | LinkedIn API | `LINKEDIN_ACCESS_TOKEN`| Posts profissionais | 60 dias | ✅ Configurado |
-| Groq Cloud | `GROQ_API_KEY` | LLM para adaptação de conteúdo | Perpétuo | ✅ Configurado |
+| Groq Cloud | `GROQ_API_KEY` | LLM primário (llama-3.3-70b, llama-3.1-8b, gemma2) | Perpétuo | ✅ Configurado |
+| Google Gemini API | `GEMINI_API_KEY` | Fallback LLM (gemini-2.0-flash) | Perpétuo | ⚠️ Configurar (opcional) |
+| OpenRouter | `OPENROUTER_API_KEY` | Fallback LLM terciário (modelos open-source) | Perpétuo | ⚠️ Configurar (opcional) |
+| NewsData.io | `NEWSDATA_API_KEY` | NewsMonitorAgent (API de notícias) | Perpétuo | ⚠️ Configurar (opcional) |
 | (Novo Serviço) | | | | |
 
 ---
@@ -287,6 +291,19 @@ Sempre que um erro complexo for suprimido, o agente ou o criador deve adicionar 
     - **Capacidades**: Hybrid Search (Texto + Grafos), Causal Tracing (`why`), Consolidação Automática de Insights, Auto-linking semântico.
     - **Privacidade**: Processamento 100% local para embeddings; LLM (Groq) opcional apenas para metadados e resumos.
 - **Data:** Março 2026.
+
+### 📂 Assunto: [Sessão Antigravity — Limpeza, Robustez e Completude]
+- **Tópico:** Implementação dos 5 Objetivos Prioritários (Março 2026)
+- **Resumo da Implementação:** Sessão completa de higiene, robustez e completude do ecossistema.
+    - **OBJETIVO 1 (Limpeza .bak)**: Removidos 7 arquivos .bak do git tracking + research_report.html movido para data/reports/. .gitignore atualizado.
+    - **OBJETIVO 5 (LLM Fallback)**: Implementado `LLMRouter` em `agents/llm.py` com fallback em cascata: Groq (primary) → Gemini (secondary) → OpenRouter (tertiary) → Modo Degradado (fallback determinístico). Adicionadas variáveis `GEMINI_API_KEY` e `OPENROUTER_API_KEY` ao .env.
+    - **OBJETIVO 2 (Architect)**: Implementado `ArchitectAgent` completo com: orquestração de tarefas, classificação de domínio via LLM (llama-3.1-8b) + fallback regex, health check em background (5 min), registro dinâmico de agentes, integração MessageBus (tópicos: architect.command, architect.decision, architect.health), graceful shutdown com SIGTERM/SIGINT.
+    - **OBJETIVO 3 (NewsMonitor + Crawler)**:
+        - `NewsMonitorAgent`: RSS feeds (G1, BBC, Reuters, ESPN) + NewsData.io API, deduplicação SHA256, score de relevância por keywords, persistência em data/news/, publicação em news.headline_batch.
+        - `CrawlerAgent`: Playwright + aiohttp, rate limiting (1 req/s por domínio), UA rotation (5 UAs), extração estruturada (título, corpo, autor, links, metadata), persistência em learning/research_vault/, publicação em crawler.result.
+    - **OBJETIVO 4 (CI/CD)**: GitHub Actions pipeline (.github/workflows/ci.yml) com: quality gate (Ruff lint, Bandit security, pytest com coverage ≥30%), import sanity check, format check, MOON_CODEX compliance check (bloqueia modelos pagos e print() em produção).
+    - **Testes Criados**: test_llm_router.py (5 testes), test_architect.py (9 testes), test_news_monitor.py (8 testes), test_crawler.py (9 testes). Total: 31 testes passando.
+- **Data:** 15 Março 2026.
 
 ---
 
