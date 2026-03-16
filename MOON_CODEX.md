@@ -769,6 +769,81 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 
 - **Data:** 16 Março 2026.
 
+### 📂 Assunto: [Sessão Tripla P10 + P7 — AIJail Bridge + Apex Dashboard API]
+- **Tópico:** Integração do AIJail ao MoonQAAgent via bridge + API de dados vivos para o Apex Dashboard
+- **Resumo da Implementação:** Duas missões críticas completadas: (1) P10 — AIJail bridge criado e integrado ao MoonQAAgent para execução sandboxed de comandos bash; (2) P7 — Apex Dashboard API criada com endpoint /api/data servindo dados vivos dos agentes (ecosystem status, sports markets, news headlines, blog exports). P1+P5 (instalação de harnesses) deferida para próxima sessão (requer sudo).
+    - **P10 — AIJail Bridge**:
+        - **core/ai_jail_bridge.py**: NOVO — bridge entre AIJail e agentes Moon
+          - `JAIL_AVAILABLE`: True (ai-jail importável)
+          - API: `get_jail()`, `run_python_safe()`, `run_bash_safe()`
+          - Fallback: execução direta sem sandbox se indisponível
+          - Testes: 9 passando + 1 skip
+        - **agents/moon_qa_agent.py**: integrado `run_bash_safe()` no `_get_affected_files()`
+          - Substituído `subprocess.run()` por `run_bash_safe()`
+          - Evento MessageBus: `qa.git_diff` com auditoria sandbox
+          - Payload: command, success, sandbox_active, blocked_ops, files_count
+        - **Resultado**: MoonQAAgent agora executa comandos git em sandbox seguro
+
+    - **P7 — Apex Dashboard API**:
+        - **apex_dashboard/api.py**: NOVO — API stdlib http.server (zero deps externas)
+          - `GET /api/data`: ecosystem status, sports markets, news headlines, blog exports
+          - `GET /health`: health check endpoint
+          - CORS habilitado para desenvolvimento local
+          - Porta padrão: 8080
+          - Dados agregados:
+            - `ecosystem`: status, agents_active, tests count, last_sync
+            - `sports`: markets (football, basketball, tennis), logos_available
+            - `news`: headlines de hoje (data/news/headlines_YYYY-MM-DD.json)
+            - `blog`: recent_posts com PDFs de data/blog_exports/
+        - **apex_dashboard/__init__.py**: criado
+        - **tests/test_apex_dashboard_api.py**: 9 testes passando
+          - Estrutura payload, ecosystem status, sports markets
+          - Load news, blog exports, timestamp válido
+        - **Integração Frontend**: index.html pode consumir via fetch():
+          ```javascript
+          const API_URL = 'http://localhost:8080/api/data';
+          async function loadMoonData() {
+              const res = await fetch(API_URL);
+              const data = await res.json();
+              // data.ecosystem, data.sports, data.news, data.blog
+          }
+          setInterval(loadMoonData, 30000); // Refresh 30s
+          ```
+
+    - **P1+P5 — Harnesses (DEFERIDO)**:
+        - **Status**: Requer instalação via sudo apt-get
+        - **Ferramentas ausentes**: ffmpeg, pandoc, gimp, inkscape, obs-studio
+        - **Próxima sessão**: Instalar e gerar harnesses via MoonCLIAgent
+
+    - **Suite Final**:
+        - Total: **318 testes passando, 14 skipados, 0 falhas**
+        - P10: +9 testes (ai_jail_bridge)
+        - P7: +9 testes (apex_dashboard_api)
+        - Taxa de sucesso: 100%
+
+    - **GitHub Sync**:
+        - Commits: `62798ed` (P10), `f841396` (P7)
+        - Status: Dirty: False (apenas dados gerados em diretórios gitignored)
+        - Remote: https://github.com/newjsouza/the-moon-ecosystem.git (atualizado)
+
+    - **Arquivos Criados/Alterados**:
+        - `core/ai_jail_bridge.py` (novo: 114 linhas)
+        - `agents/moon_qa_agent.py` (modificado: integração run_bash_safe)
+        - `tests/test_ai_jail_bridge.py` (novo: 9 testes)
+        - `apex_dashboard/api.py` (novo: 120 linhas)
+        - `apex_dashboard/__init__.py` (novo)
+        - `tests/test_apex_dashboard_api.py` (novo: 9 testes)
+        - `MOON_CODEX.md` (atualizado: documentação P10 + P7)
+
+    - **Pendências Atualizadas**:
+        - P1:  ⏳ DEFERIDO — OBS Studio (requer sudo apt install obs-studio)
+        - P5:  ⏳ DEFERIDO — Harnesses ffmpeg, pandoc, gimp, inkscape (requer sudo)
+        - P7:  ✅ RESOLVIDO — /api/data endpoint + dados vivos
+        - P8:  ✅ RESOLVIDO — Harnesses cli_abc123xyz gitignored
+        - P10: ✅ RESOLVIDO — AIJail bridge + MoonQAAgent sandboxed
+
+- **Data:** 16 Março 2026.
+
 ---
 
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
