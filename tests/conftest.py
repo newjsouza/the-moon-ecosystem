@@ -69,7 +69,16 @@ def mock_message_bus():
 
 @pytest.fixture
 def env_cleanup():
-    """Fixture to cleanup environment variables after test."""
+    """
+    Fixture to cleanup environment variables after test.
+
+    Also clears LLM-related env vars before test to ensure isolation
+    from .env file values.
+    """
+    # Clear LLM-related env vars BEFORE test
+    for key in ["GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"]:
+        os.environ[key] = ""
+
     original_env = os.environ.copy()
     yield
     os.environ.clear()

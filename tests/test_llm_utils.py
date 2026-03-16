@@ -22,15 +22,14 @@ from io import StringIO
 @pytest.mark.llm_router
 def test_validate_llm_env_no_keys(env_cleanup):
     """Testa validação sem nenhuma API key configurada."""
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None  # Reset singleton
+
     from agents.llm import validate_llm_env
-    
-    # Remove todas as keys
-    os.environ["GROQ_API_KEY"] = ""
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
-    
+
     status = validate_llm_env()
-    
+
     assert status["configured"]["groq"] is False
     assert status["configured"]["gemini"] is False
     assert status["configured"]["openrouter"] is False
@@ -87,14 +86,16 @@ def test_validate_llm_env_all_providers(env_cleanup):
 @pytest.mark.llm_router
 def test_validate_llm_env_invalid_key(env_cleanup):
     """Testa validação com chave inválida (placeholder)."""
-    from agents.llm import validate_llm_env
-    
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
+
     os.environ["GROQ_API_KEY"] = "COLE_O_SEU_TOKEN_AQUI"
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
-    
+
+    from agents.llm import validate_llm_env
+
     status = validate_llm_env()
-    
+
     assert status["configured"]["groq"] is False
     assert status["fully_configured"] is False
 
@@ -103,16 +104,16 @@ def test_validate_llm_env_invalid_key(env_cleanup):
 @pytest.mark.llm_router
 def test_validate_llm_env_recommendations(env_cleanup):
     """Testa que recomendações são geradas corretamente."""
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
+
     from agents.llm import validate_llm_env
-    
-    os.environ["GROQ_API_KEY"] = ""
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
-    
+
     status = validate_llm_env()
-    
+
     recommendations = status["recommendations"]
-    
+
     # Deve ter recomendação para Groq
     assert any("GROQ_API_KEY" in rec for rec in recommendations)
     # Deve ter recomendação para Gemini
@@ -129,14 +130,14 @@ def test_validate_llm_env_recommendations(env_cleanup):
 @pytest.mark.llm_router
 def test_get_available_llm_providers_none(env_cleanup):
     """Testa obtenção de providers sem nenhum configurado."""
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
+
     from agents.llm import get_available_llm_providers
-    
-    os.environ["GROQ_API_KEY"] = ""
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
-    
+
     providers = get_available_llm_providers()
-    
+
     assert providers == []
 
 
@@ -160,15 +161,19 @@ def test_get_available_llm_providers_all(env_cleanup):
 @pytest.mark.llm_router
 def test_get_available_llm_providers_order(env_cleanup):
     """Testa que ordem de providers segue hierarquia de fallback."""
-    from agents.llm import get_available_llm_providers
-    
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
+
     # Configura apenas Gemini e OpenRouter (sem Groq)
     os.environ["GROQ_API_KEY"] = ""
     os.environ["GEMINI_API_KEY"] = "test_gemini_key"
     os.environ["OPENROUTER_API_KEY"] = "test_openrouter_key"
-    
+
+    from agents.llm import get_available_llm_providers
+
     providers = get_available_llm_providers()
-    
+
     # Gemini deve vir antes de OpenRouter
     assert providers == ["Gemini", "OpenRouter"]
 
@@ -204,17 +209,17 @@ def test_print_llm_status_output(env_cleanup, capsys):
 @pytest.mark.llm_router
 def test_print_llm_status_no_providers(env_cleanup, capsys):
     """Testa output quando nenhum provider está configurado."""
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
+
     from agents.llm import print_llm_status
-    
-    os.environ["GROQ_API_KEY"] = ""
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
-    
+
     print_llm_status()
-    
+
     captured = capsys.readouterr()
     output = captured.out
-    
+
     # Deve mencionar modo degradado
     assert "degradado" in output.lower() or "Nenhum" in output
 

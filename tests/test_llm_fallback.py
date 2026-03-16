@@ -79,9 +79,9 @@ async def test_fallback_groq_rate_limit_to_degraded(env_cleanup):
 @pytest.mark.asyncio
 async def test_degraded_mode_no_providers(env_cleanup):
     """Testa modo degradado quando nenhum provider está configurado."""
-    os.environ["GROQ_API_KEY"] = ""
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
 
     router = LLMRouter()
     result = await router.complete("Olá, preciso de ajuda")

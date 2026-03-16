@@ -108,14 +108,14 @@ def test_validate_environment_with_groq(mock_env):
 @pytest.mark.unit
 def test_validate_environment_no_providers(env_cleanup):
     """Testa validação sem nenhum provider."""
+    # Força reload do Config singleton
+    from core.config import Config
+    Config._instance = None
+
     from main import validate_environment
-    
-    os.environ["GROQ_API_KEY"] = ""
-    os.environ["GEMINI_API_KEY"] = ""
-    os.environ["OPENROUTER_API_KEY"] = ""
-    
+
     status = validate_environment()
-    
+
     assert status["groq_available"] is False
     assert status["llm_configured"] is False
 
