@@ -2,6 +2,7 @@
 agents/blog/publisher.py
 Blog Publisher Agent - Handles mkdocs, terminal installations and deployments.
 """
+import asyncio
 import os
 import shutil
 import frontmatter
@@ -82,4 +83,50 @@ class BlogPublisherAgent(AgentBase):
             self.logger.error(f"Erro durante compilação do blog: {e}")
             return TaskResult(success=False, error=str(e))
 
+        # Hook assíncrono: exportar assets (PDF + diagramas) em background
+        asyncio.create_task(
+            self._export_post_assets_async(post_id=safe_title, content=markdown_content)
+        )
+
         return TaskResult(success=True, data={"status": "Posted", "url": f"{blog_dir}/index.html"})
+
+    async def _export_post_assets_async(
+        self,
+        post_id: str,
+        content: str,
+    ) -> None:
+        """
+        Hook assíncrono pós-publicação: gera PDF e diagramas do post.
+        Executado em background — não bloqueia nem falha a publicação.
+        Controlado por ENABLE_CLI_EXPORTS no .env.
+        """
+        if os.environ.get("ENABLE_CLI_EXPORTS", "false").lower() != "true":
+            return
+
+        try:
+            from skills.cli_harnesses.blog_cli_exporter import BlogCLIExporter, extract_mermaid_blocks
+            exporter = BlogCLIExporter()
+            caps = exporter.capabilities()
+            if not any(caps.values()):
+                self.logger.info("BlogCLIExporter: nenhuma capability disponível")
+                return
+
+            # Extrair diagramas Mermaid do conteúdo
+            diagrams = extract_mermaid_blocks(content)
+
+            result = await exporter.generate_post_assets(
+                post_id=post_id,
+                content=content,
+                diagrams=diagrams,
+                formats=["pdf"],
+            )
+
+            self.logger.info(
+                f"Blog export: post_id={post_id} "
+                f"pdf={result.get('pdf')} "
+                f"diagrams={len(result.get('diagrams', []))}"
+            )
+
+        except Exception as exc:
+            # NUNCA propagar exceção — apenas logar
+            self.logger.warning(f"_export_post_assets_async: erro não-crítico: {exc}")

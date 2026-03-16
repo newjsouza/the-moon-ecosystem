@@ -21,7 +21,13 @@ data/omni_channel/
 data/hardware_bridge/
 data/knowledge_graph/
 data/reports/
+data/blog_exports/
+data/cli_harness_results/
+data/reviews/
+data/plans/
+data/news/
 learning/workspaces/alchemist/quarantine/
+learning/workspaces/alchemist/discoveries/
 learning/knowledge_graph/embeddings.npz
 learning/research_vault/
 

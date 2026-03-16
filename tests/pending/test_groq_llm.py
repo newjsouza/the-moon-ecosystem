@@ -3,7 +3,15 @@ Unit tests for Groq LLM integration.
 TDD: Tests written first to define expected behavior.
 """
 import pytest
+import sys
+from pathlib import Path
 from unittest.mock import Mock, AsyncMock, patch
+
+# Add Super-Agente/groq-models to path
+root = Path(__file__).resolve().parent.parent.parent
+groq_models_path = root / "Super-Agente" / "groq-models"
+if str(groq_models_path) not in sys.path:
+    sys.path.insert(0, str(groq_models_path))
 
 
 class TestLLMInterface:

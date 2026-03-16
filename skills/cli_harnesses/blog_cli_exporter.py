@@ -368,3 +368,24 @@ class BlogCLIExporter:
             })
 
         return result
+
+
+def extract_mermaid_blocks(content: str) -> list[dict]:
+    """
+    Extrai blocos Mermaid do conteúdo markdown do post.
+    Detecta: ```mermaid ... ``` e converte para lista de dicts.
+
+    Retorna:
+        [{"name": "diagram_1", "code": "graph TD...", "format": "svg"}]
+    """
+    import re
+    pattern = r'```mermaid\s*\n(.*?)\n```'
+    matches = re.findall(pattern, content, re.DOTALL)
+    diagrams = []
+    for i, code in enumerate(matches):
+        diagrams.append({
+            "name": f"diagram_{i+1}",
+            "code": code.strip(),
+            "format": "svg",
+        })
+    return diagrams
