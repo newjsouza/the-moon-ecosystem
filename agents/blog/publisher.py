@@ -17,6 +17,7 @@ class BlogPublisherAgent(AgentBase):
         self.priority = AgentPriority.CRITICAL
         self.description = "Blog Publisher - Premium Engine V2 via Python"
         self.logger = setup_logger("BlogPublisherAgent")
+        self.bus = None  # MessageBus reference for events
 
     async def _execute(self, task: str, **kwargs) -> TaskResult:
         orchestrator = kwargs.get("orchestrator")
@@ -45,16 +46,16 @@ class BlogPublisherAgent(AgentBase):
             index_template = env.get_template("index.html")
 
             all_posts = []
-            
+
             # Lê todos os markdowns disponíveis (funcionando como um bando de dados)
             for file in os.listdir(f"{blog_dir}/posts_md"):
                 if file.endswith(".md"):
                     with open(f"{blog_dir}/posts_md/{file}", "r", encoding="utf-8") as f:
                         post = frontmatter.load(f)
-                        
+
                         # Converte corpo Markdown para HTML real
                         html_body = markdown.markdown(post.content)
-                        
+
                         # Metadados
                         slug = file.replace(".md", "")
                         post_data = {
@@ -68,7 +69,7 @@ class BlogPublisherAgent(AgentBase):
                             "slug": slug
                         }
                         all_posts.append(post_data)
-                        
+
                         # Renderiza e salva o HTML da postagem isolada
                         rendered_post = post_template.render(post=post_data)
                         with open(f"{blog_dir}/{slug}.html", "w", encoding="utf-8") as pf:
@@ -84,8 +85,14 @@ class BlogPublisherAgent(AgentBase):
             return TaskResult(success=False, error=str(e))
 
         # Hook assíncrono: exportar assets (PDF + diagramas) em background
+        # Passa referência ao bus para publicação de evento após exports
         asyncio.create_task(
-            self._export_post_assets_async(post_id=safe_title, content=markdown_content)
+            self._export_post_assets_async(
+                post_id=safe_title,
+                content=markdown_content,
+                html_path=f"{blog_dir}/{safe_title}.html",
+                md_filepath=md_filepath,
+            )
         )
 
         return TaskResult(success=True, data={"status": "Posted", "url": f"{blog_dir}/index.html"})
@@ -94,14 +101,29 @@ class BlogPublisherAgent(AgentBase):
         self,
         post_id: str,
         content: str,
+        html_path: str,
+        md_filepath: str,
     ) -> None:
         """
         Hook assíncrono pós-publicação: gera PDF e diagramas do post.
         Executado em background — não bloqueia nem falha a publicação.
         Controlado por ENABLE_CLI_EXPORTS no .env.
+        Publica evento 'blog.published' no MessageBus após exports.
         """
+        from core.message_bus import MessageBus
+
         if os.environ.get("ENABLE_CLI_EXPORTS", "false").lower() != "true":
             return
+
+        export_result = {
+            "post_id": post_id,
+            "html_path": html_path,
+            "md_path": md_filepath,
+            "pdf_path": None,
+            "images": [],
+            "has_pdf": False,
+            "has_images": False,
+        }
 
         try:
             from skills.cli_harnesses.blog_cli_exporter import BlogCLIExporter, extract_mermaid_blocks
@@ -121,6 +143,14 @@ class BlogPublisherAgent(AgentBase):
                 formats=["pdf"],
             )
 
+            # Atualizar resultado para evento
+            export_result["pdf_path"] = result.get("pdf")
+            export_result["has_pdf"] = bool(result.get("pdf"))
+
+            diagram_paths = [d.get("path") for d in result.get("diagrams", []) if d.get("path")]
+            export_result["images"] = diagram_paths
+            export_result["has_images"] = len(diagram_paths) > 0
+
             self.logger.info(
                 f"Blog export: post_id={post_id} "
                 f"pdf={result.get('pdf')} "
@@ -130,3 +160,16 @@ class BlogPublisherAgent(AgentBase):
         except Exception as exc:
             # NUNCA propagar exceção — apenas logar
             self.logger.warning(f"_export_post_assets_async: erro não-crítico: {exc}")
+
+        # Publicar evento no MessageBus (mesmo se exports falharam)
+        try:
+            # Obter MessageBus (singleton)
+            bus = self.bus if self.bus else MessageBus()
+            await bus.publish(
+                sender="blog_publisher",
+                topic="blog.published",
+                payload=export_result,
+            )
+            self.logger.info(f"Evento blog.published publicado: {post_id}")
+        except Exception as exc:
+            self.logger.warning(f"Falha ao publicar evento blog.published: {exc}")

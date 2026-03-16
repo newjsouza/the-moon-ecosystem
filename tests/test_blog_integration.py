@@ -2,6 +2,7 @@
 
 import pytest
 from pathlib import Path
+from unittest.mock import AsyncMock, patch, MagicMock
 
 SAMPLE_POST = """
 # The Moon Ecosystem: Análise 2026
@@ -77,3 +78,102 @@ class TestBlogExportHook:
         enabled = os.environ.get("ENABLE_CLI_EXPORTS", "false").lower() == "true"
         assert enabled is False
         os.environ["ENABLE_CLI_EXPORTS"] = "true"  # restaurar
+
+
+@pytest.mark.asyncio
+class TestBlogPublisherMessageBus:
+    """Testa integração do BlogPublisherAgent com MessageBus."""
+
+    async def test_publish_event_apos_export(self):
+        """Evento blog.published deve ser publicado após exports."""
+        from agents.blog.publisher import BlogPublisherAgent
+        from core.message_bus import MessageBus
+        import os
+
+        os.environ["ENABLE_CLI_EXPORTS"] = "true"
+
+        # Criar publisher e mock bus
+        publisher = BlogPublisherAgent()
+        mock_bus = AsyncMock()
+        mock_bus.publish = AsyncMock()
+        publisher.bus = mock_bus
+
+        # Chamar método de export diretamente
+        await publisher._export_post_assets_async(
+            post_id="test_event_001",
+            content=SAMPLE_POST,
+            html_path="meu_blog_autonomo/test.html",
+            md_filepath="meu_blog_autonomo/posts_md/test.md",
+        )
+
+        # Verificar que publish foi chamado
+        assert mock_bus.publish.called
+        call_args = mock_bus.publish.call_args
+        assert call_args.kwargs["sender"] == "blog_publisher"
+        assert call_args.kwargs["topic"] == "blog.published"
+        payload = call_args.kwargs["payload"]
+        assert payload["post_id"] == "test_event_001"
+        assert "html_path" in payload
+        assert "pdf_path" in payload
+        assert "images" in payload
+
+    async def test_publish_event_mesmo_sem_harness(self):
+        """Evento deve ser publicado mesmo se harness indisponível."""
+        from agents.blog.publisher import BlogPublisherAgent
+        from core.message_bus import MessageBus
+        import os
+
+        os.environ["ENABLE_CLI_EXPORTS"] = "true"
+
+        publisher = BlogPublisherAgent()
+        mock_bus = AsyncMock()
+        mock_bus.publish = AsyncMock()
+        publisher.bus = mock_bus
+
+        # Mock do exporter para simular indisponibilidade (patch no import interno)
+        with patch("skills.cli_harnesses.blog_cli_exporter.BlogCLIExporter") as MockExporter:
+            instance = MockExporter.return_value
+            instance.capabilities.return_value = {
+                "pdf_export": False,
+                "mermaid_svg": False,
+            }
+
+            await publisher._export_post_assets_async(
+                post_id="test_no_harness",
+                content="# Post sem harness",
+                html_path="test.html",
+                md_filepath="test.md",
+            )
+
+        # Quando não há capabilities, retorna cedo sem publicar evento
+        assert not mock_bus.publish.called
+
+    async def test_publish_event_com_excecao(self):
+        """Evento é publicado mesmo com exceção (reporta falha)."""
+        from agents.blog.publisher import BlogPublisherAgent
+        import os
+
+        os.environ["ENABLE_CLI_EXPORTS"] = "true"
+
+        publisher = BlogPublisherAgent()
+        mock_bus = AsyncMock()
+        mock_bus.publish = AsyncMock()
+        publisher.bus = mock_bus
+
+        # Mock que lança exceção (patch no import interno)
+        with patch("skills.cli_harnesses.blog_cli_exporter.BlogCLIExporter") as MockExporter:
+            MockExporter.side_effect = Exception("Crash!")
+
+            # Não deve propagar exceção
+            await publisher._export_post_assets_async(
+                post_id="test_crash",
+                content="# Post",
+                html_path="test.html",
+                md_filepath="test.md",
+            )
+
+        # Evento é publicado mesmo com exceção (design: reporta falha)
+        assert mock_bus.publish.called
+        payload = mock_bus.publish.call_args.kwargs["payload"]
+        assert payload["post_id"] == "test_crash"
+        assert payload["has_pdf"] is False  # Falhou, sem PDF

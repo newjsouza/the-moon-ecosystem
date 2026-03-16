@@ -633,6 +633,66 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 
 - **Data:** 16 Março 2026.
 
+### 📂 Assunto: [Sessão P4 — BlogCLIExporter Integrado ao Blog Publisher com MessageBus]
+- **Tópico:** Integração do fluxo de publicação de blog com exports automáticos (PDF + Mermaid SVG) e evento `blog.published` no MessageBus
+- **Resumo da Implementação:** O BlogCLIExporter já estava integrado ao BlogPublisherAgent via `_export_post_assets_async()`. Esta sessão adicionou a publicação do evento `blog.published` no MessageBus após os exports completarem, permitindo que outros agentes (BlogManager, OmniChannelStrategist, etc.) reajam à publicação de novos posts.
+    - **Estado Pré-Implementação**:
+        - BlogPublisherAgent já chamava BlogCLIExporter em background
+        - Controlado por `ENABLE_CLI_EXPORTS=true` no .env
+        - PDFs e diagramas Mermaid já eram gerados em `data/blog_exports/`
+        - **Faltava:** Evento no MessageBus para notificar outros agentes
+
+    - **Implementação P4**:
+        - **agents/blog/publisher.py**:
+          - Adicionado `self.bus = None` para referência ao MessageBus
+          - Modificado `_export_post_assets_async()` para aceitar `html_path` e `md_filepath`
+          - Adicionado publish do evento `blog.published` após exports completarem
+          - Payload do evento: `{post_id, html_path, md_path, pdf_path, images[], has_pdf, has_images}`
+          - Falha silenciosa: exceções não propagam, apenas logadas
+        - **tests/test_blog_integration.py**:
+          - Adicionados 3 novos testes em `TestBlogPublisherMessageBus`:
+            - `test_publish_event_apos_export`: Verifica evento publicado com dados corretos
+            - `test_publish_event_mesmo_sem_harness`: Verifica que sem harness não publica (early return)
+            - `test_publish_event_com_excecao`: Verifica que evento é publicado mesmo com exceção (reporta falha)
+
+    - **Arquitetura P4 (Fluxo Completo)**:
+      ```
+      BlogManagerAgent
+        └→ BlogWriterAgent (gera markdown)
+        └→ BlogPublisherAgent (HTML Jinja2 + exports)
+             └→ _export_post_assets_async() (background task)
+                  └→ BlogCLIExporter.generate_post_assets()
+                       └→ post_to_pdf() → data/blog_exports/<slug>.pdf
+                       └→ mermaid_to_image() → data/blog_exports/<slug>_diagram_N.svg
+                  └→ MessageBus.publish("blog.published", payload)
+                       └→ BlogManager, OmniChannelStrategist, etc. podem subscribe
+      ```
+
+    - **Princípios Mantidos**:
+        - BlogCLIExporter: ZERO DEPS do blog agent (imutável, importado internamente)
+        - Integração unidirecional: publisher → exporter
+        - Falha silenciosa: PDF/SVG indisponível não bloqueia publicação HTML
+        - MessageBus: evento `blog.published` emitido após cada publish (sucesso ou falha)
+        - Background task: exports não bloqueiam resposta ao usuário
+
+    - **Testes**:
+        - Total: **300 testes passando, 13 skipados, 0 falhas**
+        - Novos testes P4: 3 em `TestBlogPublisherMessageBus`
+        - Testes blog: 15/15 passando (8 integration + 7 cli_exporter)
+        - Taxa de sucesso: 100%
+
+    - **Smoke Test**:
+        - PDF gerado: `data/blog_exports/p4_smoke_test_*.pdf` ✅
+        - SVG gerado: `data/blog_exports/p4_smoke_test_diagram_1.svg` ✅
+        - Evento capturado: `blog.published` com payload correto ✅
+
+    - **Arquivos Criados/Alterados**:
+        - `agents/blog/publisher.py` (modificado: MessageBus event + params)
+        - `tests/test_blog_integration.py` (adicionados: 3 testes MessageBus)
+        - `MOON_CODEX.md` (atualizado: documentação P4)
+
+- **Data:** 16 Março 2026.
+
 ---
 
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
