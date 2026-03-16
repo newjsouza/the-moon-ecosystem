@@ -693,6 +693,82 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 
 - **Data:** 16 Março 2026.
 
+### 📂 Assunto: [Sessão P6 — Correção Regressão + Sync GitHub + Reconhecimento Super-Agente/ e ai-jail/]
+- **Tópico:** Correção de regressão detectada, sincronização completa com GitHub, e reconhecimento dos diretórios Super-Agente/ e ai-jail/
+- **Resumo da Implementação:** Uma falha de teste foi detectada (`test_alpha_vantage_data_error`) — causada por mock incorreto. Após correção, suite completa: 300 testes passando, 13 skip, 0 falhas. Repositório GitHub sincronizado com .gitignore atualizado para dados gerados. Super-Agente/ e ai-jail/ mapeados e documentados.
+    - **Regressão Corrigida**:
+        - **Teste**: `tests/pending/test_economic_sentinel.py::test_alpha_vantage_data_error`
+        - **Causa**: Mock estava patchando `alpha_vantage.timeseries.TimeSeries` em vez de `agents.economic_sentinel.TimeSeries`
+        - **Correção**: Alterado para `@patch('agents.economic_sentinel.TimeSeries')` com mock do método `get_daily`
+        - **Validação**: Teste passando, suite completa: 300 pass, 13 skip, 0 fail
+
+    - **Sincronização GitHub**:
+        - Arquivos dirty ao início: 27 (dados gerados + harnesses)
+        - .gitignore atualizado:
+          - `learning/workspaces_test/` (dados de teste)
+          - `skills/cli_harnesses/generated/cli_abc123xyz_*.py` (harnesses sem identificação real)
+          - `skills/cli_harnesses/generated/cli_jq_*.py` (harnesses sem identificação real)
+        - Commit: `3d8b83a`
+        - Status pós-sync: **Dirty: False** (working tree clean)
+        - Remote: https://github.com/newjsouza/the-moon-ecosystem.git (atualizado)
+
+    - **Super-Agente/ — Mapeamento**:
+        - **Localização**: `Super-Agente/antigravity-kit/`
+        - **Intenção**: Kit de agentes especializados para desenvolvimento (inspirado no Antigravity)
+        - **Conteúdo principal**:
+          - 20 agentes em markdown (backend-specialist, code-archaeologist, devops-engineer, etc.)
+          - Scripts Python: `auto_preview.py`, `checklist.py`, `session_manager.py`, `verify_all.py`
+          - Configuração MCP: `mcp_config.json`
+          - Regras: `GEMINI.md`
+          - Dados UI/UX: CSVs com charts, colors, icons, stacks
+        - **Documentação**: `Super-Agente/docs/SUPER-AGENTE-DOCUMENTACAO.md`
+        - **Skills**: anthropics-skills, napkin, interface-design
+        - **MCP Servers**: playwright-mcp, filesystem-mcp
+        - **Sobreposição com core**: Nenhuma direta — são definições em markdown, não implementação Python
+        - **Estado**: Documentação/Configuração de agentes conceituais
+        - **Decisão**: Manter como referência conceitual. Implementação real já existe em `agents/`
+        - **Próxima ação**: Nenhuma — documentado e aguardando roadmap
+
+    - **ai-jail/ — Mapeamento**:
+        - **Localização**: `ai-jail/`
+        - **Intenção**: Sandbox para execução segura de código gerado por IA
+        - **Conteúdo principal**:
+          - `ai_jail.py`: Implementação completa com AIJail class, JailConfig, ExecutionResult
+          - `README.md`: Documentação de uso e API
+        - **Funcionalidades**:
+          - Execução isolada de Python e Bash
+          - Timeout configurável (default: 30s)
+          - Blocklist de comandos perigosos (rm -rf /, dd if=, mkfs, etc.)
+          - Allowlist de diretórios
+          - Controle de rede (default: desativado)
+          - Logging de auditoria
+        - **Referências no codebase**:
+          - CLAUDE.md: Documenta como "Sandbox para agentes de IA"
+          - MOON_CODEX.md: Menciona sandbox no SkillAlchemist
+        - **Risco de segurança**: Nenhum identificado — código bem estruturado, sem backdoors
+        - **Dependências do core/agents**: Nenhuma — módulo standalone
+        - **Estado**: Implementado mas não integrado
+        - **Decisão**: Integrar ao `MoonQAAgent` ou `OpenCodeAgent` para execução segura de código
+        - **Próxima ação**: Criar P10 — Integrar ai-jail ao fluxo de code execution
+
+    - **Matriz de Decisão**:
+        | Diretório      | Estado Real                          | Ação Recomendada                    |
+        |----------------|--------------------------------------|-------------------------------------|
+        | Super-Agente/  | Documentação de agentes conceituais  | Manter como referência              |
+        | ai-jail/       | Sandbox implementado, não integrado  | Integrar ao MoonQAAgent (P10)       |
+
+    - **Testes**:
+        - Total: **300 testes passando, 13 skipados, 0 falhas**
+        - Regressão corrigida: 1/1
+        - Taxa de sucesso: 100%
+
+    - **Arquivos Criados/Alterados**:
+        - `tests/pending/test_economic_sentinel.py` (fix: mock correto)
+        - `.gitignore` (add: workspaces_test, harnesses gerados)
+        - `MOON_CODEX.md` (atualizado: documentação P6)
+
+- **Data:** 16 Março 2026.
+
 ---
 
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
