@@ -129,7 +129,7 @@ async def test_execute_fetch_mode():
 @pytest.mark.asyncio
 async def test_execute_fetch_js_heavy_delegates():
     agent = WebMCPAgent()
-    with patch.object(agent, "_delegate_to_browser_pilot", new_callable=AsyncMock) as mock_del:
+    with patch.object(agent, "_delegate_browser", new_callable=AsyncMock) as mock_del:
         mock_del.return_value = {"mode": "deep_via_browser_pilot", "url": "https://twitter.com/x"}
         result = await agent._execute("fetch:https://twitter.com/x")
     assert result.success is True

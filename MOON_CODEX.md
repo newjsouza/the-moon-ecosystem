@@ -1243,4 +1243,103 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 
 ---
 
+## WebMCP Sports Layer — Dados Esportivos com WebMCPAgent (2026-03-17)
+
+### Arquivos criados
+
+| Arquivo | Linhas | Descrição |
+|---|---|---|
+| `skills/webmcp/sports/schemas.py` | ~95 | MatchInfo, Lineup, LineupPlayer, NewsArticle, SportsQueryResult |
+| `skills/webmcp/sports/base_provider.py` | ~85 | WebProviderBase — base extensível para scrapers |
+| `skills/webmcp/sports/sofascore.py` | ~130 | API JSON pública do SofaScore (endpoints oficiais) |
+| `skills/webmcp/sports/flashscore.py` | ~85 | HTML scraping Flashscore BR (backup, ao vivo) |
+| `skills/webmcp/sports/news.py` | ~110 | Multi-portal: GloboEsporte, UOL, ESPN, Lance!, Goal |
+| `skills/webmcp/sports/lineup_detector.py` | ~95 | Cascata multi-fonte para escalações |
+| `skills/webmcp/sports/__init__.py` | 0 | Pacote |
+| `skills/webmcp/router.py` | ~95 | WebDataRouter — detecção de intenção esportiva |
+| `tests/test_webmcp_sports.py` | ~185 | 22 testes unitários passando |
+
+### Modos de uso (WebMCPAgent)
+
+```python
+agent = WebMCPAgent()
+
+# Partidas de hoje (SofaScore)
+await agent._execute("sports:today")
+
+# Escalação t-50min (cascata: SofaScore → Flashscore → Notícias)
+await agent._execute("sports:lineup:Flamengo vs Palmeiras")
+
+# Partidas ao vivo (Flashscore)
+await agent._execute("sports:live")
+
+# Notícias de escalação multi-portal
+await agent._execute("sports:news:escalação brasileirão")
+
+# Busca livre (auto-detect esportivo)
+await agent._execute("escalação do Flamengo hoje")
+
+# Polling status para APEX (retorna dict booleano)
+detector = LineupDetector()
+status = await detector.poll_lineup_status("Flamengo", "Palmeiras")
+# {"home_confirmed": True, "away_confirmed": False, "source": "sofascore_api"}
+```
+
+### Decisões de design
+
+- **Custo Zero:** SofaScore API pública (JSON), sem autenticação
+- **Cascata robusta:** 1) SofaScore API → 2) Busca + API → 3) Notícias
+- **Auto-detect:** termos esportivos em português detectam routing automático
+- **Lineup window:** propriedade `lineup_window_active` (t-70min a t-10min)
+- **News priority:** artigos de escalação ordenados primeiro
+- **bs4 opcional:** Flashscore funciona sem BeautifulSoup (retorna lista vazia)
+
+### Termos esportivos detectados (auto-detect)
+
+```python
+_SPORTS_TERMS = [
+    "escalação", "jogo", "partida", "futebol", "campeonato",
+    "brasileirão", "champions", "libertadores", "copa do brasil",
+    "premier league", "la liga", "bundesliga", "serie a",
+    "vs ", " x ", "sofascore", "flashscore", "gol", "placar",
+    "resultado", "ao vivo", "live score", "titulares", "técnico",
+]
+```
+
+### Portais de notícias monitorados
+
+1. ge.globo.com (GloboEsporte)
+2. esporte.uol.com.br (UOL Esportes)
+3. espn.com.br (ESPN Brasil)
+4. lance.com.br (Lance!)
+5. goal.com/pt-br (Goal Brasil)
+6. superesportes.com.br
+7. torcedores.com
+8. terra.com.br/esportes
+9. ogol.com.br
+
+### Integração com APEX Betting Oracle
+
+- **Dados reais:** football-data.org para jogos do dia
+- **Escalações:** WebMCP Sports Layer (SofaScore + notícias)
+- **Refinamento:** análise pré-45min com escalações confirmadas
+- **Liminação conhecida:** API gratuita football-data.org não fornece escalações; WebMCP supre esta lacuna
+
+### Testes
+
+```bash
+python3 -m pytest tests/test_webmcp_sports.py -v
+# 22 testes passando em ~1.3s
+```
+
+### Dependências
+
+- `httpx` (HTTP async)
+- `beautifulsoup4` (HTML parsing, opcional para Flashscore)
+- `pytest-asyncio` (testes async)
+
+- **Data:** 17 Março 2026.
+
+---
+
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
