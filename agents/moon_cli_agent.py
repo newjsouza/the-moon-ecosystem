@@ -332,7 +332,11 @@ Gere o código completo agora:"""
 
         # Salvar código gerado
         # CORREÇÃO P8: Usar nome semântico cli-anything-{tool}.py em vez de hash
-        tool_slug = Path(target.rstrip("/")).name.lower().strip().replace(" ", "-").replace("_", "-")
+        # Extrair nome da ferramenta do target (ex: "harness for ffmpeg" → "ffmpeg")
+        target_clean = target.lower().strip()
+        if "harness for " in target_clean:
+            target_clean = target_clean.replace("harness for ", "")
+        tool_slug = Path(target_clean.rstrip("/")).name.lower().strip().replace(" ", "-").replace("_", "-")
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_dir = Path("skills/cli_harnesses/generated")
         output_dir.mkdir(parents=True, exist_ok=True)
