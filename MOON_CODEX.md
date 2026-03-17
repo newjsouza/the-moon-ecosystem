@@ -1238,6 +1238,7 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
     - `pytest-asyncio` (testes async)
   - **Integração Architect:** registrado em `DOMAIN_AGENT_MAP` com domínios `web`, `search`, `fetch`
   - **Padrões keyword:** `r"(web|http|https|site|página|url|fetch|buscar|pesquisar|search|scrap)"`
+  - **Status APIs:** GROQ_API_KEY ✅, TELEGRAM_BOT_TOKEN ✅ (variáveis de ambiente do sistema)
 - **Data:** 17 Março 2026.
 
 ---
