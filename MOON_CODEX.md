@@ -1076,6 +1076,24 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 
 - **Data:** 16 Março 2026.
 
+### 📂 Assunto: [Infraestrutura / Systemd Autostart]
+- **Tópico:** MoonBot Telegram — Serviço Systemd com Autostart
+- **Resumo da Implementação:** Configurado o `moon-telegram-bot` como serviço systemd para inicialização automática no boot do sistema.
+    - **Serviço:** `/etc/systemd/system/moon-telegram-bot.service`
+    - **Entrypoint:** `agents/telegram/bot.py` → `MoonBot().run()`
+    - **Comandos de Gestão:**
+        - Habilitar: `sudo systemctl enable moon-telegram-bot.service`
+        - Status: `sudo systemctl status moon-telegram-bot.service`
+        - Logs: `journalctl -u moon-telegram-bot.service -f`
+        - Restart: `sudo systemctl restart moon-telegram-bot.service`
+    - **Configurações:**
+        - `Restart=on-failure` | `RestartSec=5s`
+        - `After=network-online.target` (depende de rede)
+        - `WorkingDirectory=/home/johnathan/Área de trabalho/The Moon`
+        - `ExecStart=/usr/bin/python3 agents/telegram/bot.py`
+    - **Status:** ✅ Ativo e rodando (active (running))
+- **Data:** 17 Março 2026.
+
 ---
 
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*

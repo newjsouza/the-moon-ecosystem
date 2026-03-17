@@ -1,0 +1,20 @@
+[Unit]
+Description=The Moon Ecosystem — MoonBot Telegram
+Documentation=https://github.com/newjsouza/the-moon-ecosystem
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=johnathan
+WorkingDirectory=/home/johnathan/Área de trabalho/The Moon
+EnvironmentFile=/home/johnathan/Área de trabalho/The Moon/.env
+ExecStart=/usr/bin/python3 agents/telegram/bot.py
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=moon-telegram-bot
+
+[Install]
+WantedBy=multi-user.target
