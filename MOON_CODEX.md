@@ -880,23 +880,35 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
           }
           ```
 
-    - **P1+P5 — Harnesses (PERMANECE PENDENTE)**:
-        - **Status**: Requer sudo apt-get install
-        - **Ferramentas**: obs-studio, ffmpeg, pandoc, gimp, inkscape
-        - **Próxima sessão**: Instalar + gerar harnesses com nome correto
+    - **P1+P5 — Harnesses (PARCIALMENTE RESOLVIDO)**:
+        - **Status**: 4 de 5 ferramentas instaladas via sudo apt-get
+        - **Ferramentas instaladas**:
+          - ✅ ffmpeg (v6.1.1)
+          - ✅ pandoc (v3.1.3)
+          - ✅ gimp (v3.0.4)
+          - ✅ inkscape (v1.2.2)
+          - ⏳ obs-studio (instalação em andamento via PPA)
+        - **Harnesses gerados**:
+          - `skills/cli_harnesses/generated/cli-anything-ffmpeg.py` (274 linhas)
+          - `skills/cli_harnesses/generated/cli-anything-pandoc.py` (175 linhas)
+          - `skills/cli_harnesses/generated/cli-anything-gimp.py` (141 linhas)
+          - `skills/cli_harnesses/generated/cli-anything-inkscape.py` (194 linhas)
+        - **Total harnesses**: 6 (libreoffice, mermaid, ffmpeg, pandoc, gimp, inkscape)
+        - **Próxima sessão**: Reinstalar obs-studio se necessário
 
     - **Suite Final**:
         - Total: **318 testes passando, 14 skipados, 0 falhas**
         - Taxa de sucesso: 100%
 
     - **Arquivos Criados/Alterados**:
-        - `agents/moon_cli_agent.py` (modificado: linha 335-340, correção P8)
+        - `agents/moon_cli_agent.py` (modificado: linha 335-340, correção P8 + parsing "harness for")
         - `apex_dashboard/index.html` (modificado: +50 linhas, painel Moon + script fetch)
-        - `MOON_CODEX.md` (atualizado: documentação P8 + P7 Frontend)
+        - `skills/cli_harnesses/generated/` (4 novos harnesses)
+        - `MOON_CODEX.md` (atualizado: documentação P8 + P7 Frontend + P1+P5)
 
     - **Pendências Atualizadas**:
-        - P1:  ⏳ DEFERIDO — OBS Studio (sudo required)
-        - P5:  ⏳ DEFERIDO — Harnesses ffmpeg, pandoc, gimp, inkscape (sudo required)
+        - P1:  ⏳ PARCIAL — OBS Studio (PPA lento, 4/5 ferramentas OK)
+        - P5:  ✅ RESOLVIDO — ffmpeg, pandoc, gimp, inkscape + harnesses
         - P7:  ✅ RESOLVIDO — API + frontend integrados
         - P8:  ✅ RESOLVIDO — Gerador de nomes corrigido
         - P10: ✅ RESOLVIDO — AIJail bridge operacional
