@@ -331,11 +331,12 @@ Gere o código completo agora:"""
             )
 
         # Salvar código gerado
-        software_name = Path(target.rstrip("/")).name.replace(" ", "_").lower()
+        # CORREÇÃO P8: Usar nome semântico cli-anything-{tool}.py em vez de hash
+        tool_slug = Path(target.rstrip("/")).name.lower().strip().replace(" ", "-").replace("_", "-")
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_dir = Path("skills/cli_harnesses/generated")
         output_dir.mkdir(parents=True, exist_ok=True)
-        output_path = output_dir / f"cli_{software_name}_{ts}.py"
+        output_path = output_dir / f"cli-anything-{tool_slug}.py"
         output_path.write_text(generated_code, encoding="utf-8")
 
         # Publicar evento

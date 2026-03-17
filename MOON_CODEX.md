@@ -838,9 +838,68 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
     - **Pendências Atualizadas**:
         - P1:  ⏳ DEFERIDO — OBS Studio (requer sudo apt install obs-studio)
         - P5:  ⏳ DEFERIDO — Harnesses ffmpeg, pandoc, gimp, inkscape (requer sudo)
-        - P7:  ✅ RESOLVIDO — /api/data endpoint + dados vivos
+        - P7:  ✅ RESOLVIDO — /api/data endpoint + dados vivos + frontend integrado
         - P8:  ✅ RESOLVIDO — Harnesses cli_abc123xyz gitignored
         - P10: ✅ RESOLVIDO — AIJail bridge + MoonQAAgent sandboxed
+
+- **Data:** 16 Março 2026.
+
+### 📂 Assunto: [Sessão P8 + P7 Frontend — Correção Gerador Nomes + Moon Panel no Apex]
+- **Tópico:** Correção do gerador de harnesses (cli_abc123xyz → cli-anything-{tool}) + integração do Moon Ecosystem Panel no Apex Dashboard index.html
+- **Resumo da Implementação:** Duas tarefas concluídas: (1) P8 — gerador de harnesses corrigido para usar nomes semânticos `cli-anything-{tool}.py`; (2) P7 Frontend — painel Moon Ecosystem adicionado ao Apex Dashboard index.html com fetch automático da API /api/data. P1+P5 permanece pendente (requer sudo).
+    - **P8 — Correção do Gerador de Nomes**:
+        - **agents/moon_cli_agent.py** (linha 338): corrigido nome de arquivo
+          - ANTES: `f"cli_{software_name}_{ts}.py"` → hash + timestamp
+          - DEPOIS: `f"cli-anything-{tool_slug}.py"` → nome semântico
+          - `tool_slug = Path(target).name.lower().replace(" ", "-").replace("_", "-")`
+        - **Validação**:
+          - Import OK: `from agents.moon_cli_agent import MoonCLIAgent`
+          - CLI tests: 39 passando
+          - Arquivos bugados existentes: 29 (não removidos automaticamente)
+          - Novos harnesses: usarão padrão correto
+
+    - **P7 Frontend — Moon Ecosystem Panel no Apex Dashboard**:
+        - **apex_dashboard/index.html**: adicionado painel no aside
+          - Card glassmorphism consistente com tema Apex Sports
+          - IDs: `moon-status`, `moon-agents`, `moon-tests`, `moon-updated`
+          - Script fetch: `/api/data` a cada 30 segundos
+          - Exibe: status (online/offline), agents_active (5 primeiros), testes (pass/skip)
+        - **Integração**:
+          - Respeita tema dark/glassmorphism do Apex
+          - Cores: primary=#0da6f2, accent=#ccff00
+          - Material Symbols: `hub` icon
+          - Fallback: "⚠ API offline" se fetch falhar
+        - **Schema esperado da API**:
+          ```json
+          {
+            "ecosystem": {
+              "status": "online",
+              "agents_active": ["architect", "news_monitor", ...],
+              "tests": {"pass": 318, "skip": 14, "fail": 0}
+            }
+          }
+          ```
+
+    - **P1+P5 — Harnesses (PERMANECE PENDENTE)**:
+        - **Status**: Requer sudo apt-get install
+        - **Ferramentas**: obs-studio, ffmpeg, pandoc, gimp, inkscape
+        - **Próxima sessão**: Instalar + gerar harnesses com nome correto
+
+    - **Suite Final**:
+        - Total: **318 testes passando, 14 skipados, 0 falhas**
+        - Taxa de sucesso: 100%
+
+    - **Arquivos Criados/Alterados**:
+        - `agents/moon_cli_agent.py` (modificado: linha 335-340, correção P8)
+        - `apex_dashboard/index.html` (modificado: +50 linhas, painel Moon + script fetch)
+        - `MOON_CODEX.md` (atualizado: documentação P8 + P7 Frontend)
+
+    - **Pendências Atualizadas**:
+        - P1:  ⏳ DEFERIDO — OBS Studio (sudo required)
+        - P5:  ⏳ DEFERIDO — Harnesses ffmpeg, pandoc, gimp, inkscape (sudo required)
+        - P7:  ✅ RESOLVIDO — API + frontend integrados
+        - P8:  ✅ RESOLVIDO — Gerador de nomes corrigido
+        - P10: ✅ RESOLVIDO — AIJail bridge operacional
 
 - **Data:** 16 Março 2026.
 
