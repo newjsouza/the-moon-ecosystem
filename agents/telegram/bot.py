@@ -61,6 +61,22 @@ logging.getLogger("telegram").setLevel(logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # ─────────────────────────────────────────────────────────────
+#  APEX Oracle import (lazy — evita import circular)
+# ─────────────────────────────────────────────────────────────
+_apex_oracle_instance = None
+
+def _get_apex_oracle():
+    global _apex_oracle_instance
+    if _apex_oracle_instance is None:
+        try:
+            from agents.apex.oracle import ApexOracle, DailyContextStore
+            _apex_oracle_instance = ApexOracle()
+            logger.info("ApexOracle carregado com sucesso")
+        except Exception as e:
+            logger.warning(f"ApexOracle não disponível: {e}")
+    return _apex_oracle_instance
+
+# ─────────────────────────────────────────────────────────────
 #  Paths & constants
 # ─────────────────────────────────────────────────────────────
 from pathlib import Path as _P
@@ -670,6 +686,15 @@ FORMATO DE RESPOSTA:
         if extra_context:
             base += f"\n\nDADOS REAIS DO SISTEMA:\n{extra_context}"
 
+        # Injeta contexto das análises APEX do dia
+        try:
+            from agents.apex.oracle import DailyContextStore
+            apex_ctx = DailyContextStore().get_context_for_bot()
+            if apex_ctx:
+                base += f"\n\n{apex_ctx}"
+        except Exception:
+            pass
+
         return base
 
     # ════════════════════════════════════════════════════════
@@ -1049,6 +1074,13 @@ FORMATO DE RESPOSTA:
         # Post-init: start reminder loop
         async def _post_init(application) -> None:
             asyncio.create_task(self._reminder_loop(application))
+            # Inicia loop autônomo do APEX Oracle
+            apex = _get_apex_oracle()
+            if apex:
+                asyncio.create_task(apex.run_autonomous_loop())
+                logger.info("ApexOracle loop autônomo iniciado junto ao bot")
+            else:
+                logger.warning("ApexOracle não iniciado — verifique configuração")
             # Set bot commands for Telegram UI
             await application.bot.set_my_commands([
                 BotCommand("start",    "Iniciar / apresentação"),
