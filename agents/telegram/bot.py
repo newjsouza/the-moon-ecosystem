@@ -77,6 +77,22 @@ def _get_apex_oracle():
     return _apex_oracle_instance
 
 # ─────────────────────────────────────────────────────────────
+#  BrowserPilot — import lazy
+# ─────────────────────────────────────────────────────────────
+_browser_pilot_instance = None
+
+def _get_browser_pilot():
+    global _browser_pilot_instance
+    if _browser_pilot_instance is None:
+        try:
+            from agents.browser_pilot import BrowserPilot
+            _browser_pilot_instance = BrowserPilot()
+            logger.info("BrowserPilot carregado com sucesso")
+        except Exception as e:
+            logger.warning(f"BrowserPilot não disponível: {e}")
+    return _browser_pilot_instance
+
+# ─────────────────────────────────────────────────────────────
 #  Paths & constants
 # ─────────────────────────────────────────────────────────────
 from pathlib import Path as _P
@@ -839,7 +855,8 @@ FORMATO DE RESPOSTA:
             "• Executar comandos no seu computador\n"
             "• Pesquisa na internet\n"
             "• Gestão de tarefas e lembretes\n"
-            "• Status de todos os agentes do ecossistema\n\n"
+            "• Status de todos os agentes do ecossistema\n"
+            "• Navegação autônoma no browser com IA\n\n"
             "Comandos:\n"
             "/tarefas — ver tarefas pendentes\n"
             "/briefing — resumo do ecossistema\n"
@@ -847,7 +864,9 @@ FORMATO DE RESPOSTA:
             "/cmd <comando> — executar no terminal\n"
             "/limpar — limpar histórico da conversa\n"
             "/status — status do sistema\n"
-            "/id — seu Chat ID",
+            "/id — seu Chat ID\n"
+            "/browser — navegar no browser com IA\n"
+            "/cancelar_browser — cancelar sessão de navegação\n",
             parse_mode="Markdown",
         )
 
@@ -928,12 +947,82 @@ FORMATO DE RESPOSTA:
             parse_mode="Markdown",
         )
 
+    async def cmd_browser(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """
+        /browser <instrução em linguagem natural>
+        Inicia uma sessão de navegação autônoma com o BrowserPilot.
+        """
+        task = " ".join(context.args) if context.args else ""
+        if not task:
+            await update.message.reply_text(
+                "🌐 *BrowserPilot*\n\n"
+                "Uso: `/browser <instrução>`\n\n"
+                "Exemplos:\n"
+                "• `/browser acesse rapidapi.com e crie uma conta gratuita`\n"
+                "• `/browser faça login no GitHub e abra o repo the-moon-ecosystem`\n"
+                "• `/browser acesse api-football no RapidAPI e assine o plano gratuito`\n\n"
+                "_Quando precisar de senha ou dados sensíveis, vou te pedir via Telegram._",
+                parse_mode="Markdown",
+            )
+            return
+
+        pilot = _get_browser_pilot()
+        if not pilot:
+            await update.message.reply_text(
+                "❌ BrowserPilot não disponível. Verifique os logs do sistema.",
+                parse_mode="Markdown",
+            )
+            return
+
+        await update.message.reply_text(
+            f"🚀 *BrowserPilot iniciando...*\n\n_{task}_",
+            parse_mode="Markdown",
+        )
+        session_id = await pilot.start_session(task)
+        # Armazena session_id no contexto do usuário para receber inputs
+        user_id = str(update.effective_user.id)
+        self.memory.set_context(
+            user_id,
+            f"BROWSER_SESSION_ACTIVE:{session_id}"
+        )
+
+    async def cmd_cancelar_browser(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Cancela a sessão de navegação ativa."""
+        pilot = _get_browser_pilot()
+        if not pilot:
+            await update.message.reply_text("Nenhuma sessão ativa.")
+            return
+        session = pilot.get_active_session()
+        if session:
+            await pilot.cancel_session(session.session_id)
+        else:
+            await update.message.reply_text("Nenhuma sessão de navegação ativa.")
+
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handles all text messages."""
         user_id  = str(update.effective_user.id)
         user_text = update.message.text
 
         logger.info(f"[{user_id}] text: {user_text[:80]}")
+
+        # ── Intercepta input sensível para BrowserPilot ──────────────
+        pilot = _get_browser_pilot()
+        if pilot:
+            active = pilot.get_active_session()
+            if active and active.status == "waiting_input":
+                # Usuário está respondendo a uma pausa do BrowserPilot
+                # O valor é passado direto, sem log, sem memória
+                provided = await pilot.provide_sensitive_input(
+                    active.session_id, user_text
+                )
+                if provided:
+                    # Deleta a mensagem do usuário para proteger o dado sensível
+                    try:
+                        await update.message.delete()
+                    except Exception:
+                        pass
+                    return
+        # ── Fim interceptação ────────────────────────────────────────
 
         # Fast-path intent routing
         routed = await self._route_intent(user_id, user_text, update, context)
@@ -1066,6 +1155,8 @@ FORMATO DE RESPOSTA:
         app.add_handler(CommandHandler("limpar",   self.cmd_limpar))
         app.add_handler(CommandHandler("status",   self.cmd_status))
         app.add_handler(CommandHandler("id",       self.cmd_get_id))
+        app.add_handler(CommandHandler("browser",          self.cmd_browser))
+        app.add_handler(CommandHandler("cancelar_browser", self.cmd_cancelar_browser))
 
         # Messages
         app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
@@ -1081,6 +1172,8 @@ FORMATO DE RESPOSTA:
                 logger.info("ApexOracle loop autônomo iniciado junto ao bot")
             else:
                 logger.warning("ApexOracle não iniciado — verifique configuração")
+            # Pré-carrega BrowserPilot
+            _get_browser_pilot()
             # Set bot commands for Telegram UI
             await application.bot.set_my_commands([
                 BotCommand("start",    "Iniciar / apresentação"),
@@ -1091,6 +1184,7 @@ FORMATO DE RESPOSTA:
                 BotCommand("cmd",      "Executar comando no terminal"),
                 BotCommand("limpar",   "Limpar histórico da conversa"),
                 BotCommand("id",       "Mostrar Chat ID"),
+                BotCommand("browser",  "Navegar no browser com IA"),
             ])
             logger.info("MoonBot initialized and ready.")
 

@@ -1177,6 +1177,38 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
   - **Limitação conhecida (P6):** football-data.org API gratuita não fornece escalações; integração futura com API-Football (RapidAPI) para lineups reais
 - **Data:** 17 Março 2026.
 
+### 📂 Assunto: [BrowserPilot — Navegação Interativa com Dados Sensíveis]
+
+- **Tópico:** BrowserPilot — Navegação autônoma com pausa para dados sensíveis
+- **Resumo:**
+  - **Arquivo:** `agents/browser_pilot.py`
+  - **Comando Telegram:** `/browser <instrução em linguagem natural>`
+  - **Cancelar:** `/cancelar_browser`
+  - **Fluxo:**
+        1. Usuário envia `/browser <tarefa>`
+        2. Groq LLM (llama-3.3-70b-versatile) gera plano JSON de steps (goto, click, fill, screenshot...)
+        3. BrowserPilot executa cada step via BrowserBridge → daemon Playwright (Bun/TypeScript)
+        4. Ao encontrar campo sensível (senha, OTP, cartão, etc.) → PAUSA → envia screenshot + prompt via Telegram
+        5. Usuário responde no Telegram → mensagem deletada automaticamente (proteção) → execução continua
+        6. Screenshot final enviado ao Telegram ao concluir
+  - **Proteção de dados sensíveis:**
+    - Nenhum dado sensível é armazenado em memória ou disco
+    - Mensagem do usuário com dado sensível é deletada do Telegram imediatamente após uso
+    - Valor descartado com `del sensitive_value` após preenchimento do campo
+    - Timeout de 10 minutos para input do usuário
+  - **Infraestrutura usada:**
+    - `core/browser_bridge.py` — cliente HTTP para daemon Playwright
+    - `skills/moon_browse/` — daemon Bun/Playwright (Chromium headless)
+    - `DISPLAY=:0` — X11 real (sem Xvfb necessário)
+    - `google-chrome` — browser disponível no sistema
+  - **Integração Telegram:**
+    - `agents/telegram/bot.py` — handlers `cmd_browser` e `cmd_cancelar_browser`
+    - Interceptação de mensagens no `handle_message` para input sensível
+    - Notificações via `PilotNotifier` (HTTP direto para Telegram API)
+  - **Testes:** `tests/test_browser_pilot.py` (14 testes unitários passando)
+  - **Comandos do daemon Playwright:** goto, click, fill, press, screenshot, text, html, console, links, snapshot, tabs, newtab, closetab, hover, scroll, select, check, wait, assert_text
+- **Data:** 17 Março 2026.
+
 ---
 
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
