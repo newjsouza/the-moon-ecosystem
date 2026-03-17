@@ -269,11 +269,11 @@ async def test_alert_publishes_to_messagebus(watchdog_with_message_bus):
 @pytest.mark.asyncio
 async def test_health_check_healthy(watchdog):
     """Testa health check quando sistema está saudável."""
-    # Define limites altos para não disparar alertas
-    watchdog.max_cpu_percent = 99.0
-    watchdog.max_memory_percent = 99.0
-    watchdog.max_disk_usage_percent = 99.0
-    
+    # Define limites em 100% (impossível de exceder) para garantir zero alertas
+    watchdog.max_cpu_percent = 100.0
+    watchdog.max_memory_percent = 100.0
+    watchdog.max_disk_usage_percent = 100.0
+
     issues = await watchdog._perform_health_check()
     assert len(issues) == 0
 

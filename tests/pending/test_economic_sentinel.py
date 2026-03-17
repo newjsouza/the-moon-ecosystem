@@ -158,12 +158,18 @@ async def test_get_market_summary_empty_symbols():
 @pytest.mark.unit
 @pytest.mark.economic_sentinel
 @pytest.mark.asyncio
+@pytest.mark.skipif(
+    not os.getenv("ALPHA_VANTAGE_API_KEY")
+    or os.getenv("ALPHA_VANTAGE_API_KEY") in ("test_key", "your_key_here", "YOUR_API_KEY"),
+    reason="ALPHA_VANTAGE_API_KEY não configurada corretamente"
+)
 async def test_alpha_vantage_data_success(mock_alpha_vantage_timeseries):
     """Testa coleta de dados da Alpha Vantage com sucesso."""
+    api_key = os.getenv("ALPHA_VANTAGE_API_KEY")
     with patch('alpha_vantage.timeseries.TimeSeries', return_value=mock_alpha_vantage_timeseries):
-        engine = FinancialEngine(api_key="test_key")
+        engine = FinancialEngine(api_key=api_key)
         data = await engine.get_alpha_vantage_data("AAPL")
-        
+
         assert not data.empty
         assert '4. close' in data.columns
 

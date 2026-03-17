@@ -25,10 +25,11 @@
       "name": "obs-studio",
       "binary": "cli-anything-obs-studio",
       "installed": false,
-      "path": null,
-      "version": null,
-      "skipped": true,
-      "skip_reason": "Software alvo não instalado no sistema"
+      "path": "/home/johnathan/Área de trabalho/The Moon/skills/cli_harnesses/generated/cli-anything-obs-studio.py",
+      "version": "Generated 2026-03-16 (pending pip install)",
+      "skipped": false,
+      "skip_reason": null,
+      "notes": "Harness generated, pending installation via: pip install -e obs-studio/agent-harness/"
     },
     {
       "name": "drawio",
