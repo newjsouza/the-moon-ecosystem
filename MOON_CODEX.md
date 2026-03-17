@@ -1342,4 +1342,125 @@ python3 -m pytest tests/test_webmcp_sports.py -v
 
 ---
 
+## Orchestrator × WebMCPAgent — Routing Automático (2026-03-17)
+
+### Arquivos modificados
+
+| Arquivo | Tipo | Mudança |
+|---|---|---|
+| `core/orchestrator.py` | Patch cirúrgico | +método `_enrich_with_web_context()` |
+| `core/orchestrator.py` | Patch cirúrgico | Chamada ao enricher em `handle_channel_message` |
+| `core/orchestrator.py` | Patch cirúrgico | 5 comandos WebMCP no `CommandRegistry` |
+| `skills/webmcp/web_context.py` | Novo | Detector de intenção + enriquecedor |
+
+### Comandos registrados no CommandRegistry
+
+| Prefixo | Rota | Fonte de dados |
+|---|---|---|
+| `/buscar <query>` | `search_and_fetch:` | DuckDuckGo + httpx |
+| `/escalação <time1> vs <time2>` | `sports:lineup:` | SofaScore → Notícias |
+| `/jogos` | `sports:today` | SofaScore API |
+| `/aovivo` | `sports:live` | Flashscore |
+| `/notícias [futebol]` | `sports:news:` | Multi-portal |
+
+### Fluxo de enriquecimento automático
+
+```
+1. Usuário envia: "qual a escalação do Flamengo hoje?"
+                    ↓
+2. handle_channel_message() recebe texto
+                    ↓
+3. _enrich_with_web_context() detecta sinais:
+   - needs_web_data() → True (tem "hoje" + termo esportivo)
+   - build_web_task() → "sports:lineup:qual a escalação..."
+                    ↓
+4. WebMCPAgent._execute() roda tarefa:
+   - Router detecta "sports:lineup:"
+   - LineupDetector em cascata:
+     1) SofaScore API → match_id → lineups
+     2) Busca SofaScore → match_id → API
+     3) Notícias (GloboEsporte, ESPN, etc.)
+                    ↓
+5. metadata["web_context"] injetado com dados
+                    ↓
+6. _route_command() processa com contexto enriquecido
+                    ↓
+7. LlmAgent ou CommandRegistry responde com dados reais
+```
+
+### Sinais de detecção (web_context.py)
+
+**Web genérica:**
+
+- `buscar`, `pesquisar`, `procurar`, `encontrar`
+- `quem é`, `qual é`, `como está`, `onde fica`
+- `hoje`, `agora`, `ao vivo`, `live`, `atualizado`
+- `notícia`, `preço`, `cotação`, `dólar`, `bitcoin`
+
+**Esportivos:**
+
+- `escalação`, `titulares`, `partida`, `jogo`, `placar`
+- `futebol`, `brasileirão`, `champions`, `libertadores`
+- Nomes de times: `flamengo`, `palmeiras`, `manchester`, `real madrid`, etc.
+- `vs`, ` x ` (padrão de confronto)
+
+### Código do enriquecedor
+
+```python
+async def _enrich_with_web_context(
+    self, text: str, metadata: dict
+) -> dict:
+    """
+    Pré-processador WebMCP: detecta queries que precisam de dados
+    externos e injeta contexto em metadata["web_context"].
+    Falha silenciosa — nunca bloqueia o fluxo principal.
+    """
+    try:
+        from skills.webmcp.web_context import needs_web_data, fetch_web_context
+        if needs_web_data(text):
+            ctx = await fetch_web_context(text)
+            if ctx:
+                metadata = {**metadata, "web_context": ctx}
+    except Exception:
+        pass
+    return metadata
+```
+
+### Testes
+
+```bash
+# WebMCP Sports Layer
+python3 -m pytest tests/test_webmcp_sports.py -v
+# 22 testes passando
+
+# WebMCP Agent
+python3 -m pytest tests/test_webmcp_agent.py -v
+# 18 testes passando
+
+# Suite completa (5 falhas CLI são pré-existentes)
+python3 -m pytest tests/ --tb=no -q
+```
+
+### Decisões de design
+
+1. **Falha silenciosa:** `fetch_web_context()` retorna `None` se falhar — nunca bloqueia
+2. **Desacoplado:** `web_context.py` não importa `orchestrator` — testável isoladamente
+3. **Patch mínimo:** apenas 3 adições cirúrgicas no orchestrator (121 linhas totais)
+4. **Comandos slash:** registrados no `CommandRegistry` — acessíveis via Telegram com `/`
+5. **Auto-detect:** texto livre sem `/` também é enriquecido se detectar sinais web
+
+### Backup e rollback
+
+```bash
+# Backup automático criado antes do patch
+cp core/orchestrator.py core/orchestrator.py.bak
+
+# Rollback se necessário
+cp core/orchestrator.py.bak core/orchestrator.py
+```
+
+- **Data:** 17 Março 2026.
+
+---
+
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*

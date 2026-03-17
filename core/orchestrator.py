@@ -442,6 +442,106 @@ class Orchestrator:
     #  Message Gateway
     # ═══════════════════════════════════════════════════════════
 
+
+        # ── WebMCP Commands ────────────────────────────────────────────
+        @self.registry.command("/buscar", description="Busca informações na web em tempo real", usage="/buscar <query>", category="Web", prefix_match=True)
+        async def cmd_web_search(remainder: str, metadata: dict) -> str:
+            from agents.webmcp_agent import WebMCPAgent
+            if not remainder:
+                return "⚠️ Uso: `/buscar <query>`"
+            result = await WebMCPAgent()._execute(f"search_and_fetch:{remainder}")
+            if not result.success:
+                return f"Erro na busca: {result.error}"
+            pages = result.data.get("pages", [])
+            if not pages:
+                items = result.data.get("results", [])
+                return "\n".join(
+                    f"• {r.get('title','?')} — {r.get('snippet','')[:200]}"
+                    for r in items[:8]
+                ) or "Nenhum resultado encontrado."
+            return "\n\n".join(
+                f"**{p.get('title','?')}**\n{p.get('content','')[:800]}"
+                for p in pages[:3]
+            )
+
+        @self.registry.command("/escalação", description="Busca escalação de uma partida", usage="/escalação <time1> vs <time2>", category="Sports", prefix_match=True)
+        async def cmd_lineup(remainder: str, metadata: dict) -> str:
+            from agents.webmcp_agent import WebMCPAgent
+            if not remainder:
+                return "⚠️ Uso: `/escalação <time1> vs <time2>`"
+            result = await WebMCPAgent()._execute(f"sports:lineup:{remainder}")
+            if not result.success:
+                return f"Escalação indisponível: {result.error}"
+            data = result.data
+            matches = data.get("matches", [])
+            if matches:
+                m = matches[0]
+                hl = m.get("home_lineup") or {}
+                al = m.get("away_lineup") or {}
+                home_starters = [p["name"] for p in hl.get("players", []) if p.get("is_starter")]
+                away_starters = [p["name"] for p in al.get("players", []) if p.get("is_starter")]
+                lines_out = [f"⚽ {m.get('home_team')} vs {m.get('away_team')}", f"🏆 {m.get('competition','?')}"]
+                if home_starters:
+                    lines_out.append(f"\n🔵 {m.get('home_team')} ({hl.get('formation','?')}):")
+                    lines_out.extend(f"  {p}" for p in home_starters)
+                if away_starters:
+                    lines_out.append(f"\n🔴 {m.get('away_team')} ({al.get('formation','?')}):")
+                    lines_out.extend(f"  {p}" for p in away_starters)
+                return "\n".join(lines_out)
+            news = data.get("news", [])
+            if news:
+                return "\n".join(f"📰 {a.get('title')} ({a.get('source')})" for a in news[:5])
+            return "Escalação ainda não divulgada. Tente novamente mais próximo do jogo."
+
+        @self.registry.command("/jogos", description="Lista partidas de futebol de hoje", usage="/jogos", category="Sports")
+        async def cmd_today(remainder: str, metadata: dict) -> str:
+            from agents.webmcp_agent import WebMCPAgent
+            result = await WebMCPAgent()._execute("sports:today")
+            if not result.success:
+                return f"Erro: {result.error}"
+            matches = result.data.get("matches", [])
+            if not matches:
+                return "Nenhuma partida encontrada para hoje."
+            lines_out = ["📅 Partidas de hoje:"]
+            for m in matches[:15]:
+                score = ""
+                if m.get("score_home") is not None:
+                    score = f" {m['score_home']}-{m['score_away']}"
+                lines_out.append(f"• {m.get('home_team')} vs {m.get('away_team')}{score} [{m.get('competition','?')}]")
+            return "\n".join(lines_out)
+
+        @self.registry.command("/aovivo", description="Partidas de futebol ao vivo agora", usage="/aovivo", category="Sports")
+        async def cmd_live(remainder: str, metadata: dict) -> str:
+            from agents.webmcp_agent import WebMCPAgent
+            result = await WebMCPAgent()._execute("sports:live")
+            if not result.success:
+                return f"Erro: {result.error}"
+            matches = result.data.get("matches", [])
+            if not matches:
+                return "Nenhuma partida ao vivo no momento."
+            lines_out = ["🔴 Ao vivo agora:"]
+            for m in matches[:10]:
+                score = f" {m['score_home']}-{m['score_away']}" if m.get("score_home") is not None else ""
+                lines_out.append(f"• {m.get('home_team')} vs {m.get('away_team')}{score}")
+            return "\n".join(lines_out)
+
+        @self.registry.command("/notícias", description="Últimas notícias esportivas", usage="/notícias [futebol]", category="Sports", prefix_match=True)
+        async def cmd_sports_news(remainder: str, metadata: dict) -> str:
+            from agents.webmcp_agent import WebMCPAgent
+            topic = remainder.strip() or "futebol"
+            result = await WebMCPAgent()._execute(f"sports:news:{topic}")
+            if not result.success:
+                return f"Erro: {result.error}"
+            articles = result.data.get("news", [])
+            if not articles:
+                return "Nenhuma notícia encontrada."
+            lines_out = [f"📰 Notícias — {topic}:"]
+            for a in articles[:8]:
+                icon = "🔵" if a.get("mentions_lineup") else "📌"
+                lines_out.append(f"{icon} {a.get('title')} ({a.get('source')})")
+            return "\n".join(lines_out)
+
+
     async def handle_channel_message(self, text: str, metadata: Dict[str, Any]) -> None:
         source = metadata.get("source", "unknown")
         logger.info(f"Message from [{source}]: {text[:80]}...")
@@ -453,12 +553,33 @@ class Orchestrator:
             target="orchestrator",
         )
 
+        metadata = await self._enrich_with_web_context(text, metadata)
         response = await self._route_command(text, metadata)
 
         for channel in self.channels:
             if channel.name == source:
                 await channel.send_message(response, recipient_id=metadata.get("chat_id"))
                 break
+
+
+    async def _enrich_with_web_context(
+        self, text: str, metadata: dict
+    ) -> dict:
+        """
+        Pré-processador WebMCP: detecta queries que precisam de dados
+        externos e injeta contexto em metadata["web_context"].
+        Falha silenciosa — nunca bloqueia o fluxo principal.
+        """
+        try:
+            from skills.webmcp.web_context import needs_web_data, fetch_web_context
+            if needs_web_data(text):
+                ctx = await fetch_web_context(text)
+                if ctx:
+                    metadata = {**metadata, "web_context": ctx}
+        except Exception:
+            pass
+        return metadata
+
 
     async def _route_command(self, text: str, metadata: Dict[str, Any]) -> str:
         """Routes text to the CommandRegistry or falls back to LlmAgent."""
