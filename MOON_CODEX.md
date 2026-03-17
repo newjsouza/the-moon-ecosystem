@@ -1209,6 +1209,37 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
   - **Comandos do daemon Playwright:** goto, click, fill, press, screenshot, text, html, console, links, snapshot, tabs, newtab, closetab, hover, scroll, select, check, wait, assert_text
 - **Data:** 17 Março 2026.
 
+### 📂 Assunto: [WebMCPAgent — Coleta Web Leve com Delegação ao BrowserPilot]
+
+- **Tópico:** WebMCPAgent — Camada de coleta web (httpx + DuckDuckGo) com fallback para BrowserPilot
+- **Resumo:**
+  - **Arquivo:** `agents/webmcp_agent.py`
+  - **Skills:** `skills/webmcp/` (schemas.py, extractor.py, fetcher.py, search_engine.py)
+  - **Testes:** `tests/test_webmcp_agent.py` — 18 testes unitários passando
+  - **Modos de operação (task string):**
+
+    | Prefixo | Comportamento |
+    |---|---|
+    | `search:<query>` | DuckDuckGo HTML scraping, sem API key |
+    | `fetch:<url>` | httpx leve; detecta JS-heavy e delega |
+    | `search_and_fetch:<query>` | Busca + fetch dos 2 primeiros resultados |
+    | `deep:<url>` | Delega ao BrowserPilot (Playwright) via MessageBus |
+    | texto livre | Tratado como `search:` |
+
+  - **Decisões de design:**
+    - **Custo Zero Absoluto:** DuckDuckGo HTML scraping, sem chave de API
+    - **Integração BrowserPilot:** páginas JS-heavy delegadas via MessageBus
+    - **Fallback robusto:** bs4 opcional, regex como fallback
+    - **Truncagem 8000 chars:** protege contexto do LLMRouter (Groq 70b)
+    - **JS_HEAVY_DOMAINS:** lista de domínios que requerem Playwright (twitter, instagram, facebook, linkedin, tiktok, youtube, reddit, airbnb, amazon, mercadolivre)
+  - **Dependências adicionadas:**
+    - `httpx` (async HTTP client)
+    - `beautifulsoup4` (HTML parser)
+    - `pytest-asyncio` (testes async)
+  - **Integração Architect:** registrado em `DOMAIN_AGENT_MAP` com domínios `web`, `search`, `fetch`
+  - **Padrões keyword:** `r"(web|http|https|site|página|url|fetch|buscar|pesquisar|search|scrap)"`
+- **Data:** 17 Março 2026.
+
 ---
 
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*

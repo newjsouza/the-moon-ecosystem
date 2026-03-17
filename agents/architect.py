@@ -67,6 +67,10 @@ DOMAIN_AGENT_MAP = {
     "harness": "MoonCLIAgent",
     "libreoffice": "MoonCLIAgent",
     "mermaid": "MoonCLIAgent",
+    # WebMCP Agent
+    "web": "WebMCPAgent",
+    "search": "WebMCPAgent",
+    "fetch": "WebMCPAgent",
 }
 
 # Palavras-chave para fallback (regex)
@@ -92,6 +96,8 @@ KEYWORD_PATTERNS = {
     "ship": r"(ship|deploy|release|pr|pull request|changelog|push|merge|entrega)",
     # MoonCLIAgent patterns
     "cli": r"(cli|harness|libreoffice|mermaid|diagrama|documento|pdf|exportar|render|cli-anything)",
+    # WebMCP Agent patterns
+    "web": r"(web|http|https|site|página|url|fetch|buscar|pesquisar|search|scrap)",
 }
 
 
@@ -650,6 +656,8 @@ class ArchitectAgent(AgentBase):
             "MoonShipAgent": ("agents.moon_ship_agent", ["ship.command"]),
             # MoonCLIAgent
             "MoonCLIAgent": ("agents.moon_cli_agent", ["cli.command", "cli.execute", "cli.generate", "cli.discover"]),
+            # WebMCP Agent
+            "WebMCPAgent": ("agents.webmcp_agent", ["web.command", "search.command", "fetch.command"]),
         }
 
         for name, (module_path, topics) in known_agents.items():
