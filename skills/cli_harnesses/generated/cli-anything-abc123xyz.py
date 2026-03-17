@@ -1,1 +1,0 @@
-Olá! Estou em modo degradado (todos os providers de LLM estão indisponíveis). Por favor, tente novamente em alguns instantes.

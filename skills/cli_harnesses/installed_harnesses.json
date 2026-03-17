@@ -24,12 +24,13 @@
     {
       "name": "obs-studio",
       "binary": "cli-anything-obs-studio",
-      "installed": false,
-      "path": "/home/johnathan/Área de trabalho/The Moon/skills/cli_harnesses/generated/cli-anything-obs-studio.py",
-      "version": "Generated 2026-03-16 (pending pip install)",
+      "installed": true,
+      "path": "/home/johnathan/.local/bin/cli-anything-obs-studio",
+      "version": "Usage: cli-anything-obs-studio [OPTIONS] COMMAND [ARGS]...\n\n  OBS Studio CLI -- Stateful scene collection editing from the command line.",
+      "help_preview": "Usage: cli-anything-obs-studio [OPTIONS] COMMAND [ARGS]...\n\n  OBS Studio CLI -- Stateful scene collection editing from the command line.\n\nOptions:\n  --json          Output as JSON\n  --project TEXT  Path to OBS scene collection JSON file\n  --help          Show this message and exit.\n\nCommands:\n  audio       Audio management commands.\n  filter      Filter management commands.\n  output      Output/streaming/recording configuration.",
       "skipped": false,
       "skip_reason": null,
-      "notes": "Harness generated, pending installation via: pip install -e obs-studio/agent-harness/"
+      "notes": "Installed via pip install -e /tmp/cli-anything-src/obs-studio/agent-harness/"
     },
     {
       "name": "drawio",

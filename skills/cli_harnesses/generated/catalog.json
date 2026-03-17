@@ -1,174 +1,41 @@
 {
-  "generated_at": "2026-03-16T15:44:40.599764",
-  "total": 24,
+  "generated_at": "2026-03-17T00:04:27.815121",
+  "total": 5,
   "harnesses": [
     {
-      "file": "cli_abc123xyz_20260316_101623.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_101623.py",
-      "lines": 239,
-      "syntax_valid": false,
-      "size_bytes": 6646
+      "file": "cli-anything-ffmpeg.py",
+      "path": "skills/cli_harnesses/generated/cli-anything-ffmpeg.py",
+      "lines": 274,
+      "syntax_valid": true,
+      "size_bytes": 8432
     },
     {
-      "file": "cli_abc123xyz_20260316_101723.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_101723.py",
-      "lines": 109,
-      "syntax_valid": false,
-      "size_bytes": 4458
+      "file": "cli-anything-gimp.py",
+      "path": "skills/cli_harnesses/generated/cli-anything-gimp.py",
+      "lines": 141,
+      "syntax_valid": true,
+      "size_bytes": 4500
     },
     {
-      "file": "cli_abc123xyz_20260316_104445.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_104445.py",
-      "lines": 77,
-      "syntax_valid": false,
-      "size_bytes": 3944
+      "file": "cli-anything-inkscape.py",
+      "path": "skills/cli_harnesses/generated/cli-anything-inkscape.py",
+      "lines": 194,
+      "syntax_valid": true,
+      "size_bytes": 7990
     },
     {
-      "file": "cli_abc123xyz_20260316_152059.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_152059.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_abc123xyz_20260316_152553.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_152553.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_abc123xyz_20260316_152817.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_152817.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_abc123xyz_20260316_153143.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_153143.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_abc123xyz_20260316_153541.py",
-      "path": "skills/cli_harnesses/generated/cli_abc123xyz_20260316_153541.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_curl_20260316_154411.py",
-      "path": "skills/cli_harnesses/generated/cli_curl_20260316_154411.py",
-      "lines": 140,
-      "syntax_valid": false,
-      "size_bytes": 4928
-    },
-    {
-      "file": "cli_gs_20260316_154424.py",
-      "path": "skills/cli_harnesses/generated/cli_gs_20260316_154424.py",
-      "lines": 133,
-      "syntax_valid": false,
-      "size_bytes": 5499
-    },
-    {
-      "file": "cli_jq_20260316_101416.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_101416.py",
-      "lines": 228,
-      "syntax_valid": false,
-      "size_bytes": 6061
-    },
-    {
-      "file": "cli_jq_20260316_101628.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_101628.py",
-      "lines": 197,
-      "syntax_valid": false,
-      "size_bytes": 7372
-    },
-    {
-      "file": "cli_jq_20260316_101728.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_101728.py",
+      "file": "cli-anything-obs-studio.py",
+      "path": "skills/cli_harnesses/generated/cli-anything-obs-studio.py",
       "lines": 201,
-      "syntax_valid": false,
-      "size_bytes": 6032
+      "syntax_valid": true,
+      "size_bytes": 8053
     },
     {
-      "file": "cli_jq_20260316_104451.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_104451.py",
-      "lines": 188,
-      "syntax_valid": false,
-      "size_bytes": 6108
-    },
-    {
-      "file": "cli_jq_20260316_152059.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_152059.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_jq_20260316_152553.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_152553.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_jq_20260316_152817.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_152817.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_jq_20260316_152918.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_152918.py",
-      "lines": 157,
-      "syntax_valid": false,
-      "size_bytes": 5723
-    },
-    {
-      "file": "cli_jq_20260316_153143.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_153143.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_jq_20260316_153407.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_153407.py",
-      "lines": 159,
-      "syntax_valid": false,
-      "size_bytes": 5551
-    },
-    {
-      "file": "cli_jq_20260316_153541.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_153541.py",
-      "lines": 1,
-      "syntax_valid": false,
-      "size_bytes": 128
-    },
-    {
-      "file": "cli_jq_20260316_153637.py",
-      "path": "skills/cli_harnesses/generated/cli_jq_20260316_153637.py",
-      "lines": 148,
-      "syntax_valid": false,
-      "size_bytes": 5852
-    },
-    {
-      "file": "cli_rsync_20260316_154420.py",
-      "path": "skills/cli_harnesses/generated/cli_rsync_20260316_154420.py",
-      "lines": 181,
-      "syntax_valid": false,
-      "size_bytes": 5643
-    },
-    {
-      "file": "cli_wget_20260316_154416.py",
-      "path": "skills/cli_harnesses/generated/cli_wget_20260316_154416.py",
-      "lines": 158,
-      "syntax_valid": false,
-      "size_bytes": 5579
+      "file": "cli-anything-pandoc.py",
+      "path": "skills/cli_harnesses/generated/cli-anything-pandoc.py",
+      "lines": 175,
+      "syntax_valid": true,
+      "size_bytes": 5585
     }
   ]
 }
