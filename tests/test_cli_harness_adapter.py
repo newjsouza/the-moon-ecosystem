@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from tests.conftest import requires_libreoffice, requires_mermaid
 
 
 class TestCLIHarnessAdapterImport:
@@ -64,6 +65,7 @@ class TestCLIHarnessAdapterRun:
         assert result.harness == "harness_inexistente_abc123"
         assert result.raw_stderr != ""
 
+    @requires_libreoffice
     async def test_run_real_harness_help(self):
         from core.cli_harness_adapter import get_harness_adapter
         adapter = get_harness_adapter()

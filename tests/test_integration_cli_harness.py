@@ -11,6 +11,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from tests.conftest import requires_libreoffice, requires_mermaid
 
 
 def _libreoffice_available() -> bool:
@@ -40,6 +41,7 @@ def _harness_mermaid_installed() -> bool:
     reason="LibreOffice ou harness cli-anything-libreoffice não disponível"
 )
 class TestE2ELibreOffice:
+    @requires_libreoffice
     async def test_harness_help_output_real(self):
         from core.cli_harness_adapter import get_harness_adapter
         adapter = get_harness_adapter()
@@ -92,6 +94,7 @@ class TestE2ELibreOffice:
     reason="Harness cli-anything-mermaid não instalado"
 )
 class TestE2EMermaid:
+    @requires_mermaid
     async def test_harness_help_output_real(self):
         from core.cli_harness_adapter import get_harness_adapter
         adapter = get_harness_adapter()

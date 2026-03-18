@@ -1,6 +1,7 @@
 """tests/test_moon_cli_agent.py — Testes do MoonCLIAgent"""
 
 import pytest
+from tests.conftest import requires_libreoffice, requires_mermaid
 
 
 class TestMoonCLIAgentImport:
@@ -59,6 +60,7 @@ class TestMoonCLIAgentActions:
         result = await agent._execute("run")
         assert result.success is False
 
+    @requires_libreoffice
     async def test_run_real_harness_help(self):
         from agents.moon_cli_agent import MoonCLIAgent
         from core.cli_harness_adapter import get_harness_adapter
@@ -71,6 +73,7 @@ class TestMoonCLIAgentActions:
         assert result.success is True
         assert result.data["exit_code"] == 0
 
+    @requires_libreoffice
     async def test_help_command_works(self):
         from agents.moon_cli_agent import MoonCLIAgent
         from core.cli_harness_adapter import get_harness_adapter

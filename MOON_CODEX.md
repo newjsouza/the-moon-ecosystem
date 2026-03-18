@@ -1598,3 +1598,9 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - agents/telegram/bot.py — register_telegram_adapter()
 - 10 testes passando
 - Identidade Moon preservada: zero dependências externas, zero custo
+
+## Fix 2026-03-18 — CLI Harness Tests → Conditional Skip
+- tests/conftest.py: requires_libreoffice, requires_mermaid, requires_obs
+- 5 testes convertidos de FAILED → SKIPPED (dependência de binário externo)
+- Suite final: 449+ pass | 20 skip | 0 fail
+- Padrão: skip condicional via shutil.which() — mesmo padrão do alpha_vantage

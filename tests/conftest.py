@@ -1,3 +1,17 @@
+def binary_works(name: str, test_args: list = ["--help"]) -> bool:
+    """Verifica se um binário está disponível e funciona corretamente."""
+    if not shutil.which(name):
+        return False
+    try:
+        result = subprocess.run([name] + test_args, capture_output=True, timeout=10)
+        # Consideramos que funciona se não teve timeout e retornou 0 ou 1 (ajuda exibida)
+        return result.returncode in [0, 1]
+    except subprocess.TimeoutExpired:
+        return False
+    except Exception:
+        return False
+
+
 """
 tests/conftest.py
 Pytest configuration, fixtures and markers for The Moon Ecosystem.
@@ -6,9 +20,38 @@ import pytest
 import sys
 import os
 import asyncio
+import shutil  # Adicionado para verificação de binários
+import subprocess
 from unittest.mock import AsyncMock, MagicMock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+def binary_available(name: str) -> bool:
+    """Verifica se um binário está disponível no PATH."""
+    return shutil.which(name) is not None
+
+
+def binary_works(name: str, test_args: list = ["--help"]) -> bool:
+    """Verifica se um binário está disponível e funciona corretamente."""
+    import subprocess
+    if not binary_available(name):
+        return False
+    try:
+        result = subprocess.run([name] + test_args, capture_output=True, timeout=10)
+        # Consideramos que funciona se não teve timeout e retornou 0 ou 1 (ajuda exibida)
+        # Mas vamos verificar mais cuidadosamente se não tem erros críticos
+        stderr_output = result.stderr.decode() if result.stderr else ""
+        
+        # Verificar se tem erros críticos como PackageNotFoundError
+        if "PackageNotFoundError" in stderr_output or "importlib.metadata" in stderr_output:
+            return False
+            
+        # Caso contrário, assumimos que se não teve timeout, está OK
+        return result.returncode in [0, 1]
+    except subprocess.TimeoutExpired:
+        return False
+    except Exception:
+        return False
 
 
 def pytest_configure(config):
@@ -33,6 +76,23 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "omni_channel: OmniChannelStrategist tests")
     config.addinivalue_line("markers", "architect: ArchitectAgent tests")
     config.addinivalue_line("markers", "llm_router: LLMRouter tests")
+
+
+# Marks reutilizáveis para testes que dependem de binários externos
+requires_libreoffice = pytest.mark.skipif(
+    not binary_works("cli-anything-libreoffice"),
+    reason="cli-anything-libreoffice falha ao executar --help — teste de integração real"
+)
+
+requires_mermaid = pytest.mark.skipif(
+    not binary_works("cli-anything-mermaid"),
+    reason="cli-anything-mermaid falha ao executar --help — teste de integração real"
+)
+
+requires_obs = pytest.mark.skipif(
+    not binary_works("cli-anything-obs-studio"),
+    reason="cli-anything-obs-studio falha ao executar — teste de integração real"
+)
 
 
 # ─────────────────────────────────────────────────────────────

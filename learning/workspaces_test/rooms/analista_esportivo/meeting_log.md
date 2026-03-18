@@ -59,3 +59,7 @@
 [00:15:17] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
 [00:42:47] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
 [00:44:59] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[00:52:16] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[00:55:06] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[08:37:49] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
+[10:35:40] Sala inicializada para a skill Analista Esportivo. Bem-vindo, SportsAgent!
