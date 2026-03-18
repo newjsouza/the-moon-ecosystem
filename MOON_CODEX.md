@@ -1506,6 +1506,17 @@ cp core/orchestrator.py.bak core/orchestrator.py
 - tests/test_session_manager.py: 9 testes passando
 - Dependências: stdlib (zero custo)
 
+---
+
+## Sessão 2026-03-17 FASE 2 — MoonFlow Pipeline Engine
+- core/moon_flow.py: FlowStep, FlowResult, MoonFlow, MoonFlowRegistry
+- flows/: blog_pipeline.json + apex_pipeline.json
+- core/orchestrator.py: /flow command + _load_default_flows()
+- tests/test_moon_flow.py: 12 testes passando
+- Dependências: stdlib (zero custo)
+
+---
+
 ## APEX P9 — LLM Refinamento com Titulares Reais (2026-03-17)
 
 ### Problema resolvido

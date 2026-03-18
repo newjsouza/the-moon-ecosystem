@@ -37,7 +37,8 @@ from core.verification.graph import CodeVerificationGraph
 from core.verification.state import VerificationState
 from core.workspace.manager import WorkspaceManager
 from skills.skill_base import SkillBase
-from core.session_manager import get_session_manager  # Nova importação
+from core.session_manager import get_session_manager  # Já existente
+from core.moon_flow import get_flow_registry, MoonFlow  # Nova importação
 
 logger = logging.getLogger("moon.core.orchestrator")
 
@@ -199,6 +200,10 @@ class Orchestrator:
         
         # ── Session Manager ──────────────────────────────────────
         self.session_manager = get_session_manager()
+        
+        # ── Flow Registry ────────────────────────────────────────
+        self.flow_registry = get_flow_registry()
+        self._load_default_flows()
         
         logger.info("Orchestrator initialized.")
 
@@ -449,6 +454,10 @@ class Orchestrator:
 
 
         # ── WebMCP Commands ────────────────────────────────────────────
+        @self.registry.command("/flow", description="Executar pipeline MoonFlow", usage="/flow <nome> [parâmetros]", category="Sistema", prefix_match=True)
+        async def cmd_flow(remainder: str, metadata: dict) -> str:
+            return await self._handle_flow_command(remainder, metadata)
+
         @self.registry.command("/buscar", description="Busca informações na web em tempo real", usage="/buscar <query>", category="Web", prefix_match=True)
         async def cmd_web_search(remainder: str, metadata: dict) -> str:
             from agents.webmcp_agent import WebMCPAgent
@@ -682,7 +691,7 @@ class Orchestrator:
     @staticmethod
     def _strip_code_fences(text: str) -> str:
         """
-        Removes leading/trailing markdown code fences.
+        Removes leading/trailing code fences.
         Handles: ```python, ```js, ```, ``` (typed or plain).
         """
         stripped = re.sub(r"^```[a-zA-Z0-9]*\n?", "", text.strip())
@@ -1076,6 +1085,31 @@ class Orchestrator:
     def _set_session_context(self, data: dict, user_id: str = None, channel: str = None, workspace: str = None, mode: str = "user") -> None:
         session_id = self.session_manager.build_session_id(mode, user_id or "", channel or "", workspace or "")
         self.session_manager.set_session(session_id, data)
+
+    async def _handle_flow_command(self, args: str, metadata: dict) -> str:
+        parts = args.strip().split(None, 1)
+        flow_name = parts[0] if parts else ""
+        ctx = {"topic": parts[1]} if len(parts) > 1 else {}
+        flow = self.flow_registry.get(flow_name)
+        if not flow:
+            available = ", ".join(self.flow_registry.list_flows())
+            return f"Flow '{flow_name}' não encontrado. Disponíveis: {available}"
+        result = await flow.execute(ctx, self)
+        if result.success:
+            return f"✅ Flow '{flow_name}' executado com sucesso em {result.total_time:.2f}s"
+        else:
+            return f"❌ Flow '{flow_name}' falhou: {result.error}"
+
+    def _load_default_flows(self) -> None:
+        import pathlib
+        flows_dir = pathlib.Path("flows")
+        if flows_dir.exists():
+            for f in flows_dir.glob("*.json"):
+                try:
+                    flow = self.flow_registry.load_from_file(str(f))
+                    self.flow_registry.register(flow)
+                except Exception as e:
+                    pass  # silencioso, nunca bloqueia startup
 
     async def _handle_devops_scan_complete(self, message: Dict[str, Any]) -> None:
         """

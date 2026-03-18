@@ -1,0 +1,10 @@
+{
+  "name": "apex_pipeline",
+  "session_mode": "channel",
+  "steps": [
+    {"name": "fetch_games", "agent": "webmcp", "task": "Buscar partidas de hoje", "depends_on": [], "on_error": "stop"},
+    {"name": "fetch_lineups", "agent": "webmcp", "task": "Buscar escalações das partidas encontradas", "depends_on": ["fetch_games"], "on_error": "continue"},
+    {"name": "analyze", "agent": "apex", "task": "Analisar partidas com escalações disponíveis", "depends_on": ["fetch_lineups"], "on_error": "stop"},
+    {"name": "notify", "agent": "telegram", "task": "Enviar análise via Telegram", "depends_on": ["analyze"], "on_error": "continue"}
+  ]
+}

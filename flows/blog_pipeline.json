@@ -1,0 +1,10 @@
+{
+  "name": "blog_pipeline",
+  "session_mode": "workspace",
+  "steps": [
+    {"name": "plan", "agent": "moon_plan", "task": "Planejar post sobre {topic}", "depends_on": [], "on_error": "stop"},
+    {"name": "write", "agent": "blog_writer", "task": "Escrever post com base no plano", "depends_on": ["plan"], "on_error": "stop"},
+    {"name": "review", "agent": "moon_review", "task": "Revisar post escrito", "depends_on": ["write"], "on_error": "continue"},
+    {"name": "publish", "agent": "blog_publisher", "task": "Publicar post revisado", "depends_on": ["review"], "on_error": "stop"}
+  ]
+}
