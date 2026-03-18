@@ -1500,6 +1500,12 @@ cp core/orchestrator.py.bak core/orchestrator.py
 
 ---
 
+## Sessão 2026-03-17 FASE 1 — Session Scoping
+- core/session_manager.py: SessionManager, 4 modos (user/channel/workspace/global)
+- core/orchestrator.py: patch _get_session_context() + _set_session_context()
+- tests/test_session_manager.py: 9 testes passando
+- Dependências: stdlib (zero custo)
+
 ## APEX P9 — LLM Refinamento com Titulares Reais (2026-03-17)
 
 ### Problema resolvido

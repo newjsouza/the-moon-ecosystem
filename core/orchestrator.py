@@ -37,6 +37,7 @@ from core.verification.graph import CodeVerificationGraph
 from core.verification.state import VerificationState
 from core.workspace.manager import WorkspaceManager
 from skills.skill_base import SkillBase
+from core.session_manager import get_session_manager  # Nova importação
 
 logger = logging.getLogger("moon.core.orchestrator")
 
@@ -195,6 +196,10 @@ class Orchestrator:
 
         self.registry = CommandRegistry()
         self.message_bus.subscribe("devops.scan_complete", self._handle_devops_scan_complete)
+        
+        # ── Session Manager ──────────────────────────────────────
+        self.session_manager = get_session_manager()
+        
         logger.info("Orchestrator initialized.")
 
     # ═══════════════════════════════════════════════════════════
@@ -1063,6 +1068,15 @@ class Orchestrator:
             "score": final_state.quality_score,
             "errors": final_state.error_message,
         }
+
+    def _get_session_context(self, user_id: str = None, channel: str = None, workspace: str = None, mode: str = "user") -> dict:
+        session_id = self.session_manager.build_session_id(mode, user_id or "", channel or "", workspace or "")
+        return self.session_manager.get_session(session_id)
+
+    def _set_session_context(self, data: dict, user_id: str = None, channel: str = None, workspace: str = None, mode: str = "user") -> None:
+        session_id = self.session_manager.build_session_id(mode, user_id or "", channel or "", workspace or "")
+        self.session_manager.set_session(session_id, data)
+
     async def _handle_devops_scan_complete(self, message: Dict[str, Any]) -> None:
         """
         Handles the completion of a DevOps scan.
