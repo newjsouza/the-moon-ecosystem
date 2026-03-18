@@ -1572,3 +1572,29 @@ check_pre45()
 
 ### Retrocompatibilidade
 Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge WebMCP — zero mudança necessária.
+
+## Sessão 2026-03-17 — Evolução OpenClaw→Moon (FASES 1-5)
+### FASE 1: SessionManager
+- core/session_manager.py — 4 modos de escopo
+- 9 testes passando
+
+### FASE 2: MoonFlow Pipeline Engine
+- core/moon_flow.py — FlowStep, FlowResult, MoonFlow, MoonFlowRegistry
+- flows/blog_pipeline.json + flows/apex_pipeline.json
+- 12 testes passando
+
+### FASE 3: SkillManifest
+- core/skill_manifest.py — descoberta automática por domínio
+- skills/**/skill.json — manifestos para webmcp, github, voice, harnesses
+- 9 testes passando
+
+### FASE 4: BrowserPilot Estruturado
+- core/browser_state.py — ElementRef, PageSnapshot, BrowserAction, BrowserSession
+- agents/browser_pilot.py — patch cirúrgico com _start_session, _record_action, replay
+- 12 testes passando
+
+### FASE 5: ChannelGateway
+- core/channel_gateway.py — ChannelMessage, ChannelResponse, ChannelGateway
+- agents/telegram/bot.py — register_telegram_adapter()
+- 10 testes passando
+- Identidade Moon preservada: zero dependências externas, zero custo

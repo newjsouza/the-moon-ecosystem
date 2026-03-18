@@ -999,111 +999,70 @@ FORMATO DE RESPOSTA:
             await update.message.reply_text("Nenhuma sessão de navegação ativa.")
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """Handles all text messages."""
-        user_id  = str(update.effective_user.id)
-        user_text = update.message.text
+        """Handles incoming text messages."""
+        user_id = str(update.effective_user.id)
+        chat_id = str(update.effective_chat.id)
+        text    = update.message.text
 
-        logger.info(f"[{user_id}] text: {user_text[:80]}")
+        # Normalize for intent routing
+        text_lower = text.lower().strip()
 
-        # ── Intercepta input sensível para BrowserPilot ──────────────
-        pilot = _get_browser_pilot()
-        if pilot:
-            active = pilot.get_active_session()
-            if active and active.status == "waiting_input":
-                # Usuário está respondendo a uma pausa do BrowserPilot
-                # O valor é passado direto, sem log, sem memória
-                provided = await pilot.provide_sensitive_input(
-                    active.session_id, user_text
-                )
-                if provided:
-                    # Deleta a mensagem do usuário para proteger o dado sensível
-                    try:
-                        await update.message.delete()
-                    except Exception:
-                        pass
-                    return
-        # ── Fim interceptação ────────────────────────────────────────
-
-        # Fast-path intent routing
-        routed = await self._route_intent(user_id, user_text, update, context)
-        if routed:
-            await update.message.reply_text(routed, parse_mode="Markdown")
+        # Try intent routing first (before LLM for fast paths)
+        response = await self._route_intent(user_id, text, update, context)
+        if response:
+            await update.message.reply_text(response, parse_mode="Markdown")
             return
 
-        # General LLM path — also check for sports context
-        extra_ctx = ""
-        sm = self._get_sports_manager()
-        if sm:
-            sports_ctx = await self.sports.build(user_text, sm)
-            if sports_ctx:
-                extra_ctx = sports_ctx
-
-        response = await self._ask_llm(user_id, user_text, extra_context=extra_ctx)
+        # Route to LLM
+        response = await self._ask_llm(user_id, text)
         await update.message.reply_text(response, parse_mode="Markdown")
 
-    async def handle_voice(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """Handles voice messages: download → transcribe → route → respond."""
-        user_id = str(update.effective_user.id)
-        logger.info(f"[{user_id}] voice message received")
 
-        status_msg = await update.message.reply_text("🎧 Transcrevendo áudio...")
+    async def handle_voice(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Handles incoming voice messages."""
+        user_id = str(update.effective_user.id)
+        file_obj = await update.message.voice.get_file()
+        voice_bytes = await file_obj.download_as_bytearray()
+
+        # Convert to temp file for Whisper
+        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+            f.write(voice_bytes)
+            temp_path = f.name
 
         try:
-            voice_file = await context.bot.get_file(update.message.voice.file_id)
+            transcription = await self._transcribe_voice(temp_path)
+            if not transcription:
+                await update.message.reply_text("❌ Não consegui entender o áudio. Repita?")
+                return
 
-            with tempfile.TemporaryDirectory() as tmpdir:
-                oga_path = os.path.join(tmpdir, "voice.oga")
-                wav_path = os.path.join(tmpdir, "voice.wav")
-
-                await voice_file.download_to_drive(oga_path)
-
-                # Convert to WAV
-                audio = AudioSegment.from_ogg(oga_path)
-                audio.export(wav_path, format="wav")
-
-                # Transcribe via Groq Whisper
-                with open(wav_path, "rb") as f:
-                    transcription = await self.groq.audio.transcriptions.create(
-                        file     = (wav_path, f.read()),
-                        model    = WHISPER,
-                        language = "pt",
-                    )
-
-                transcribed_text = transcription.text.strip()
-                logger.info(f"Transcribed: {transcribed_text[:100]}")
-
-                if not transcribed_text:
-                    await status_msg.edit_text("⚠️ Não consegui transcrever o áudio.")
-                    return
-
-                # Show transcription
-                await status_msg.edit_text(
-                    f"📝 *Transcrição:* _{transcribed_text}_", parse_mode="Markdown"
-                )
-
-                # Route like a text message
-                routed = await self._route_intent(user_id, transcribed_text, update, context)
-                if routed:
-                    await update.message.reply_text(routed, parse_mode="Markdown")
-                    return
-
-                # General LLM path
-                extra_ctx = ""
-                sm = self._get_sports_manager()
-                if sm:
-                    sports_ctx = await self.sports.build(transcribed_text, sm)
-                    if sports_ctx:
-                        extra_ctx = sports_ctx
-
-                response = await self._ask_llm(user_id, transcribed_text, extra_context=extra_ctx)
-                await update.message.reply_text(response, parse_mode="Markdown")
-
-        except Exception as e:
-            logger.error(f"Voice handling error: {e}")
+            # Process transcription as text
+            response = await self._ask_llm(user_id, transcription)
             await update.message.reply_text(
-                "⚠️ Erro ao processar áudio. Verifique se o ffmpeg está instalado.",
-                parse_mode="Markdown",
+                f"🎙️ *Você disse:* {transcription}\n\n{response}",
+                parse_mode="Markdown"
             )
+        finally:
+            try:
+                os.unlink(temp_path)
+            except:
+                pass
+
+
+    async def _transcribe_voice(self, audio_path: str) -> Optional[str]:
+        """Transcribes voice message using Whisper API."""
+        try:
+            with open(audio_path, "rb") as audio_file:
+                completion = await self.groq.audio.transcriptions.create(
+                    model    = WHISPER,
+                    file     = ("audio.ogg", audio_file),
+                    response_format = "text",
+                    language = "pt",
+                )
+                return completion.strip()
+        except Exception as e:
+            logger.error(f"Voice transcription failed: {e}")
+            return None
+
 
     # ════════════════════════════════════════════════════════
     #  Reminder checker loop
@@ -1195,6 +1154,28 @@ FORMATO DE RESPOSTA:
             allowed_updates=["message", "callback_query"],
             drop_pending_updates=True,
         )
+
+
+# Telegram adapter and registration function for ChannelGateway
+async def _telegram_send_adapter(response: ChannelResponse) -> bool:
+    """Adapter do TelegramBot para o ChannelGateway."""
+    try:
+        from telegram import Bot
+        bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
+        if not bot_token:
+            return False
+        
+        bot = Bot(token=bot_token)
+        await bot.send_message(chat_id=response.channel_id, text=response.text)
+        return True
+    except Exception:
+        return False
+
+
+def register_telegram_adapter():
+    from core.channel_gateway import get_channel_gateway
+    gw = get_channel_gateway()
+    gw.register_adapter("telegram", _telegram_send_adapter)
 
 
 if __name__ == "__main__":
