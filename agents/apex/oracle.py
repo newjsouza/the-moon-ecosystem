@@ -653,6 +653,7 @@ IMPORTANTE: Retorne APENAS o JSON, sem texto extra antes ou depois."""
         self,
         analysis: dict,
         match_detail: Optional[dict],
+        webmcp_lineups: Optional[dict] = None,
     ) -> dict:
         """Refina análise com escalações confirmadas 45 min antes."""
         home_name = analysis["home_team"]
@@ -661,19 +662,20 @@ IMPORTANTE: Retorne APENAS o JSON, sem texto extra antes ou depois."""
         # Extrai lineups do match detail
         lineups = self._extract_lineups(match_detail, home_name, away_name)
 
-        # Se não há escalação, retorna análise original sem refinamento
-        if not lineups.get("home_lineup") and not lineups.get("away_lineup"):
-            analysis["refined_analysis"] = (
-                analysis["general_analysis"] +
-                "\n\n_⚠️ Escalações ainda não confirmadas pela fonte de dados._"
-            )
-            return {"analysis": analysis, "lineups": lineups}
+        # P9: completa com lineups do WebMCP quando a fonte principal vier vazia
+        if webmcp_lineups:
+            merged = dict(lineups)
+            for key, value in webmcp_lineups.items():
+                current = merged.get(key)
+                if key not in merged or not current:
+                    merged[key] = value
+            lineups = merged
 
-        # Gera refinamento
-        system_prompt = """Você é um analista profissional de apostas esportivas.
-Refine a análise de aposta considerando as escalações confirmadas.
-Foque nos impactos de desfalques, retornos e suspensões.
-Seja objetivo e direto. Responda em português do Brasil."""
+        lineup_ctx = ""
+        if lineups.get("home_lineup"):
+            lineup_ctx += f"\n{home_name} TITULARES: {', '.join(lineups['home_lineup'][:11])}"
+        if lineups.get("away_lineup"):
+            lineup_ctx += f"\n{away_name} TITULARES: {', '.join(lineups['away_lineup'][:11])}"
 
         absent_ctx = ""
         if lineups.get("home_absent"):
@@ -689,20 +691,36 @@ Seja objetivo e direto. Responda em português do Brasil."""
         if lineups.get("away_returns"):
             absent_ctx += f"\n{away_name} RETORNOS: {', '.join(lineups['away_returns'])}"
 
+        # Sem nenhuma informação de escalação, mantém o aviso original
+        if not lineup_ctx and not absent_ctx:
+            analysis["refined_analysis"] = (
+                analysis["general_analysis"] +
+                "\n\n_⚠️ Escalações ainda não confirmadas pela fonte de dados._"
+            )
+            return {"analysis": analysis, "lineups": lineups}
+
+        system_prompt = """Você é um analista profissional de apostas esportivas.
+Refine a análise de aposta considerando as escalações confirmadas.
+Avalie o impacto tático dos titulares escalados e dos possíveis desfalques.
+Seja objetivo e direto. Responda em português do Brasil."""
+
+        escalacoes_ctx = lineup_ctx
         if absent_ctx:
-            user_prompt = f"""Análise original do jogo {home_name} × {away_name}:
+            escalacoes_ctx += f"\n\nDESFALQUES/RETORNOS:{absent_ctx}"
+
+        source_label = lineups.get("source", "fonte desconhecida")
+        user_prompt = f"""Análise original do jogo {home_name} × {away_name}:
 {analysis['general_analysis'][:500]}
 
-NOVIDADES DE ESCALAÇÃO:{absent_ctx}
+ESCALAÇÕES CONFIRMADAS (fonte: {source_label}):{escalacoes_ctx}
 
 Com base nestas informações, escreva um parágrafo refinando a análise.
-Avalie se as escalações confirmam ou alteram as indicações anteriores.
-Máximo 4 linhas. Responda apenas o texto, sem JSON."""
+Considere o impacto dos titulares escalados, da formação do meio-campo
+e se as escalações confirmam ou alteram as indicações anteriores.
+Máximo 5 linhas. Responda apenas o texto, sem JSON."""
 
-            refined = await self.llm.generate(user_prompt, system_prompt)
-            analysis["refined_analysis"] = refined or analysis["general_analysis"]
-        else:
-            analysis["refined_analysis"] = analysis["general_analysis"]
+        refined = await self.llm.generate(user_prompt, system_prompt)
+        analysis["refined_analysis"] = refined or analysis["general_analysis"]
 
         return {"analysis": analysis, "lineups": lineups}
 
@@ -727,6 +745,60 @@ Máximo 4 linhas. Responda apenas o texto, sem JSON."""
         # virão de web scraping ou API paga quando disponível
         # Por ora, retornamos estrutura vazia e indicamos no texto
         return lineups
+
+
+async def _fetch_webmcp_lineups(
+    home: str,
+    away: str,
+    competition: str = "",
+) -> dict:
+    """
+    Busca escalações via WebMCP Sports Layer sem bloquear o fluxo principal.
+    Retorna um dict compatível com format_pre45_analysis().
+    """
+    lineups = {
+        "home_lineup": [],
+        "away_lineup": [],
+        "home_absent": [],
+        "away_absent": [],
+        "home_suspended": [],
+        "away_suspended": [],
+        "home_returns": [],
+        "away_returns": [],
+    }
+
+    try:
+        from skills.webmcp.sports.lineup_detector import LineupDetector
+
+        detector = LineupDetector()
+        result = await detector.detect_lineups(home, away, competition=competition)
+
+        if result.matches:
+            match = result.matches[0]
+            if match.home_lineup:
+                lineups["home_lineup"] = [p.name for p in match.home_lineup.starters[:11]]
+                if match.home_lineup.formation:
+                    lineups["home_formation"] = match.home_lineup.formation
+            if match.away_lineup:
+                lineups["away_lineup"] = [p.name for p in match.away_lineup.starters[:11]]
+                if match.away_lineup.formation:
+                    lineups["away_formation"] = match.away_lineup.formation
+            if lineups["home_lineup"] or lineups["away_lineup"]:
+                lineups["source"] = result.raw_data.get("lineup_source", result.provider)
+                return lineups
+
+        lineup_news = [n for n in result.news if n.mentions_lineup]
+        if lineup_news:
+            lineups["news_articles"] = [
+                {"title": n.title, "url": n.url, "source": n.source}
+                for n in lineup_news[:3]
+            ]
+            lineups["source"] = result.raw_data.get("lineup_source", result.provider)
+            return lineups
+    except Exception as e:
+        logger.warning(f"_fetch_webmcp_lineups falhou ({home} × {away}): {e}")
+
+    return {}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -869,7 +941,14 @@ class ApexOracle:
 
             try:
                 match_detail = await self.football.get_match_detail(match_id)
-                result       = await self.engine.generate_pre45_analysis(analysis, match_detail)
+                webmcp_lineups = await _fetch_webmcp_lineups(
+                    home_name, away_name, analysis.get("competition", "")
+                )
+                result = await self.engine.generate_pre45_analysis(
+                    analysis,
+                    match_detail,
+                    webmcp_lineups=webmcp_lineups,
+                )
 
                 msg = self.formatter.format_pre45_analysis(
                     result["analysis"], result["lineups"]
@@ -887,6 +966,8 @@ class ApexOracle:
         - A cada 5 minutos verifica jogos que começam em ~45 min
         """
         logger.info("ApexOracle: loop autônomo iniciado")
+        from agents.apex.lineup_poller import APEXLineupPoller
+        asyncio.create_task(APEXLineupPoller(self.context, self.telegram).start())
         morning_sent_today = ""  # data do último envio matinal
 
         while True:

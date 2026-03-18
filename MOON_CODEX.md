@@ -1463,4 +1463,73 @@ cp core/orchestrator.py.bak core/orchestrator.py
 
 ---
 
+## APEX P8 — Lineup Polling Autônomo (2026-03-17)
+
+### Arquivos criados/modificados
+
+| Arquivo | Tipo | Descrição |
+|---|---|---|
+| `agents/apex/lineup_poller.py` | Novo | `APEXLineupPoller` para polling t-70min até t-5min |
+| `agents/apex/oracle.py` | Patch cirúrgico | `_fetch_webmcp_lineups()` + fallback WebMCP em `check_pre45()` + start do poller em `run_autonomous_loop()` |
+| `tests/test_apex_lineup_poller.py` | Novo | 17 testes unitários para poller e fallback de escalações |
+
+### Fluxo após P8
+
+1. `run_autonomous_loop()` inicia o `APEXLineupPoller` em paralelo.
+2. O poller monitora partidas dentro da janela t-70min a t-5min.
+3. O WebMCP (`LineupDetector`) é consultado para escalações e notícias de lineup.
+4. Quando ambas escalações são confirmadas, o Telegram recebe notificação imediata.
+5. O contexto diário persiste `lineups_confirmed` para consumo posterior.
+6. Em `check_pre45()`, se a API gratuita não trouxer escalações, o Oracle tenta preencher via `_fetch_webmcp_lineups()`.
+
+### Validação
+
+- `python3 -m pytest tests/test_apex_lineup_poller.py -v` -> 17 passed
+- `python3 -m pytest tests/test_webmcp_sports.py tests/test_webmcp_agent.py tests/test_apex_lineup_poller.py --tb=short -q` -> 57 passed
+- `python3 -m pytest tests/ --tb=no -q` -> 5 falhas remanescentes fora do escopo APEX/WebMCP:
+  `test_cli_harness_adapter.py`, `test_integration_cli_harness.py`, `test_moon_cli_agent.py`
+
+### Backup
+
+- `agents/apex/oracle.py.bak`
+- `MOON_CODEX.md.bak`
+
+---
+
 *FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
+
+---
+
+## APEX P9 — LLM Refinamento com Titulares Reais (2026-03-17)
+
+### Problema resolvido
+Antes do P9, o LLM nunca via os titulares reais mesmo com WebMCP ativo:
+- `_fetch_webmcp_lineups()` rodava **após** o LLM (ordem errada no P8)
+- `refined_analysis` sempre retornava `⚠️ Escalações ainda não confirmadas`
+- Formatter mostrava titulares, mas análise LLM era genérica
+
+### Mudanças em oracle.py
+| Mudança | Detalhe |
+|---|---|
+| `generate_pre45_analysis(..., webmcp_lineups=None)` | Novo param opcional — retrocompatível |
+| Merge WebMCP quando API vazia | `lineups = {**lineups, **webmcp_lineups}` |
+| `lineup_ctx` no prompt | `"Flamengo TITULARES: Rossi, Pedro, Arrascaeta..."` |
+| LLM chamado com titulares | Antes: só com desfalques. Agora: sempre que houver lineup |
+| `check_pre45()` reordenado | WebMCP **antes** do LLM — ordem correta |
+
+### Fluxo final APEX (P8 + P9)
+```
+check_pre45()
+    ├── football.get_match_detail()              → sem lineups (API grátis)
+    ├── _fetch_webmcp_lineups()                  → titulares reais [P9: ANTES do LLM]
+    └── generate_pre45_analysis(webmcp_lineups=) → merge + lineup_ctx no prompt
+            └── LLM.generate(titulares + desfalques)
+                    └── refined_analysis tático com jogadores reais ✅
+```
+
+### Testes
+- `tests/test_apex_p9.py` — 15 testes passando
+- Regressão total APEX+WebMCP: 73 testes passando
+
+### Retrocompatibilidade
+Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge WebMCP — zero mudança necessária.
