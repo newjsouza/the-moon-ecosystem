@@ -19,7 +19,7 @@ CAPACIDADES:
   6. Bot Telegram recebe /browser <instrução> para iniciar sessão
      e responde mensagens de texto durante pausas ativas
 
-COMANDOS SUPORTADOS (via BrowserBridge):
+COMANDOS SUPERTADOS (via BrowserBridge):
   goto, click, fill, press, scroll, hover, type,
   screenshot, text, links, snapshot, tabs, newtab
 
@@ -39,8 +39,12 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+import uuid
 
 from groq import AsyncGroq
+
+# Importar as classes de estado do navegador
+from core.browser_state import BrowserSession, BrowserAction, PageSnapshot
 
 logger = logging.getLogger("moon.browser_pilot")
 
@@ -305,6 +309,8 @@ class BrowserPilot:
         self.notifier = PilotNotifier()
         self._sessions: Dict[str, PilotSession] = {}
         self._bridge  = None   # lazy init — evita import circular
+        # Adicionando o objeto de sessão do navegador
+        self._browser_session: BrowserSession | None = None
 
     def _get_bridge(self):
         """Lazy import do BrowserBridge para evitar import circular."""
@@ -613,3 +619,38 @@ class BrowserPilot:
         except Exception as e:
             logger.debug(f"Screenshot falhou: {e}")
             return None
+
+    def _start_session(self, session_id: str = None) -> BrowserSession:
+        """Inicia uma nova sessão de navegação estruturada."""
+        sid = session_id or str(uuid.uuid4())[:8]
+        self._browser_session = BrowserSession(session_id=sid, actions=[], snapshots=[])
+        return self._browser_session
+
+    def _record_action(self, action_type: str, target_ref: str = None, value: str = None) -> None:
+        """Registra uma ação na sessão de navegação."""
+        if self._browser_session:
+            self._browser_session.add_action(BrowserAction(
+                action_type=action_type, target_ref=target_ref,
+                value=value, timestamp=time.time()
+            ))
+
+    def _record_snapshot(self, url: str, title: str, raw_text: str = "", elements: list = None) -> None:
+        """Registra um snapshot da página na sessão de navegação."""
+        if self._browser_session:
+            self._browser_session.add_snapshot(PageSnapshot(
+                url=url, title=title, timestamp=time.time(),
+                elements=elements or [], raw_text=raw_text
+            ))
+
+    def get_replay_log(self) -> list:
+        """Obtém o log de replay auditável das ações realizadas."""
+        if self._browser_session:
+            return self._browser_session.replay_log()
+        return []
+
+    def get_session_dict(self) -> dict:
+        """Obtém a representação dicionário da sessão atual."""
+        if self._browser_session:
+            return self._browser_session.to_dict()
+        return {}
+        
