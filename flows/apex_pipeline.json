@@ -2,9 +2,37 @@
   "name": "apex_pipeline",
   "session_mode": "channel",
   "steps": [
-    {"name": "fetch_games", "agent": "webmcp", "task": "Buscar partidas de hoje", "depends_on": [], "on_error": "stop"},
-    {"name": "fetch_lineups", "agent": "webmcp", "task": "Buscar escalações das partidas encontradas", "depends_on": ["fetch_games"], "on_error": "continue"},
-    {"name": "analyze", "agent": "apex", "task": "Analisar partidas com escalações disponíveis", "depends_on": ["fetch_lineups"], "on_error": "stop"},
-    {"name": "notify", "agent": "telegram", "task": "Enviar análise via Telegram", "depends_on": ["analyze"], "on_error": "continue"}
+    {
+      "name": "fetch_games",
+      "agent": "webmcp",
+      "task": "jogos de hoje futebol brasileiro",
+      "depends_on": [],
+      "on_error": "stop",
+      "timeout": 30.0
+    },
+    {
+      "name": "fetch_lineups",
+      "agent": "webmcp",
+      "task": "escalações das partidas de hoje",
+      "depends_on": ["fetch_games"],
+      "on_error": "continue",
+      "timeout": 60.0
+    },
+    {
+      "name": "analyze",
+      "agent": "apex",
+      "task": "analisar partidas com dados disponíveis e gerar análise de apostas",
+      "depends_on": ["fetch_lineups"],
+      "on_error": "stop",
+      "timeout": 90.0
+    },
+    {
+      "name": "notify",
+      "agent": "telegram",
+      "task": "enviar análise APEX via Telegram",
+      "depends_on": ["analyze"],
+      "on_error": "continue",
+      "timeout": 15.0
+    }
   ]
 }

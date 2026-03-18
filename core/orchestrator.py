@@ -461,6 +461,21 @@ class Orchestrator:
         async def cmd_nexus(remainder: str, metadata: dict) -> str:
             return await self._call_agent("NexusIntelligence", remainder or "status")
 
+        @reg.command("/apex", description="Executar pipeline APEX de análise de apostas", usage="/apex [args]", category="APEX", prefix_match=True)
+        async def cmd_apex(remainder: str, metadata: dict) -> str:
+            """Executa o apex_pipeline via MoonFlow."""
+            flow = self.flow_registry.get("apex_pipeline")
+            if not flow:
+                return "❌ apex_pipeline não encontrado em flows/"
+            
+            ctx = {"query": remainder.strip()} if remainder.strip() else {}
+            result = await flow.execute(ctx, self)
+            
+            if result.success:
+                return f"✅ APEX Pipeline executado com sucesso em {result.total_time:.2f}s"
+            else:
+                return f"❌ APEX Pipeline falhou: {result.error}"
+
     # ═══════════════════════════════════════════════════════════
     #  Message Gateway
     # ═══════════════════════════════════════════════════════════

@@ -1604,3 +1604,10 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - 5 testes convertidos de FAILED → SKIPPED (dependência de binário externo)
 - Suite final: 449+ pass | 20 skip | 0 fail
 - Padrão: skip condicional via shutil.which() — mesmo padrão do alpha_vantage
+
+## Sessão 2026-03-18 FASE 6 — APEX Pipeline End-to-End
+- flows/apex_pipeline.json: atualizado com tasks reais
+- core/moon_flow.py: execute() resolve agentes reais via Orchestrator
+- core/orchestrator.py: /apex command adicionado ao CommandRegistry
+- tests/test_apex_flow.py: 7 testes passando
+- Ciclo completo: /apex → MoonFlow → WebMCP → APEX → Telegram
