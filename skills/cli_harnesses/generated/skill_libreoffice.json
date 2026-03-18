@@ -1,0 +1,11 @@
+{
+  "name": "cli_libreoffice", 
+  "version": "1.0.0",
+  "description": "Harness CLI-Anything para LibreOffice",
+  "domains": ["cli", "libreoffice", "document"],
+  "commands": ["run", "help", "convert", "export"],
+  "examples": ["converter doc.docx em PDF", "gerar documento Word"],
+  "fallback": null, 
+  "cost": "zero", 
+  "requires_key": false
+}

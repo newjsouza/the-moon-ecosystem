@@ -1517,6 +1517,19 @@ cp core/orchestrator.py.bak core/orchestrator.py
 
 ---
 
+## Sessão 2026-03-17 FASE 3 — SkillManifest Discovery
+- core/skill_manifest.py: SkillManifest, SkillRegistry com descoberta automática
+- skills/*: Manifestos skill.json para webmcp, github, voice, cli_harnesses
+- agents/architect.py: Integração com skill_registry + get_skills_for_domain()
+- tests/test_skill_manifest.py: 9 testes passando
+- Descoberta: Varredura automática de skills/**/skill.json no startup
+
+---
+
+*FIM DO DOCUMENTO. AGENTES DO SISTEMA: VOCÊS SÃO RESPONSÁVEIS POR EXPANDIR E MODIFICAR ESTE ARQUIVO CONTINUAMENTE, MEDIANTE MELHORIAS CONSTANTES, ASSEGURANDO A IMORTALIDADE DO NOSSO APRENDIZADO.*
+
+---
+
 ## APEX P9 — LLM Refinamento com Titulares Reais (2026-03-17)
 
 ### Problema resolvido

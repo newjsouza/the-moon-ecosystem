@@ -1,0 +1,11 @@
+{
+  "name": "github", 
+  "version": "1.0.0",
+  "description": "Integração com GitHub API via token",
+  "domains": ["github", "code", "repo"],
+  "commands": ["list_repos", "create_issue", "push_file", "get_commit"],
+  "examples": ["listar repos", "criar issue no The Moon"],
+  "fallback": null, 
+  "cost": "zero", 
+  "requires_key": true
+}

@@ -148,6 +148,11 @@ class ArchitectAgent(AgentBase):
         # Callbacks de agentes (injetados manualmente ou via auto-discovery)
         self._agent_instances: Dict[str, Any] = {}
 
+        # Skill Registry (adicionado após DOMAIN_AGENT_MAP)
+        from core.skill_manifest import get_skill_registry
+        self.skill_registry = get_skill_registry()
+        self.skill_registry.discover("skills")
+
     # ═══════════════════════════════════════════════════════════
     #  Lifecycle
     # ═══════════════════════════════════════════════════════════
@@ -762,6 +767,9 @@ class ArchitectAgent(AgentBase):
         """
         return self._agent_status_cache.copy()
 
+    def get_skills_for_domain(self, domain: str) -> list:
+        return [s.name for s in self.skill_registry.list_by_domain(domain)]
+        
     # ═══════════════════════════════════════════════════════════
     #  Utilities
     # ═══════════════════════════════════════════════════════════

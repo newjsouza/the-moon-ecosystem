@@ -1,0 +1,11 @@
+{
+  "name": "cli_obs-studio", 
+  "version": "1.0.0",
+  "description": "Harness CLI-Anything para OBS Studio",
+  "domains": ["cli", "obs-studio", "video"],
+  "commands": ["run", "help", "record", "stream"],
+  "examples": ["iniciar gravação", "configurar cena OBS"],
+  "fallback": null, 
+  "cost": "zero", 
+  "requires_key": false
+}

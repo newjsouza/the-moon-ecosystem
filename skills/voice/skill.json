@@ -1,0 +1,11 @@
+{
+  "name": "voice", 
+  "version": "1.0.0",
+  "description": "Síntese e transcrição de voz",
+  "domains": ["voice", "audio", "tts"],
+  "commands": ["synthesize", "transcribe"],
+  "examples": ["converter texto em áudio"],
+  "fallback": null, 
+  "cost": "zero", 
+  "requires_key": false
+}

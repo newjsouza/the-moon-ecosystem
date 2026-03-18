@@ -1,0 +1,11 @@
+{
+  "name": "cli_mermaid", 
+  "version": "1.0.0",
+  "description": "Harness CLI-Anything para Mermaid",
+  "domains": ["cli", "mermaid", "diagram"],
+  "commands": ["run", "help", "convert", "export"],
+  "examples": ["gerar diagrama mermaid", "converter MD para PNG"],
+  "fallback": null, 
+  "cost": "zero", 
+  "requires_key": false
+}

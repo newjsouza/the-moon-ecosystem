@@ -1,0 +1,11 @@
+{
+  "name": "webmcp", 
+  "version": "1.0.0",
+  "description": "Coleta web leve via DuckDuckGo + scraping",
+  "domains": ["web", "search", "fetch", "sports"],
+  "commands": ["search", "fetch", "search_and_fetch", "deep", "sports:lineups", "sports:games"],
+  "examples": ["buscar resultado flamengo", "escalação Palmeiras vs Corinthians"],
+  "fallback": "browser_pilot", 
+  "cost": "zero", 
+  "requires_key": false
+}
