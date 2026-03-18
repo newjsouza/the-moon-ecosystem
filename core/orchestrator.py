@@ -472,9 +472,77 @@ class Orchestrator:
             result = await flow.execute(ctx, self)
             
             if result.success:
-                return f"✅ APEX Pipeline executado com sucesso em {result.total_time:.2f}s"
+                return f"✅ APEX Pipeline executado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
             else:
                 return f"❌ APEX Pipeline falhou: {result.error}"
+
+        @reg.command("/flow-status", description="Status de execução de um flow", usage="/flow-status <run_id>", category="Flows", prefix_match=True)
+        async def cmd_flow_status(remainder: str, metadata: dict) -> str:
+            """Retorna detalhes de uma execução específica de flow."""
+            if not remainder.strip():
+                return "⚠️ Uso: `/flow-status <run_id>`"
+                
+            from core.flow_run_store import get_flow_run_store
+            store = get_flow_run_store()
+            run_record = store.load_run(remainder.strip())
+            
+            if not run_record:
+                return f"❌ Run ID '{remainder.strip()}' não encontrado."
+                
+            # Format the response
+            import datetime
+            started = datetime.datetime.fromtimestamp(run_record.started_at).strftime('%Y-%m-%d %H:%M:%S')
+            finished = datetime.datetime.fromtimestamp(run_record.finished_at).strftime('%Y-%m-%d %H:%M:%S') if run_record.finished_at > 0 else "Em andamento"
+            
+            steps_info = []
+            for step in run_record.steps:
+                status_icon = "✅" if step.status == "success" else "❌" if step.status == "failed" else "⏳"
+                steps_info.append(f"  {status_icon} {step.step_name} ({step.agent})")
+            
+            steps_str = "\n".join(steps_info) if steps_info else "  Nenhum step registrado"
+            
+            return (
+                f"📊 *Status do Flow Run*\n"
+                f"ID: `{run_record.run_id}`\n"
+                f"Flow: `{run_record.flow_name}`\n"
+                f"Status: `{run_record.status.upper()}`\n"
+                f"Início: `{started}`\n"
+                f"Término: `{finished}`\n"
+                f"\n*Steps:*\n{steps_str}"
+            )
+
+        @reg.command("/flow-runs", description="Histórico de execuções", usage="/flow-runs [flow_name]", category="Flows", prefix_match=True)
+        async def cmd_flow_runs(remainder: str, metadata: dict) -> str:
+            """Retorna últimas execuções de flows."""
+            from core.flow_run_store import get_flow_run_store
+            store = get_flow_run_store()
+            
+            flow_name = remainder.strip() if remainder.strip() else None
+            runs = store.list_runs(flow_name=flow_name)
+            
+            if not runs:
+                if flow_name:
+                    return f"❌ Nenhuma execução encontrada para o flow '{flow_name}'."
+                else:
+                    return "❌ Nenhuma execução de flow encontrada."
+            
+            # Sort by start time, most recent first
+            runs = sorted(runs, key=lambda r: r.started_at, reverse=True)[:10]  # Limit to last 10
+            
+            runs_info = []
+            for run in runs:
+                import datetime
+                started = datetime.datetime.fromtimestamp(run.started_at).strftime('%Y-%m-%d %H:%M:%S')
+                status_icon = "✅" if run.status == "success" else "❌" if run.status == "failed" else "⏳"
+                
+                runs_info.append(f"{status_icon} `{run.run_id[:8]}...`: {run.flow_name} - {run.status} ({started})")
+            
+            runs_str = "\n".join(runs_info)
+            
+            if flow_name:
+                return f"📋 *Últimas execuções de `{flow_name}`*:\n{runs_str}"
+            else:
+                return f"📋 *Últimas execuções de flows*:\n{runs_str}"
 
     # ═══════════════════════════════════════════════════════════
     #  Message Gateway

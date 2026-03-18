@@ -29,6 +29,8 @@ class FlowResult:
     steps: List[Dict[str, Any]]
     total_time: float
     error: str = None
+    run_id: str = ""      # Added for observability
+    session_id: str = ""  # Added for observability
 
 
 class MoonFlow:
@@ -38,7 +40,28 @@ class MoonFlow:
         self.session_mode = session_mode
 
     async def execute(self, context: Dict[str, Any], orchestrator) -> FlowResult:
+        import uuid
+        from core.flow_run_store import get_flow_run_store
+        
+        # Generate unique run ID
+        run_id = str(uuid.uuid4())
         start_time = time.time()
+        
+        # Get session ID from context if available
+        session_id = context.get("session_id", "unknown")
+        
+        # Create and save initial run record
+        from core.flow_run_store import FlowRunRecord, FlowStepRun
+        store = get_flow_run_store()
+        run_record = FlowRunRecord(
+            run_id=run_id,
+            flow_name=self.name,
+            session_id=session_id,
+            status="running",
+            started_at=start_time
+        )
+        store.save_run(run_record)
+        
         results = []
         step_outputs = {}
 
@@ -63,6 +86,16 @@ class MoonFlow:
                 task_with_context = step.task.format(**context, **step_outputs)
 
                 try:
+                    # Record step start
+                    step_started_at = time.time()
+                    step_run = FlowStepRun(
+                        step_name=step.name,
+                        agent=step.agent,
+                        status="running",
+                        started_at=step_started_at
+                    )
+                    store.update_step(run_id, step_run)
+
                     # Execute the agent task
                     result = await asyncio.wait_for(
                         orchestrator._call_agent(step.agent, task_with_context, timeout=step.timeout),
@@ -79,6 +112,13 @@ class MoonFlow:
                     
                     results.append(step_result)
                     
+                    # Update step status
+                    step_run.finished_at = time.time()
+                    step_run.status = "success" if result.success else "failed"
+                    step_run.output_summary = str(result.data)[:200] if result.data else ""
+                    step_run.error = result.error or ""
+                    store.update_step(run_id, step_run)
+                    
                     # Store output for potential use by subsequent steps
                     step_outputs[f"step_{step.name}"] = result.data
                     
@@ -88,12 +128,15 @@ class MoonFlow:
                         executed_in_this_round += 1
                     else:
                         if step.on_error == "stop":
+                            store.mark_finished(run_id, "failed")
                             return FlowResult(
                                 flow_name=self.name,
                                 success=False,
                                 steps=results,
                                 total_time=time.time() - start_time,
-                                error=f"Step '{step.name}' failed and on_error='stop'"
+                                error=f"Step '{step.name}' failed and on_error='stop'",
+                                run_id=run_id,
+                                session_id=session_id
                             )
                         elif step.on_error == "continue":
                             executed_steps.add(step.name)
@@ -113,13 +156,22 @@ class MoonFlow:
                     }
                     results.append(step_result)
                     
+                    # Update step status for timeout
+                    step_run.finished_at = time.time()
+                    step_run.status = "failed"
+                    step_run.error = step_result["error"]
+                    store.update_step(run_id, step_run)
+                    
                     if step.on_error == "stop":
+                        store.mark_finished(run_id, "failed")
                         return FlowResult(
                             flow_name=self.name,
                             success=False,
                             steps=results,
                             total_time=time.time() - start_time,
-                            error=f"Step '{step.name}' timed out and on_error='stop'"
+                            error=f"Step '{step.name}' timed out and on_error='stop'",
+                            run_id=run_id,
+                            session_id=session_id
                         )
                     elif step.on_error == "continue":
                         executed_steps.add(step.name)
@@ -139,13 +191,22 @@ class MoonFlow:
                     }
                     results.append(step_result)
                     
+                    # Update step status for exception
+                    step_run.finished_at = time.time()
+                    step_run.status = "failed"
+                    step_run.error = str(e)
+                    store.update_step(run_id, step_run)
+                    
                     if step.on_error == "stop":
+                        store.mark_finished(run_id, "failed")
                         return FlowResult(
                             flow_name=self.name,
                             success=False,
                             steps=results,
                             total_time=time.time() - start_time,
-                            error=f"Step '{step.name}' raised exception and on_error='stop': {str(e)}"
+                            error=f"Step '{step.name}' raised exception and on_error='stop': {str(e)}",
+                            run_id=run_id,
+                            session_id=session_id
                         )
                     elif step.on_error == "continue":
                         executed_steps.add(step.name)
@@ -158,20 +219,26 @@ class MoonFlow:
 
             # If no steps were executed in this round, there's a circular dependency
             if executed_in_this_round == 0:
+                store.mark_finished(run_id, "failed")
                 return FlowResult(
                     flow_name=self.name,
                     success=False,
                     steps=results,
                     total_time=time.time() - start_time,
-                    error="Circular dependency detected or unsatisfied dependencies"
+                    error="Circular dependency detected or unsatisfied dependencies",
+                    run_id=run_id,
+                    session_id=session_id
                 )
 
         # All steps executed successfully
+        store.mark_finished(run_id, "success")
         return FlowResult(
             flow_name=self.name,
             success=True,
             steps=results,
-            total_time=time.time() - start_time
+            total_time=time.time() - start_time,
+            run_id=run_id,
+            session_id=session_id
         )
 
     def to_dict(self) -> Dict[str, Any]:

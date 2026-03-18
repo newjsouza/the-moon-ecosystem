@@ -1611,3 +1611,11 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - core/orchestrator.py: /apex command adicionado ao CommandRegistry
 - tests/test_apex_flow.py: 7 testes passando
 - Ciclo completo: /apex → MoonFlow → WebMCP → APEX → Telegram
+
+## Sessão 2026-03-18 FASE 7 — Persistência e Observabilidade de Flows
+- core/flow_run_store.py: histórico local de execuções MoonFlow
+- core/moon_flow.py: run_id + persistência por step
+- core/orchestrator.py: /flow-status e /flow-runs
+- tests/test_flow_run_store.py: 9 testes
+- tests/test_flow_observability.py: 7 testes
+- Operação local auditável, retomável e zero-custo
