@@ -210,6 +210,14 @@ class Orchestrator:
         self.template_registry = get_template_registry()
         self.template_registry.discover("flow_templates")
         
+        # ── Policy Engine ────────────────────────────────────────
+        from core.policy_engine import get_policy_engine
+        self.policy_engine = get_policy_engine()
+        _policy_file = "config/default_policy.json"
+        import pathlib
+        if pathlib.Path(_policy_file).exists():
+            self.policy_engine.load_from_file(_policy_file)
+        
         # ── Channel Gateway (Phase 5) ────────────────────────────
         from core.channel_gateway import get_channel_gateway
         self.channel_gateway = get_channel_gateway()
@@ -668,6 +676,58 @@ class Orchestrator:
             else:
                 return f"📋 *Todos os templates disponíveis:*\n" + "\n".join(templates_info)
 
+        @reg.command("/policy", description="Gerencia políticas de acesso", usage="/policy [list|check|stats]", category="Admin", prefix_match=True)
+        async def cmd_policy(remainder: str, metadata: dict) -> str:
+            """
+            /policy list — lista todas as regras ativas
+            /policy check <channel> <command> — verifica se comando é permitido
+            /policy stats — estatísticas do engine
+            """
+            parts = remainder.strip().split()
+            sub = parts[0] if parts else "list"
+            if sub == "list":
+                rules = self.policy_engine.list_rules()
+                data = [{"id": r.rule_id, "effect": r.effect, "priority": r.priority, "desc": r.description} for r in rules]
+                return f"📋 *Políticas ativas* (total: {len(data)}):\n" + "\n".join([
+                    f"  `{r['id']}`: {r['effect'].upper()} (prio: {r['priority']}) - {r['desc']}" 
+                    for r in data
+                ])
+            elif sub == "check" and len(parts) >= 3:
+                channel = parts[1]
+                command = parts[2]
+                allowed, reason = self._check_policy(command, channel_type=channel)
+                status = "✅ PERMITIDO" if allowed else "❌ NEGADO"
+                return f"🔍 *Verificação de Política*\nCanal: `{channel}`\nComando: `{command}`\nStatus: {status}\nMotivo: {reason}"
+            elif sub == "stats":
+                stats = self.policy_engine.get_stats()
+                return f"📊 *Estatísticas do Policy Engine*\nTotal regras: {stats['total_rules']}\nAllow: {stats['allow_rules']}\nDeny: {stats['deny_rules']}"
+            return "⚠️ Uso: `/policy list` | `/policy check <canal> <comando>` | `/policy stats`"
+
+    # ═══════════════════════════════════════════════════════════
+    #  Helper Methods
+    # ═══════════════════════════════════════════════════════════
+
+    def _check_policy(self, command: str, channel_type: str = "internal",
+                      user_id: str = "owner", agent: str = "*",
+                      domain: str = "*") -> tuple[bool, str]:
+        """
+        Check if a command is allowed based on the policy engine.
+        Returns (allowed: bool, reason: str)
+        """
+        try:
+            decision = self.policy_engine.check(
+                channel_type=channel_type,
+                user_id=user_id,
+                agent=agent,
+                domain=domain,
+                command=command
+            )
+            return decision.allowed, decision.reason
+        except Exception as e:
+            # On error, default to allowing (fail-open principle)
+            logger.warning(f"Policy check failed (default allow): {e}")
+            return True, f"Erro na verificação de política: {str(e)}"
+
     # ═══════════════════════════════════════════════════════════
     #  Message Gateway
     # ═══════════════════════════════════════════════════════════
@@ -685,14 +745,48 @@ class Orchestrator:
 
     async def handle_channel_message(self, text: str, metadata: Dict[str, Any]) -> None:
         source = metadata.get("source", "unknown")
+        user_id = metadata.get("user_id", "unknown")
         logger.info(f"Message from [{source}]: {text[:80]}...")
 
+        # Publish to message bus first
         await self.message_bus.publish(
             sender=source,
             topic="workspace.network",
             payload={"type": "user_message", "text": text},
             target="orchestrator",
         )
+
+        # Check policy if it's an external channel (not internal)
+        if source != "internal":
+            # Determine if this looks like a command (starts with /)
+            command = None
+            if text.startswith('/'):
+                # Extract command (e.g. "/flow-status 123" -> "/flow-status")
+                parts = text.split()
+                if parts:
+                    command = parts[0]
+            
+            # Only check policy if we identified a command
+            if command:
+                try:
+                    allowed, reason = self._check_policy(
+                        command=command,
+                        channel_type=source,
+                        user_id=user_id
+                    )
+                    
+                    if not allowed:
+                        # Send policy violation message back to the channel
+                        rejection_msg = f"🔒 Acesso negado: {reason}"
+                        
+                        for channel in self.channels:
+                            if channel.name == source:
+                                await channel.send_message(rejection_msg, recipient_id=metadata.get("chat_id"))
+                                break
+                        return  # Exit early, don't process the command
+                except Exception as e:
+                    # In case of policy engine error, log but continue (fail-open)
+                    logger.warning(f"Policy check error (continuing): {e}")
 
         metadata = await self._enrich_with_web_context(text, metadata)
         response = await self._route_command(text, metadata)

@@ -1,0 +1,59 @@
+{
+  "rules": [
+    {
+      "rule_id": "allow-owner-all",
+      "description": "Johnathan tem acesso total a tudo",
+      "effect": "allow",
+      "channels": ["*"],
+      "users": ["johnathan", "owner"],
+      "agents": ["*"],
+      "domains": ["*"],
+      "commands": ["*"],
+      "priority": 100
+    },
+    {
+      "rule_id": "allow-telegram-safe-commands",
+      "description": "Telegram pode usar comandos de consulta e análise",
+      "effect": "allow",
+      "channels": ["telegram"],
+      "users": ["*"],
+      "agents": ["webmcp", "apex"],
+      "domains": ["sports", "search"],
+      "commands": ["/apex", "/buscar", "/jogos", "/aovivo", "/escalação", "/notícias"],
+      "priority": 50
+    },
+    {
+      "rule_id": "deny-telegram-admin",
+      "description": "Telegram não pode executar comandos administrativos de flow",
+      "effect": "deny",
+      "channels": ["telegram"],
+      "users": ["*"],
+      "agents": ["*"],
+      "domains": ["*"],
+      "commands": ["/flow-retry", "/flow-resume", "/flow-new"],
+      "priority": 60
+    },
+    {
+      "rule_id": "allow-cli-all",
+      "description": "CLI local tem acesso total",
+      "effect": "allow",
+      "channels": ["cli", "internal"],
+      "users": ["*"],
+      "agents": ["*"],
+      "domains": ["*"],
+      "commands": ["*"],
+      "priority": 80
+    },
+    {
+      "rule_id": "allow-read-only-defaults",
+      "description": "Qualquer canal pode consultar status e listar templates",
+      "effect": "allow",
+      "channels": ["*"],
+      "users": ["*"],
+      "agents": ["*"],
+      "domains": ["*"],
+      "commands": ["/flow-status", "/flow-runs", "/flow-templates"],
+      "priority": 10
+    }
+  ]
+}

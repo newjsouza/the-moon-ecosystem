@@ -1644,6 +1644,15 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - tests/test_flow_template.py: 16 testes
 - Capacidade: criar e executar flows dinâmicos via comando com variáveis
 
+## Sessão 2026-03-18 FASE 10 — Policy Layer
+- core/policy_engine.py: PolicyRule, PolicyDecision, PolicyEngine
+- config/default_policy.json: 5 regras padrão (owner-all, telegram-safe, deny-admin, cli-all, read-only)
+- core/orchestrator.py: _check_policy() + /policy command
+- tests/test_policy_engine.py: 18 testes
+- tests/test_policy_integration.py: 6 testes
+- Controle: canal, usuário, agente, domínio e comando
+- Filosofia: falha aberta (exception → allow) | owner tem acesso total
+
 ### 2026-03-18 — system_info intent no Telegram Bot
 - Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
 - Adicionada função async `_collect_system_info()` usando psutil
