@@ -145,7 +145,7 @@ class TestFlowRetry:
         """Testa se resume pula steps com status=success."""
         from core.moon_flow import MoonFlow, FlowStep
         from core.flow_run_store import get_flow_run_store
-        
+
         # Criar um flow com múltiplos steps
         steps = [
             FlowStep(name="step1", agent="agent1", task="task1"),
@@ -153,7 +153,7 @@ class TestFlowRetry:
             FlowStep(name="step3", agent="agent3", task="task3")
         ]
         flow = MoonFlow(name="test_flow", steps=steps)
-        
+
         # Executar o flow uma vez para criar um run
         mock_orchestrator = AsyncMock()
         mock_result = Mock()
@@ -162,14 +162,14 @@ class TestFlowRetry:
         mock_result.error = None
         mock_result.execution_time = 0.1
         mock_orchestrator._call_agent.return_value = mock_result
-        
+
         initial_result = await flow.execute({}, mock_orchestrator)
         run_id = initial_result.run_id
-        
+
         # Agora simular um run parcial onde apenas o step1 teve sucesso
         from core.flow_run_store import get_flow_run_store, FlowRunRecord, FlowStepRun
         store = get_flow_run_store()
-        
+
         # Criar um run artificial com apenas o primeiro step completado
         partial_run = FlowRunRecord(
             run_id=run_id,
@@ -192,13 +192,16 @@ class TestFlowRetry:
             ],
             context={}
         )
-        
+
         # Substituir o run no store
         # Primeiro apagar o run existente (isso é complicado, então faremos um teste mais alto nível)
-        
+
         # Em vez disso, vamos testar diretamente o método _execute_with_skip
         skip_steps = {"step1"}  # Simulando que o step1 já foi completado
         context = {}
+
+        # Criar um NOVO mock para isolar a contagem do _execute_with_skip
+        mock_orchestrator_skip = AsyncMock()
         
         # Mock para retornar sucesso para os steps restantes
         call_count = 0
@@ -211,15 +214,15 @@ class TestFlowRetry:
             result.error = None
             result.execution_time = 0.1
             return result
-        
-        mock_orchestrator._call_agent.side_effect = side_effect
-        
+
+        mock_orchestrator_skip._call_agent.side_effect = side_effect
+
         # Executar com skip
-        result = await flow._execute_with_skip(context, mock_orchestrator, skip_steps=skip_steps)
-        
+        result = await flow._execute_with_skip(context, mock_orchestrator_skip, skip_steps=skip_steps)
+
         # Verificar que o step1 foi pulado e os outros foram executados
         # A contagem de chamadas deve ser 2 (step2 e step3)
-        assert mock_orchestrator._call_agent.call_count == 2
+        assert mock_orchestrator_skip._call_agent.call_count == 2
         # E o resultado deve ter 3 steps (1 pulado + 2 executados)
         assert len(result.steps) == 3
         # O step1 deve estar marcado como sucesso virtual

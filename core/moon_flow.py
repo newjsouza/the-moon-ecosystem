@@ -107,7 +107,14 @@ class MoonFlow:
             # If we have more attempts, wait before retrying
             if attempt < attempts:
                 await asyncio.sleep(step.retry_delay)
-        
+
+        # All attempts failed — update step status before returning
+        step_run.finished_at = time.time()
+        step_run.status = "failed"
+        step_run.error = last_error
+        step_run.output_summary = ""
+        store.update_step(run_id, step_run)
+
         # All attempts failed
         return False, None, last_error
 

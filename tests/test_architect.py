@@ -2,6 +2,7 @@
 tests/test_architect.py
 Testes para ArchitectAgent.
 """
+import os
 import pytest
 import asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
@@ -18,18 +19,22 @@ class TestArchitectAgent:
         assert len(KEYWORD_PATTERNS) > 0
     
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        not os.getenv("HF_TOKEN") and not os.getenv("HUGGINGFACE_TOKEN"),
+        reason="HF_TOKEN necessário para baixar modelo SemanticMemoryWeaver"
+    )
     async def test_architect_initialization(self):
         """Testa inicialização do Architect."""
         from agents.architect import ArchitectAgent
         from core.message_bus import MessageBus
-        
+
         agent = ArchitectAgent()
         await agent.initialize()
-        
+
         assert agent.is_initialized
         assert len(agent._registered_agents) > 0
         assert agent._health_check_task is not None
-        
+
         await agent.shutdown()
         assert not agent.is_initialized
     
@@ -94,24 +99,28 @@ class TestArchitectAgent:
         await agent.shutdown()
     
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        not os.getenv("HF_TOKEN") and not os.getenv("HUGGINGFACE_TOKEN"),
+        reason="HF_TOKEN necessário para baixar modelo SemanticMemoryWeaver"
+    )
     async def test_health_check(self):
         """Testa health check de agentes."""
         from agents.architect import ArchitectAgent
-        
+
         agent = ArchitectAgent()
         await agent.initialize()
-        
+
         status = await agent._check_all_agents_health()
-        
+
         assert isinstance(status, dict)
         assert len(status) > 0
-        
+
         # Verifica estrutura do status
         for agent_name, agent_status in status.items():
             assert "healthy" in agent_status
             assert "registered" in agent_status
             assert "critical" in agent_status
-        
+
         await agent.shutdown()
     
     def test_get_pipeline_status(self):
