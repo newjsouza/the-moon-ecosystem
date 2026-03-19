@@ -1637,6 +1637,13 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - tests/test_flow_retry.py: 12 testes
 - Pipeline resiliente: falhas transitórias não interrompem o fluxo
 
+## Sessão 2026-03-18 FASE 9 — Flow Templates
+- core/flow_template.py: FlowTemplateVar, FlowTemplate, FlowTemplateRegistry
+- flow_templates/: apex_template, blog_template, browser_template, research_template
+- core/orchestrator.py: /flow-new e /flow-templates
+- tests/test_flow_template.py: 16 testes
+- Capacidade: criar e executar flows dinâmicos via comando com variáveis
+
 ### 2026-03-18 — system_info intent no Telegram Bot
 - Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
 - Adicionada função async `_collect_system_info()` usando psutil
