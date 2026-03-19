@@ -825,10 +825,10 @@
         }
 
         // API Fetch function
-        async function fetchAPI(endpoint) {
+        async function fetchAPI(endpoint, options = {}) {
             try {
                 showLoading(true);
-                const response = await fetch(`http://localhost:8080${endpoint}`);
+                const response = await fetch(`http://localhost:8080${endpoint}`, options);
                 const data = await response.json();
                 
                 if (!response.ok) {
@@ -866,7 +866,14 @@
         function formatTime(timestamp) {
             if (!timestamp) return '-';
             
-            const date = new Date(timestamp * 1000);
+            let date;
+            if (typeof timestamp === 'string' && timestamp.includes('T')) {
+                // Ignore timezone warning or adjust to UTC by appending Z to handle naive datetime
+                date = new Date(timestamp + (timestamp.endsWith('Z') ? '' : 'Z'));
+            } else {
+                date = new Date(timestamp * 1000);
+            }
+            
             const now = new Date();
             const diffInSeconds = Math.floor((now - date) / 1000);
             
@@ -887,7 +894,15 @@
         // Format date
         function formatDate(timestamp) {
             if (!timestamp) return '-';
-            const date = new Date(timestamp * 1000);
+            
+            let date;
+            if (typeof timestamp === 'string' && timestamp.includes('T')) {
+                // Append Z to handle naive ISO strings returned by python
+                date = new Date(timestamp + (timestamp.endsWith('Z') ? '' : 'Z'));
+            } else {
+                date = new Date(timestamp * 1000);
+            }
+            
             return date.toLocaleString('pt-BR');
         }
 
@@ -1215,40 +1230,44 @@
                 tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Erro ao carregar regras</td></tr>`;
             }
             
-            // Add event listener for policy check button
-            document.getElementById('check-policy-btn').addEventListener('click', async () => {
-                const channel = document.getElementById('check-channel').value;
-                const user = document.getElementById('check-user').value;
-                const command = document.getElementById('check-command').value;
-                
-                const result = await fetchAPI('/api/policy/check', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({channel, user, command})
+            // Add event listener for policy check button only once
+            const checkBtn = document.getElementById('check-policy-btn');
+            if (checkBtn && !checkBtn.hasAttribute('data-listener-attached')) {
+                checkBtn.setAttribute('data-listener-attached', 'true');
+                checkBtn.addEventListener('click', async () => {
+                    const channel = document.getElementById('check-channel').value;
+                    const user = document.getElementById('check-user').value;
+                    const command = document.getElementById('check-command').value;
+                    
+                    const result = await fetchAPI('/api/policy/check', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({channel, user, command})
+                    });
+                    
+                    const resultDiv = document.getElementById('check-result');
+                    if (result && result.allowed !== undefined) {
+                        resultDiv.style.display = 'block';
+                        resultDiv.innerHTML = `
+                            <div style="background: ${result.allowed ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)'}; 
+                                  color: ${result.allowed ? 'var(--accent-green)' : 'var(--accent-red)'}; 
+                                  padding: 10px; border-radius: 4px;">
+                                <strong>${result.allowed ? 'PERMITIDO' : 'NEGADO'}</strong><br>
+                                Motivo: ${result.reason}<br>
+                                Regra: ${result.rule_id}
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.style.display = 'block';
+                        resultDiv.innerHTML = `
+                            <div style="background: rgba(231, 76, 60, 0.2); color: var(--accent-red); 
+                                  padding: 10px; border-radius: 4px;">
+                                Erro ao verificar política
+                            </div>
+                        `;
+                    }
                 });
-                
-                const resultDiv = document.getElementById('check-result');
-                if (result && result.allowed !== undefined) {
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div style="background: ${result.allowed ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)'}; 
-                              color: ${result.allowed ? 'var(--accent-green)' : 'var(--accent-red)'}; 
-                              padding: 10px; border-radius: 4px;">
-                            <strong>${result.allowed ? 'PERMITIDO' : 'NEGADO'}</strong><br>
-                            Motivo: ${result.reason}<br>
-                            Regra: ${result.rule_id}
-                        </div>
-                    `;
-                } else {
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div style="background: rgba(231, 76, 60, 0.2); color: var(--accent-red); 
-                              padding: 10px; border-radius: 4px;">
-                            Erro ao verificar política
-                        </div>
-                    `;
-                }
-            });
+            }
         }
 
         // Load history data
@@ -1270,10 +1289,14 @@
             // Load runs with current filters
             await refreshHistoryTable();
             
-            // Add event listeners for filters
-            document.getElementById('filter-flow').addEventListener('change', refreshHistoryTable);
-            document.getElementById('filter-status').addEventListener('change', refreshHistoryTable);
-            document.getElementById('filter-limit').addEventListener('change', refreshHistoryTable);
+            // Add event listeners for filters only once
+            const filterFlowElement = document.getElementById('filter-flow');
+            if (filterFlowElement && !filterFlowElement.hasAttribute('data-listener-attached')) {
+                filterFlowElement.setAttribute('data-listener-attached', 'true');
+                filterFlowElement.addEventListener('change', refreshHistoryTable);
+                document.getElementById('filter-status').addEventListener('change', refreshHistoryTable);
+                document.getElementById('filter-limit').addEventListener('change', refreshHistoryTable);
+            }
         }
 
         // Refresh history table based on filters
