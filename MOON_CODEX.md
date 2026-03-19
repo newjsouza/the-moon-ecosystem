@@ -1693,3 +1693,11 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - pyproject.toml: timeout = 10 adicionado em [tool.pytest.ini_options]
 - pytest-timeout instalado: ~/.local/lib/python3.12/site-packages/
 - Suite agora finaliza sem hangs
+
+### 2026-03-19 — Fix PYTHONPATH systemd + ApexOracle 07:30
+- Causa: moon-telegram-bot.service sem Environment=PYTHONPATH
+- Fix: adicionado Environment=PYTHONPATH=. no [Service]
+- ApexOracle agora carrega corretamente no boot
+- Briefing matinal 07:30 reestabelecido
+- runtime/flows/runs.jsonl adicionado ao .gitignore
+- 26 commits pendentes enviados para GitHub
