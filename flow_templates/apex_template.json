@@ -1,0 +1,17 @@
+{
+  "name": "apex_template",
+  "domain": "sports",
+  "description": "Análise de apostas esportivas: coleta jogos, escalações, analisa e notifica",
+  "version": "1.0.0",
+  "tags": ["apex", "futebol", "apostas"],
+  "variables": [
+    {"name": "league", "description": "Liga ou campeonato", "default": "futebol brasileiro"},
+    {"name": "notify_channel", "description": "Canal de notificação", "default": "telegram"}
+  ],
+  "steps": [
+    {"name": "fetch_games", "agent": "webmcp", "task": "jogos de hoje {league}", "depends_on": [], "on_error": "stop", "max_retries": 2, "retry_delay": 3.0},
+    {"name": "fetch_lineups", "agent": "webmcp", "task": "escalações das partidas {league}", "depends_on": ["fetch_games"], "on_error": "continue", "max_retries": 1, "retry_delay": 5.0},
+    {"name": "analyze", "agent": "apex", "task": "analisar partidas de {league} e gerar análise de apostas", "depends_on": ["fetch_lineups"], "on_error": "stop", "max_retries": 1, "retry_delay": 2.0},
+    {"name": "notify", "agent": "telegram", "task": "enviar análise APEX de {league} via {notify_channel}", "depends_on": ["analyze"], "on_error": "continue", "max_retries": 2, "retry_delay": 1.0}
+  ]
+}

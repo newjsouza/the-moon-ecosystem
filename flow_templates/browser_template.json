@@ -1,0 +1,17 @@
+{
+  "name": "browser_template",
+  "domain": "browser",
+  "description": "Automação web: navega, captura snapshot e extrai dados",
+  "version": "1.0.0",
+  "tags": ["browser", "scraping", "automação"],
+  "variables": [
+    {"name": "url", "description": "URL alvo para navegar", "default": ""},
+    {"name": "objective", "description": "O que deve ser extraído ou realizado", "default": "extrair dados da página"}
+  ],
+  "steps": [
+    {"name": "navigate", "agent": "browser_pilot", "task": "navegar para {url}", "depends_on": [], "on_error": "stop", "max_retries": 2, "retry_delay": 3.0},
+    {"name": "snapshot", "agent": "browser_pilot", "task": "capturar snapshot estruturado de {url}", "depends_on": ["navigate"], "on_error": "stop", "max_retries": 1, "retry_delay": 2.0},
+    {"name": "extract", "agent": "webmcp", "task": "extrair dados: {objective} de {url}", "depends_on": ["snapshot"], "on_error": "continue", "max_retries": 1, "retry_delay": 2.0},
+    {"name": "report", "agent": "moon_review", "task": "gerar relatório de: {objective}", "depends_on": ["extract"], "on_error": "continue", "max_retries": 0, "retry_delay": 0.0}
+  ]
+}

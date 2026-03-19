@@ -1,0 +1,17 @@
+{
+  "name": "research_template",
+  "domain": "research",
+  "description": "Pesquisa web, análise e entrega de relatório",
+  "version": "1.0.0",
+  "tags": ["pesquisa", "web", "relatorio"],
+  "variables": [
+    {"name": "query", "description": "Tema ou pergunta de pesquisa", "default": ""},
+    {"name": "depth", "description": "Profundidade: rápida ou completa", "default": "rápida"}
+  ],
+  "steps": [
+    {"name": "search", "agent": "webmcp", "task": "pesquisar {query} modo {depth}", "depends_on": [], "on_error": "stop", "max_retries": 2, "retry_delay": 2.0},
+    {"name": "enrich", "agent": "webmcp", "task": "buscar mais detalhes sobre {query}", "depends_on": ["search"], "on_error": "continue", "max_retries": 1, "retry_delay": 3.0},
+    {"name": "analyze", "agent": "moon_plan", "task": "analisar e sintetizar resultado da pesquisa sobre {query}", "depends_on": ["enrich"], "on_error": "stop", "max_retries": 1, "retry_delay": 2.0},
+    {"name": "report", "agent": "moon_review", "task": "formatar relatório final de {query}", "depends_on": ["analyze"], "on_error": "continue", "max_retries": 0, "retry_delay": 0.0}
+  ]
+}

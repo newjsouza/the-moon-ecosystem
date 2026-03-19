@@ -1643,3 +1643,10 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Handler no _route_intent: detecta intenção → coleta dados locais → responde sem LLM
 - Cobre: CPU%, temperatura, RAM, Swap, Disco /, Top 3 processos
 - Dependência: psutil (pip install psutil se necessário)
+
+### 2026-03-18 — Fix hang pytest TestSandbox
+- Causa: venv.create(with_pip=True) bloqueava event loop no _transmute()
+- Fix: patch('venv.create') adicionado em todos os testes de TestSandbox
+- pyproject.toml: timeout = 10 adicionado em [tool.pytest.ini_options]
+- pytest-timeout instalado: ~/.local/lib/python3.12/site-packages/
+- Suite agora finaliza sem hangs

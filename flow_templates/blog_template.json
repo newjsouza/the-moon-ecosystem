@@ -1,0 +1,17 @@
+{
+  "name": "blog_template",
+  "domain": "blog",
+  "description": "Pipeline completo de post: planejamento, escrita, revisão e publicação",
+  "version": "1.0.0",
+  "tags": ["blog", "content", "escrita"],
+  "variables": [
+    {"name": "topic", "description": "Assunto do post", "default": "tecnologia"},
+    {"name": "tone", "description": "Tom do post (formal, técnico, casual)", "default": "técnico"}
+  ],
+  "steps": [
+    {"name": "plan", "agent": "moon_plan", "task": "Planejar post sobre {topic} em tom {tone}", "depends_on": [], "on_error": "stop", "max_retries": 1, "retry_delay": 2.0},
+    {"name": "write", "agent": "blog_writer", "task": "Escrever post sobre {topic} com tom {tone} baseado no plano", "depends_on": ["plan"], "on_error": "stop", "max_retries": 1, "retry_delay": 2.0},
+    {"name": "review", "agent": "moon_review", "task": "Revisar post sobre {topic}", "depends_on": ["write"], "on_error": "continue", "max_retries": 0, "retry_delay": 0.0},
+    {"name": "publish", "agent": "blog_publisher", "task": "Publicar post revisado sobre {topic}", "depends_on": ["review"], "on_error": "stop", "max_retries": 2, "retry_delay": 5.0}
+  ]
+}

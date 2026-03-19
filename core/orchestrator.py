@@ -205,6 +205,11 @@ class Orchestrator:
         self.flow_registry = get_flow_registry()
         self._load_default_flows()
         
+        # ── Template Registry ────────────────────────────────────
+        from core.flow_template import get_template_registry
+        self.template_registry = get_template_registry()
+        self.template_registry.discover("flow_templates")
+        
         # ── Channel Gateway (Phase 5) ────────────────────────────
         from core.channel_gateway import get_channel_gateway
         self.channel_gateway = get_channel_gateway()
@@ -597,6 +602,71 @@ class Orchestrator:
                 return f"✅ Flow retomado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
             else:
                 return f"❌ Flow retomado falhou: {result.error}"
+
+        @reg.command("/flow-new", description="Instancia e executa um flow a partir de template", usage="/flow-new <template> [var=value ...]", category="Flows", prefix_match=True)
+        async def cmd_flow_new(remainder: str, metadata: dict) -> str:
+            """
+            /flow-new <template_name> [var1=valor1 var2=valor2]
+            Instancia e executa um flow a partir de um template.
+            Exemplo: /flow-new blog topic=\"Python assíncrono\" tone=técnico
+            """
+            if not remainder.strip():
+                templates = [f"{t.name} ({t.domain})" for t in self.template_registry.list_templates()]
+                available = ', '.join(templates) if templates else "nenhum template disponível"
+                return f"⚠️ Uso: `/flow-new <template> [vars]`. Disponíveis: {available}"
+            
+            parts = remainder.strip().split()
+            template_name = parts[0]
+            template = self.template_registry.get(template_name)
+            if not template:
+                available = [t.name for t in self.template_registry.list_templates()]
+                return f"❌ Template '{template_name}' não encontrado. Disponíveis: {available}"
+            
+            values = {}
+            for part in parts[1:]:
+                if "=" in part:
+                    k, v = part.split("=", 1)
+                    values[k.strip()] = v.strip().strip('"').strip("'")
+            
+            try:
+                flow = template.instantiate(values)
+                ctx = {v.name: values.get(v.name, v.default) for v in template.variables}
+                result = await flow.execute(ctx, self)
+                
+                if result.success:
+                    return f"✅ Flow '{flow.name}' executado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
+                else:
+                    return f"❌ Flow '{flow.name}' falhou: {result.error}"
+            except Exception as e:
+                return f"❌ Erro ao instanciar/executar o flow: {str(e)}"
+
+        @reg.command("/flow-templates", description="Lista templates de flows disponíveis", usage="/flow-templates [domínio]", category="Flows", prefix_match=True)
+        async def cmd_flow_templates(remainder: str, metadata: dict) -> str:
+            """
+            /flow-templates [domain]
+            Lista templates disponíveis, opcionalmente filtrando por domínio.
+            """
+            domain = remainder.strip() or None
+            if domain:
+                templates = self.template_registry.list_by_domain(domain)
+            else:
+                templates = self.template_registry.list_templates()
+            
+            if not templates:
+                if domain:
+                    return f"❌ Nenhum template encontrado para o domínio '{domain}'."
+                else:
+                    return "❌ Nenhum template disponível."
+            
+            templates_info = []
+            for t in templates:
+                var_desc = t.get_variables_prompt()
+                templates_info.append(f"`{t.name}` ({t.domain}): {t.description}\n  {var_desc}")
+            
+            if domain:
+                return f"📋 *Templates no domínio `{domain}`:*\n" + "\n".join(templates_info)
+            else:
+                return f"📋 *Todos os templates disponíveis:*\n" + "\n".join(templates_info)
 
     # ═══════════════════════════════════════════════════════════
     #  Message Gateway

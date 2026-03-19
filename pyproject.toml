@@ -8,6 +8,7 @@ requires-python = ">=3.10"
 themoon = "main:run"
 
 [tool.pytest.ini_options]
+timeout = 10
 minversion = "7.0"
 addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]

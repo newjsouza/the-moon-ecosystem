@@ -18,6 +18,7 @@ import shutil
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch, Mock
 from datetime import datetime
+import venv
 
 # Adiciona o root do projeto ao path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -483,8 +484,10 @@ class TestSandbox:
         async def mock_import(python_path, package_name):
             return True
 
-        with patch.object(alchemist, '_pip_install_package', side_effect=mock_install), \
+        with patch('venv.create') as mock_venv, \
+             patch.object(alchemist, '_pip_install_package', side_effect=mock_install), \
              patch.object(alchemist, '_test_import', side_effect=mock_import):
+            mock_venv.return_value = None
 
             result = await alchemist._transmute(tool)
 
@@ -520,7 +523,9 @@ class TestSandbox:
         }
 
         # Mock de _pip_install_package falhando
-        with patch.object(alchemist, '_pip_install_package', new_callable=AsyncMock) as mock_install:
+        with patch('venv.create') as mock_venv, \
+             patch.object(alchemist, '_pip_install_package', new_callable=AsyncMock) as mock_install:
+            mock_venv.return_value = None
             mock_install.return_value = False
 
             result = await alchemist._transmute(tool)
@@ -550,7 +555,9 @@ class TestSandbox:
         async def raise_timeout(*args, **kwargs):
             raise asyncio.TimeoutError("Timeout")
 
-        with patch.object(alchemist, '_pip_install_package', new_callable=AsyncMock) as mock_install:
+        with patch('venv.create') as mock_venv, \
+             patch.object(alchemist, '_pip_install_package', new_callable=AsyncMock) as mock_install:
+            mock_venv.return_value = None
             mock_install.side_effect = raise_timeout
 
             result = await alchemist._transmute(tool)
@@ -573,7 +580,9 @@ class TestSandbox:
                 "source": source
             }
 
-            result = await alchemist._transmute(tool)
+            with patch('venv.create') as mock_venv:
+                mock_venv.return_value = None
+                result = await alchemist._transmute(tool)
 
             # Verifica que retornou True (pula instalação)
             assert result is True
@@ -599,9 +608,10 @@ class TestSandbox:
             "source": "pypi"
         }
 
-        with patch.object(alchemist, '_pip_install_package', new_callable=AsyncMock) as mock_install, \
+        with patch('venv.create') as mock_venv, \
+             patch.object(alchemist, '_pip_install_package', new_callable=AsyncMock) as mock_install, \
              patch.object(alchemist, '_test_import', new_callable=AsyncMock) as mock_import:
-
+            mock_venv.return_value = None
             mock_install.return_value = True
             mock_import.return_value = True
 
@@ -780,7 +790,9 @@ class TestSkill:
         mock_result.stdout = "OK"
         mock_result.stderr = ""
         
-        with patch('subprocess.run', return_value=mock_result):
+        with patch('venv.create') as mock_venv, \
+             patch('subprocess.run', return_value=mock_result):
+            mock_venv.return_value = None
             result = await alchemist._transmute(tool)
         
         # Verifica que retornou False
