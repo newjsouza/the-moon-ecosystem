@@ -1620,6 +1620,23 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - tests/test_flow_observability.py: 7 testes
 - Operação local auditável, retomável e zero-custo
 
+## Sessão 2026-03-18 FASE 7 — Persistência e Observabilidade de Flows
+- core/flow_run_store.py: histórico local de execuções MoonFlow
+- core/moon_flow.py: run_id + persistência por step
+- core/orchestrator.py: /flow-status e /flow-runs
+- tests/test_flow_run_store.py: 9 testes
+- tests/test_flow_observability.py: 7 testes
+- Operação local auditável, retomável e zero-custo
+
+## Sessão 2026-03-18 FASE 8 — Retry e Retomada de Runs
+- core/moon_flow.py: max_retries, retry_delay, retry_on por step
+- core/moon_flow.py: resume(run_id) — retomada a partir do step falho
+- core/flow_run_store.py: FlowStepRun + attempt e max_attempts
+- core/orchestrator.py: /flow-retry e /flow-resume
+- flows/apex_pipeline.json: retry configurado por step crítico
+- tests/test_flow_retry.py: 12 testes
+- Pipeline resiliente: falhas transitórias não interrompem o fluxo
+
 ### 2026-03-18 — system_info intent no Telegram Bot
 - Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
 - Adicionada função async `_collect_system_info()` usando psutil
