@@ -1661,6 +1661,25 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - APEX Oracle: agendamento nativo 07:30 sem cron externo
 - Scheduler: loop asyncio a cada 30s, integrado ao padrão AutoSyncService
 
+## Sessão 2026-03-18/19 FASE 12 — Moon Dashboard Live
+### 12.A Backend API (12 endpoints)
+- apex_dashboard/api.py: expandido com /flows, /runs, /scheduler,
+  /skills, /policy, /templates, /health, /status
+- 13 testes em test_dashboard_api.py
+
+### 12.B Frontend SPA
+- apex_dashboard/index.html: reescrito — 6 seções, dados reais,
+  auto-refresh 30s, tooltips, toasts, português
+- Paleta escura profissional, sidebar fixa, contagem regressiva
+
+### 12.C Desktop Integration
+- scripts/start_moon_dashboard.sh: inicialização com detecção de browser
+- ~/.local/share/applications/moon-dashboard.desktop: atalho registrado
+
+### 12.D Testes
+- tests/test_dashboard_integration.py: 11 testes end-to-end
+- Suite final: 573+ pass | 20 skip | 0 fail
+
 ### 2026-03-18 — system_info intent no Telegram Bot
 - Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
 - Adicionada função async `_collect_system_info()` usando psutil
