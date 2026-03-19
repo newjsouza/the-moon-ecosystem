@@ -1,0 +1,52 @@
+{
+  "jobs": [
+    {
+      "job_id": "apex-morning-07h30",
+      "flow_name": "apex_pipeline",
+      "job_type": "flow",
+      "context": {"league": "futebol brasileiro"},
+      "schedule_type": "daily",
+      "time_of_day": "07:30",
+      "interval_minutes": 0,
+      "run_at": 0.0,
+      "enabled": true,
+      "created_at": 0.0,
+      "last_run_at": 0.0,
+      "next_run_at": 0.0,
+      "run_count": 0,
+      "last_run_id": ""
+    },
+    {
+      "job_id": "apex-lineup-poll",
+      "flow_name": "apex_template",
+      "job_type": "template",
+      "context": {"league": "futebol brasileiro", "notify_channel": "telegram"},
+      "schedule_type": "interval",
+      "time_of_day": "",
+      "interval_minutes": 70,
+      "run_at": 0.0,
+      "enabled": false,
+      "created_at": 0.0,
+      "last_run_at": 0.0,
+      "next_run_at": 0.0,
+      "run_count": 0,
+      "last_run_id": ""
+    },
+    {
+      "job_id": "research-daily",
+      "flow_name": "research_template",
+      "job_type": "template",
+      "context": {"query": "notícias tecnologia IA", "depth": "rápida"},
+      "schedule_type": "daily",
+      "time_of_day": "08:00",
+      "interval_minutes": 0,
+      "run_at": 0.0,
+      "enabled": false,
+      "created_at": 0.0,
+      "last_run_at": 0.0,
+      "next_run_at": 0.0,
+      "run_count": 0,
+      "last_run_id": ""
+    }
+  ]
+}

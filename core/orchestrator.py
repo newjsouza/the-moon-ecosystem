@@ -218,6 +218,14 @@ class Orchestrator:
         if pathlib.Path(_policy_file).exists():
             self.policy_engine.load_from_file(_policy_file)
         
+        # ── Flow Scheduler ───────────────────────────────────────
+        from core.flow_scheduler import get_flow_scheduler
+        self.flow_scheduler = get_flow_scheduler()
+        self.flow_scheduler.set_orchestrator(self)
+        _jobs_file = "config/scheduled_jobs.json"
+        if pathlib.Path(_jobs_file).exists():
+            self.flow_scheduler.load_from_file(_jobs_file)
+        
         # ── Channel Gateway (Phase 5) ────────────────────────────
         from core.channel_gateway import get_channel_gateway
         self.channel_gateway = get_channel_gateway()
@@ -290,6 +298,11 @@ class Orchestrator:
         )
         self._health_check_task = asyncio.create_task(
             self._health_check_loop(), name="moon.health_check"
+        )
+
+        # Start the flow scheduler
+        asyncio.create_task(
+            self.flow_scheduler.start(), name="moon.flow_scheduler"
         )
 
         try:
@@ -676,6 +689,100 @@ class Orchestrator:
             else:
                 return f"📋 *Todos os templates disponíveis:*\n" + "\n".join(templates_info)
 
+        @reg.command("/flow-schedule", description="Agenda execução de flow/template", usage="/flow-schedule <flow> <HH:MM|every=N|once> [var=val...]", category="Flows", prefix_match=True)
+        async def cmd_flow_schedule(remainder: str, metadata: dict) -> str:
+            """
+            /flow-schedule <flow_name> <HH:MM|every=N|once> [var=val ...]
+            Exemplos:
+              /flow-schedule apex_pipeline 07:30
+              /flow-schedule research_template every=60 query="IA" depth=rápida
+              /flow-schedule apex_pipeline once
+            """
+            if not remainder.strip():
+                return "⚠️ Uso: `/flow-schedule <flow> <HH:MM | every=N | once> [var=val...]`"
+            
+            import uuid, time as _time
+            from core.flow_scheduler import ScheduledJob
+            import datetime
+            parts = remainder.strip().split()
+            flow_name = parts[0]
+            schedule_arg = parts[1] if len(parts) > 1 else "once"
+            ctx = {}
+            for part in parts[2:]:
+                if "=" in part:
+                    k, v = part.split("=", 1)
+                    ctx[k.strip()] = v.strip().strip('"').strip("'")
+            
+            # Determine if it's a template or flow by trying to find it in both registries
+            job_type = "flow"
+            if self.template_registry.get(flow_name):
+                job_type = "template"
+            elif not self.flow_registry.get(flow_name):
+                return f"❌ Flow ou template '{flow_name}' não encontrado."
+            
+            if schedule_arg.startswith("every="):
+                minutes = int(schedule_arg.split("=")[1])
+                job = ScheduledJob(
+                    job_id=str(uuid.uuid4())[:8],
+                    flow_name=flow_name, job_type=job_type,
+                    context=ctx, schedule_type="interval",
+                    interval_minutes=minutes, enabled=True,
+                    created_at=_time.time()
+                )
+            elif ":" in schedule_arg and len(schedule_arg) == 5:
+                job = ScheduledJob(
+                    job_id=str(uuid.uuid4())[:8],
+                    flow_name=flow_name, job_type=job_type,
+                    context=ctx, schedule_type="daily",
+                    time_of_day=schedule_arg, enabled=True,
+                    created_at=_time.time()
+                )
+            else:
+                job = ScheduledJob(
+                    job_id=str(uuid.uuid4())[:8],
+                    flow_name=flow_name, job_type=job_type,
+                    context=ctx, schedule_type="once",
+                    run_at=_time.time() + 5, enabled=True,
+                    created_at=_time.time()
+                )
+            job.next_run_at = job.compute_next_run()
+            job_id = self.flow_scheduler.add_job(job)
+            self.flow_scheduler.save_to_file("config/scheduled_jobs.json")
+            return f"✅ Job agendado: `{job_id}` para `{flow_name}` (próxima execução: {datetime.datetime.fromtimestamp(job.next_run_at).strftime('%d/%m %H:%M')})"
+
+        @reg.command("/flow-unschedule", description="Remove job agendado", usage="/flow-unschedule <job_id>", category="Flows", prefix_match=True)
+        async def cmd_flow_unschedule(remainder: str, metadata: dict) -> str:
+            """
+            /flow-unschedule <job_id>
+            """
+            job_id = remainder.strip()
+            if not job_id:
+                return "⚠️ Uso: `/flow-unschedule <job_id>`"
+            removed = self.flow_scheduler.remove_job(job_id)
+            if removed:
+                self.flow_scheduler.save_to_file("config/scheduled_jobs.json")
+                return f"✅ Job `{job_id}` removido com sucesso."
+            else:
+                return f"❌ Job `{job_id}` não encontrado."
+
+        @reg.command("/flow-jobs", description="Lista jobs agendados", usage="/flow-jobs", category="Flows", prefix_match=True)
+        async def cmd_flow_jobs(remainder: str, metadata: dict) -> str:
+            """
+            /flow-jobs — lista todos os jobs agendados com próximo horário de execução
+            """
+            import datetime
+            jobs = self.flow_scheduler.list_jobs()
+            if not jobs:
+                return "📋 Nenhum job agendado."
+            
+            jobs_info = []
+            for j in jobs:
+                next_dt = datetime.datetime.fromtimestamp(j.next_run_at).strftime("%d/%m %H:%M") if j.next_run_at else "—"
+                status = "🟢" if j.enabled else "🔴"
+                jobs_info.append(f"{status} `{j.job_id}`: {j.flow_name} ({j.schedule_type}) - próximo: {next_dt} (execs: {j.run_count})")
+            
+            return f"📋 *Jobs agendados* ({len(jobs_info)}):\n" + "\n".join(jobs_info)
+
         @reg.command("/policy", description="Gerencia políticas de acesso", usage="/policy [list|check|stats]", category="Admin", prefix_match=True)
         async def cmd_policy(remainder: str, metadata: dict) -> str:
             """
@@ -881,7 +988,7 @@ class Orchestrator:
             f"You are editing the file `{filename}`.\n"
             f"Current content:\n```\n{content[:3000]}\n```\n\n"
             f"Apply this change: {instruction}\n\n"
-            f"Return ONLY the complete new file content, no preamble, no markdown fences."
+            f"Return ONLY the complete new file content, no preamble, no code fences."
         )
 
         async with self._opencode_lock:

@@ -1653,6 +1653,14 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Controle: canal, usuário, agente, domínio e comando
 - Filosofia: falha aberta (exception → allow) | owner tem acesso total
 
+## Sessão 2026-03-18 FASE 11 — Flow Scheduler
+- core/flow_scheduler.py: ScheduledJob, FlowScheduler (daily/interval/once)
+- config/scheduled_jobs.json: apex-morning-07h30, apex-lineup-poll, research-daily
+- core/orchestrator.py: /flow-schedule, /flow-unschedule, /flow-jobs
+- tests/test_flow_scheduler.py: 20 testes
+- APEX Oracle: agendamento nativo 07:30 sem cron externo
+- Scheduler: loop asyncio a cada 30s, integrado ao padrão AutoSyncService
+
 ### 2026-03-18 — system_info intent no Telegram Bot
 - Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
 - Adicionada função async `_collect_system_info()` usando psutil
