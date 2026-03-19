@@ -544,6 +544,60 @@ class Orchestrator:
             else:
                 return f"📋 *Últimas execuções de flows*:\n{runs_str}"
 
+        @reg.command("/flow-retry", description="Re-executa um flow do zero", usage="/flow-retry <run_id>", category="Flows", prefix_match=True)
+        async def cmd_flow_retry(remainder: str, metadata: dict) -> str:
+            """
+            /flow-retry <run_id>
+            Re-executa um run completo do zero com o mesmo contexto.
+            """
+            run_id = remainder.strip()
+            if not run_id:
+                return "⚠️ Uso: `/flow-retry <run_id>`"
+            
+            from core.flow_run_store import get_flow_run_store
+            store = get_flow_run_store()
+            record = store.load_run(run_id)
+            if not record:
+                return f"❌ Run ID '{run_id}' não encontrado."
+            
+            flow = self.flow_registry.get(record.flow_name)
+            if not flow:
+                return f"❌ Flow '{record.flow_name}' não encontrado."
+            
+            result = await flow.execute(record.context or {}, self)
+            
+            if result.success:
+                return f"✅ Flow re-executado com sucesso em {result.total_time:.2f}s (Novo ID: {result.run_id})"
+            else:
+                return f"❌ Flow re-executado falhou: {result.error}"
+
+        @reg.command("/flow-resume", description="Retoma flow a partir do step falho", usage="/flow-resume <run_id>", category="Flows", prefix_match=True)
+        async def cmd_flow_resume(remainder: str, metadata: dict) -> str:
+            """
+            /flow-resume <run_id>
+            Retoma execução a partir do primeiro step que falhou.
+            """
+            run_id = remainder.strip()
+            if not run_id:
+                return "⚠️ Uso: `/flow-resume <run_id>`"
+            
+            from core.flow_run_store import get_flow_run_store
+            store = get_flow_run_store()
+            record = store.load_run(run_id)
+            if not record:
+                return f"❌ Run ID '{run_id}' não encontrado."
+            
+            flow = self.flow_registry.get(record.flow_name)
+            if not flow:
+                return f"❌ Flow '{record.flow_name}' não encontrado."
+            
+            result = await flow.resume(run_id, self)
+            
+            if result.success:
+                return f"✅ Flow retomado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
+            else:
+                return f"❌ Flow retomado falhou: {result.error}"
+
     # ═══════════════════════════════════════════════════════════
     #  Message Gateway
     # ═══════════════════════════════════════════════════════════

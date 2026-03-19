@@ -1619,3 +1619,10 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - tests/test_flow_run_store.py: 9 testes
 - tests/test_flow_observability.py: 7 testes
 - Operação local auditável, retomável e zero-custo
+
+### 2026-03-18 — system_info intent no Telegram Bot
+- Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
+- Adicionada função async `_collect_system_info()` usando psutil
+- Handler no _route_intent: detecta intenção → coleta dados locais → responde sem LLM
+- Cobre: CPU%, temperatura, RAM, Swap, Disco /, Top 3 processos
+- Dependência: psutil (pip install psutil se necessário)

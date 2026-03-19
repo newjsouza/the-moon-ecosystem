@@ -23,6 +23,8 @@ class FlowStepRun:
     finished_at: float = 0.0
     error: str = ""
     output_summary: str = ""
+    attempt: int = 1              # (número da tentativa atual)
+    max_attempts: int = 1         # (total de tentativas permitidas)
 
 
 @dataclass

@@ -44,6 +44,7 @@ from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import httpx
+import psutil
 from groq import AsyncGroq
 from pydub import AudioSegment
 from telegram import Update, BotCommand
@@ -466,6 +467,17 @@ class IntentDetector:
         (["aposta", "bet", "odds", "futebol", "partida", "jogo de hoje",
           "jogo de amanhã", "análise de jogo"], "sports"),
         (["status da banca", "quanto tenho", "saldo", "bankroll"], "banca_status"),
+        (
+            [
+                "verificar informações", "info do sistema", "informações do sistema",
+                "temperatura do", "uso de cpu", "uso de memória", "memória ram",
+                "espaço em disco", "recursos do sistema", "monitorar sistema",
+                "verificar sistema", "hardware", "desempenho do sistema",
+                "performance do sistema", "status hardware", "consumo de cpu",
+                "quanto de ram", "memória disponível",
+            ],
+            "system_info",
+        ),
     ]
 
     def detect(self, text: str) -> Optional[str]:
@@ -598,6 +610,91 @@ class SportsContextBuilder:
         except Exception as e:
             logger.error(f"SportsContextBuilder error: {e}")
             return "AVISO: Provedor de dados esportivos temporariamente indisponível."
+
+
+async def _collect_system_info() -> str:
+    """Coleta informações reais do sistema via psutil. Roda localmente."""
+    import platform
+    loop = asyncio.get_event_loop()
+
+    # cpu_percent é bloqueante; rodar em executor para não travar o event loop
+    cpu_pct = await loop.run_in_executor(
+        None, lambda: psutil.cpu_percent(interval=0.5)
+    )
+
+    lines: list[str] = []
+
+    # ── Sistema Operacional ───────────────────────────────────────────────
+    uname = platform.uname()
+    lines.append(
+        f"🖥️ *Sistema:* {uname.system} {uname.release} ({uname.machine})"
+    )
+    lines.append(f"🏷️ *Host:* `{uname.node}`")
+
+    # ── CPU ───────────────────────────────────────────────────────────────
+    cpu_count_log = psutil.cpu_count(logical=True)
+    cpu_count_phy = psutil.cpu_count(logical=False)
+    cpu_freq = psutil.cpu_freq()
+    freq_str = f"{cpu_freq.current:.0f} MHz" if cpu_freq else "N/A"
+    lines.append(
+        f"⚙️ *CPU:* {cpu_pct:.1f}% uso | "
+        f"{cpu_count_phy} físicos / {cpu_count_log} lógicos | {freq_str}"
+    )
+
+    # ── Temperatura ───────────────────────────────────────────────────────
+    try:
+        temps = psutil.sensors_temperatures()
+        if temps:
+            for sensor_name, entries in temps.items():
+                if entries:
+                    t = entries[0]
+                    lines.append(
+                        f"🌡️ *Temp ({sensor_name}):* {t.current:.1f}°C"
+                        + (f" (crítico: {t.critical:.0f}°C)" if t.critical else "")
+                    )
+                    break
+    except AttributeError:
+        pass  # Sem suporte a sensores nesta plataforma
+
+    # ── RAM ───────────────────────────────────────────────────────────────
+    ram = psutil.virtual_memory()
+    lines.append(
+        f"💾 *RAM:* {ram.used / 1e9:.1f} GB / {ram.total / 1e9:.1f} GB "
+        f"({ram.percent:.1f}%)"
+    )
+
+    # ── Swap ──────────────────────────────────────────────────────────────
+    swap = psutil.swap_memory()
+    if swap.total > 0:
+        lines.append(
+            f"🔄 *Swap:* {swap.used / 1e9:.1f} GB / {swap.total / 1e9:.1f} GB "
+            f"({swap.percent:.1f}%)"
+        )
+
+    # ── Disco (raiz) ──────────────────────────────────────────────────────
+    disk = psutil.disk_usage("/")
+    lines.append(
+        f"💿 *Disco (/):* {disk.used / 1e9:.1f} GB / {disk.total / 1e9:.1f} GB "
+        f"({disk.percent:.1f}%)"
+    )
+
+    # ── Top 3 processos por CPU ───────────────────────────────────────────
+    try:
+        procs = sorted(
+            psutil.process_iter(["pid", "name", "cpu_percent", "memory_percent"]),
+            key=lambda p: p.info.get("cpu_percent") or 0.0,
+            reverse=True,
+        )[:3]
+        if procs:
+            proc_lines = [
+                f"`{p.info['name'][:18]}` {p.info.get('cpu_percent', 0):.1f}%"
+                for p in procs
+            ]
+            lines.append(f"📊 *Top CPU:* {' | '.join(proc_lines)}")
+    except Exception:
+        pass
+
+    return "\n".join(lines)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -839,6 +936,13 @@ FORMATO DE RESPOSTA:
                         )
                 except Exception:
                     pass
+
+        if detected == "system_info":
+            await update.message.reply_text(
+                "🔍 Coletando informações do sistema...", parse_mode="Markdown"
+            )
+            info = await _collect_system_info()
+            return f"📡 *Informações do Sistema*\n\n{info}"
 
         return None  # Let LLM handle it
 
