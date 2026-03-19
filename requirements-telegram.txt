@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────────────────────
+#  The Moon — Telegram Bot Dependencies (minimal subset)
+# ─────────────────────────────────────────────────────────────
+
+# Core bot framework
+python-telegram-bot[job-queue]>=20.0
+
+# LLM (Groq async)
+groq>=0.9.0
+
+# HTTP async
+httpx>=0.27.0
+
+# Audio processing
+pydub>=0.25.1
+
+# System monitoring
+psutil>=5.9.0
+
+# Environment
+python-dotenv>=1.0.0

@@ -107,3 +107,8 @@ temp/
 *.tmp
 *.bak
 *.bak_*
+
+# ── Runtime data — não versionar ──────────────
+runtime/
+runtime/flows/
+*.jsonl_*

@@ -2,6 +2,24 @@ services:
   # Supabase Local - Usar CLI: supabase start
   # Ou configurar manualmente com as imagens separadas
 
+  # ─── MoonBot Telegram ──────────────────────────────────────
+  moon-telegram-bot:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile.telegram
+    container_name: moon-telegram-bot
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - bot_tasks_data:/app/data/bot_tasks
+    networks:
+      - default
+
+
   # Filesystem MCP Server - Secure filesystem access for AI agents
   filesystem-mcp:
     build:
@@ -79,6 +97,7 @@ services:
       - ollama
 
 volumes:
+  bot_tasks_data:
   redis_data:
   ollama_data:
   openwebui_data:

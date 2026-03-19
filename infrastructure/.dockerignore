@@ -1,0 +1,14 @@
+# The Moon — Docker build context exclusions
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+learning/
+Super-Agente/
+docs/
+tests/
+*.md
+*.service
+.env.example
+*.bak_*
