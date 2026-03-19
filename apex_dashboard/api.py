@@ -357,6 +357,44 @@ class MoonDashboardAPIHandler(BaseHTTPRequestHandler):
         path = parsed_path.path
         query_params = parse_qs(parsed_path.query)
         
+        # Servir index.html para / e /index.html
+        if path in ("/", "/index.html", ""):
+            import pathlib
+            index_path = pathlib.Path(__file__).parent / "index.html"
+            if index_path.exists():
+                content = index_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(content)))
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            else:
+                # index.html não encontrado
+                self._send_json({"error": "index.html não encontrado"}, 404)
+                return
+
+        # Servir arquivos estáticos (CSS, JS, PNG, SVG, ICO)
+        static_extensions = {
+            ".css": "text/css",
+            ".js": "application/javascript",
+            ".png": "image/png",
+            ".svg": "image/svg+xml",
+            ".ico": "image/x-icon",
+        }
+        from pathlib import Path as _Path
+        req_path = _Path(path.lstrip("/"))
+        static_file = _Path(__file__).parent / req_path
+        ext = static_file.suffix.lower()
+        if ext in static_extensions and static_file.exists() and static_file.is_file():
+            content = static_file.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", static_extensions[ext])
+            self.send_header("Content-Length", str(len(content)))
+            self.end_headers()
+            self.wfile.write(content)
+            return
+        
         if path == "/api/data":
             self._send_json(_build_dashboard_payload())
         elif path == "/health":
