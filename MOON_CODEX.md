@@ -1501,14 +1501,16 @@ cp core/orchestrator.py.bak core/orchestrator.py
 ---
 
 ## Sessão 2026-03-17 FASE 1 — Session Scoping
+
 - core/session_manager.py: SessionManager, 4 modos (user/channel/workspace/global)
-- core/orchestrator.py: patch _get_session_context() + _set_session_context()
+- core/orchestrator.py: patch _get_session_context() +_set_session_context()
 - tests/test_session_manager.py: 9 testes passando
 - Dependências: stdlib (zero custo)
 
 ---
 
 ## Sessão 2026-03-17 FASE 2 — MoonFlow Pipeline Engine
+
 - core/moon_flow.py: FlowStep, FlowResult, MoonFlow, MoonFlowRegistry
 - flows/: blog_pipeline.json + apex_pipeline.json
 - core/orchestrator.py: /flow command + _load_default_flows()
@@ -1518,6 +1520,7 @@ cp core/orchestrator.py.bak core/orchestrator.py
 ---
 
 ## Sessão 2026-03-17 FASE 3 — SkillManifest Discovery
+
 - core/skill_manifest.py: SkillManifest, SkillRegistry com descoberta automática
 - skills/*: Manifestos skill.json para webmcp, github, voice, cli_harnesses
 - agents/architect.py: Integração com skill_registry + get_skills_for_domain()
@@ -1527,8 +1530,9 @@ cp core/orchestrator.py.bak core/orchestrator.py
 ---
 
 ## Sessão 2026-03-17 FASE 4 — BrowserPilot Estruturado
+
 - core/browser_state.py: ElementRef, PageSnapshot, BrowserAction, BrowserSession
-- agents/browser_pilot.py: _start_session(), _record_action(), _record_snapshot()
+- agents/browser_pilot.py:_start_session(),_record_action(),_record_snapshot()
 - agents/browser_pilot.py: get_replay_log(), get_session_dict() para auditoria
 - tests/test_browser_state.py: 12 testes passando
 - Funcionalidades: snapshots estruturados, refs estáveis, replay auditável
@@ -1542,12 +1546,15 @@ cp core/orchestrator.py.bak core/orchestrator.py
 ## APEX P9 — LLM Refinamento com Titulares Reais (2026-03-17)
 
 ### Problema resolvido
+
 Antes do P9, o LLM nunca via os titulares reais mesmo com WebMCP ativo:
+
 - `_fetch_webmcp_lineups()` rodava **após** o LLM (ordem errada no P8)
 - `refined_analysis` sempre retornava `⚠️ Escalações ainda não confirmadas`
 - Formatter mostrava titulares, mas análise LLM era genérica
 
 ### Mudanças em oracle.py
+
 | Mudança | Detalhe |
 |---|---|
 | `generate_pre45_analysis(..., webmcp_lineups=None)` | Novo param opcional — retrocompatível |
@@ -1557,6 +1564,7 @@ Antes do P9, o LLM nunca via os titulares reais mesmo com WebMCP ativo:
 | `check_pre45()` reordenado | WebMCP **antes** do LLM — ordem correta |
 
 ### Fluxo final APEX (P8 + P9)
+
 ```
 check_pre45()
     ├── football.get_match_detail()              → sem lineups (API grátis)
@@ -1567,45 +1575,55 @@ check_pre45()
 ```
 
 ### Testes
+
 - `tests/test_apex_p9.py` — 15 testes passando
 - Regressão total APEX+WebMCP: 73 testes passando
 
 ### Retrocompatibilidade
+
 Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge WebMCP — zero mudança necessária.
 
 ## Sessão 2026-03-17 — Evolução OpenClaw→Moon (FASES 1-5)
+
 ### FASE 1: SessionManager
+
 - core/session_manager.py — 4 modos de escopo
 - 9 testes passando
 
 ### FASE 2: MoonFlow Pipeline Engine
+
 - core/moon_flow.py — FlowStep, FlowResult, MoonFlow, MoonFlowRegistry
 - flows/blog_pipeline.json + flows/apex_pipeline.json
 - 12 testes passando
 
 ### FASE 3: SkillManifest
+
 - core/skill_manifest.py — descoberta automática por domínio
 - skills/**/skill.json — manifestos para webmcp, github, voice, harnesses
 - 9 testes passando
 
 ### FASE 4: BrowserPilot Estruturado
+
 - core/browser_state.py — ElementRef, PageSnapshot, BrowserAction, BrowserSession
-- agents/browser_pilot.py — patch cirúrgico com _start_session, _record_action, replay
+- agents/browser_pilot.py — patch cirúrgico com_start_session,_record_action, replay
 - 12 testes passando
 
 ### FASE 5: ChannelGateway
+
 - core/channel_gateway.py — ChannelMessage, ChannelResponse, ChannelGateway
 - agents/telegram/bot.py — register_telegram_adapter()
 - 10 testes passando
 - Identidade Moon preservada: zero dependências externas, zero custo
 
 ## Fix 2026-03-18 — CLI Harness Tests → Conditional Skip
+
 - tests/conftest.py: requires_libreoffice, requires_mermaid, requires_obs
 - 5 testes convertidos de FAILED → SKIPPED (dependência de binário externo)
 - Suite final: 449+ pass | 20 skip | 0 fail
 - Padrão: skip condicional via shutil.which() — mesmo padrão do alpha_vantage
 
 ## Sessão 2026-03-18 FASE 6 — APEX Pipeline End-to-End
+
 - flows/apex_pipeline.json: atualizado com tasks reais
 - core/moon_flow.py: execute() resolve agentes reais via Orchestrator
 - core/orchestrator.py: /apex command adicionado ao CommandRegistry
@@ -1613,6 +1631,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Ciclo completo: /apex → MoonFlow → WebMCP → APEX → Telegram
 
 ## Sessão 2026-03-18 FASE 7 — Persistência e Observabilidade de Flows
+
 - core/flow_run_store.py: histórico local de execuções MoonFlow
 - core/moon_flow.py: run_id + persistência por step
 - core/orchestrator.py: /flow-status e /flow-runs
@@ -1621,6 +1640,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Operação local auditável, retomável e zero-custo
 
 ## Sessão 2026-03-18 FASE 7 — Persistência e Observabilidade de Flows
+
 - core/flow_run_store.py: histórico local de execuções MoonFlow
 - core/moon_flow.py: run_id + persistência por step
 - core/orchestrator.py: /flow-status e /flow-runs
@@ -1629,6 +1649,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Operação local auditável, retomável e zero-custo
 
 ## Sessão 2026-03-18 FASE 8 — Retry e Retomada de Runs
+
 - core/moon_flow.py: max_retries, retry_delay, retry_on por step
 - core/moon_flow.py: resume(run_id) — retomada a partir do step falho
 - core/flow_run_store.py: FlowStepRun + attempt e max_attempts
@@ -1638,6 +1659,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Pipeline resiliente: falhas transitórias não interrompem o fluxo
 
 ## Sessão 2026-03-18 FASE 9 — Flow Templates
+
 - core/flow_template.py: FlowTemplateVar, FlowTemplate, FlowTemplateRegistry
 - flow_templates/: apex_template, blog_template, browser_template, research_template
 - core/orchestrator.py: /flow-new e /flow-templates
@@ -1645,6 +1667,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Capacidade: criar e executar flows dinâmicos via comando com variáveis
 
 ## Sessão 2026-03-18 FASE 10 — Policy Layer
+
 - core/policy_engine.py: PolicyRule, PolicyDecision, PolicyEngine
 - config/default_policy.json: 5 regras padrão (owner-all, telegram-safe, deny-admin, cli-all, read-only)
 - core/orchestrator.py: _check_policy() + /policy command
@@ -1654,6 +1677,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Filosofia: falha aberta (exception → allow) | owner tem acesso total
 
 ## Sessão 2026-03-18 FASE 11 — Flow Scheduler
+
 - core/flow_scheduler.py: ScheduledJob, FlowScheduler (daily/interval/once)
 - config/scheduled_jobs.json: apex-morning-07h30, apex-lineup-poll, research-daily
 - core/orchestrator.py: /flow-schedule, /flow-unschedule, /flow-jobs
@@ -1662,25 +1686,31 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Scheduler: loop asyncio a cada 30s, integrado ao padrão AutoSyncService
 
 ## Sessão 2026-03-18/19 FASE 12 — Moon Dashboard Live
+
 ### 12.A Backend API (12 endpoints)
+
 - apex_dashboard/api.py: expandido com /flows, /runs, /scheduler,
   /skills, /policy, /templates, /health, /status
 - 13 testes em test_dashboard_api.py
 
 ### 12.B Frontend SPA
+
 - apex_dashboard/index.html: reescrito — 6 seções, dados reais,
   auto-refresh 30s, tooltips, toasts, português
 - Paleta escura profissional, sidebar fixa, contagem regressiva
 
 ### 12.C Desktop Integration
+
 - scripts/start_moon_dashboard.sh: inicialização com detecção de browser
 - ~/.local/share/applications/moon-dashboard.desktop: atalho registrado
 
 ### 12.D Testes
+
 - tests/test_dashboard_integration.py: 11 testes end-to-end
 - Suite final: 573+ pass | 20 skip | 0 fail
 
 ### 2026-03-18 — system_info intent no Telegram Bot
+
 - Adicionado intent `system_info` em IntentDetector._RULES (bot.py)
 - Adicionada função async `_collect_system_info()` usando psutil
 - Handler no _route_intent: detecta intenção → coleta dados locais → responde sem LLM
@@ -1688,16 +1718,33 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - Dependência: psutil (pip install psutil se necessário)
 
 ### 2026-03-18 — Fix hang pytest TestSandbox
-- Causa: venv.create(with_pip=True) bloqueava event loop no _transmute()
+
+- Causa: venv.create(with_pip=True) bloqueava event loop no_transmute()
 - Fix: patch('venv.create') adicionado em todos os testes de TestSandbox
 - pyproject.toml: timeout = 10 adicionado em [tool.pytest.ini_options]
 - pytest-timeout instalado: ~/.local/lib/python3.12/site-packages/
 - Suite agora finaliza sem hangs
 
 ### 2026-03-19 — Fix PYTHONPATH systemd + ApexOracle 07:30
+
 - Causa: moon-telegram-bot.service sem Environment=PYTHONPATH
 - Fix: adicionado Environment=PYTHONPATH=. no [Service]
 - ApexOracle agora carrega corretamente no boot
 - Briefing matinal 07:30 reestabelecido
 - runtime/flows/runs.jsonl adicionado ao .gitignore
 - 26 commits pendentes enviados para GitHub
+
+### 2026-03-19 — Sprint 1: SchedulerAgent (Colmeia)
+
+- **Novo agente:** `agents/scheduler_agent.py` — Rainha da Colmeia
+- **Dependência:** `apscheduler>=4.0.0a1` (AsyncScheduler nativo asyncio)
+- **Jobs padrão:**
+  - `health_check` (IntervalTrigger 2min) → publica `scheduler.tick`
+  - `daily_research` (CronTrigger 06:00) → publica `research.request`
+  - `memory_sync` (IntervalTrigger 1h) → publica `memory.store`
+- **Tópicos publicados:** `scheduler.tick`, `research.request`, `memory.store`
+- **Tópicos assinados:** `hive.heartbeat` (monitora saúde dos agentes)
+- **Comandos _execute:** `add_job`, `remove_job`, `list_jobs`
+- **Testes:** `tests/test_scheduler_agent.py` — 15/15 passando
+- **Regressão:** 588 passed, 22 skipped, 0 failed (exceto test_news_monitor.py timeout preexistente)
+- **Pendências:** Sprint 2 (MemoryAgent com sentence-transformers + Supabase pgvector)
