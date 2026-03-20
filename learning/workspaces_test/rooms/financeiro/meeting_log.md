@@ -87,3 +87,5 @@
 [21:40:12] Sala inicializada para a skill Financeiro. Bem-vindo, FinanceAgent!
 [21:41:38] Sala inicializada para a skill Financeiro. Bem-vindo, FinanceAgent!
 [21:43:31] Sala inicializada para a skill Financeiro. Bem-vindo, FinanceAgent!
+[22:25:33] Sala inicializada para a skill Financeiro. Bem-vindo, FinanceAgent!
+[22:27:09] Sala inicializada para a skill Financeiro. Bem-vindo, FinanceAgent!

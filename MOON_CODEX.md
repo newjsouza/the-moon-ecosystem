@@ -1764,3 +1764,18 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - **Testes:** `tests/test_memory_agent.py` — 21/21 passando
 - **Regressão:** 609 passed, 22 skipped, 0 failed
 - **Pendências:** Sprint 3 (DeepWebResearchAgent com Crawl4AI)
+
+### 2026-03-19 — Sprint 3: DeepWebResearchAgent (Colmeia)
+
+- **Novo agente:** `agents/deep_web_research_agent.py` — Abelha Coletora
+- **Fontes:** GitHub API (GITHUB_TOKEN) + HuggingFace Hub + Arxiv
+- **Web crawling:** `crawl4ai` (AsyncWebCrawler, cache habilitado)
+- **Síntese:** LLMRouter (Groq, zero custo) — prompt em português
+- **Subscreve:** `research.request`
+- **Publica:** `research.result`, `memory.store`, `hive.heartbeat` (60s)
+- **Tasks _execute:** `research` | `search_github` | `search_huggingface` | `search_arxiv` | `crawl_url`
+- **agents/crawler.py:** intocado ✅
+- **Dependências:** `crawl4ai`, `arxiv`, `huggingface_hub`, `requests`
+- **Testes:** `tests/test_deep_web_research_agent.py` — 21/21 passando
+- **Regressão:** 630 passed, 22 skipped, 0 failed
+- **Pendências:** Sprint 4 (DataPipelineAgent com DuckDB)
