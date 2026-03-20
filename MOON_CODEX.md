@@ -1794,3 +1794,28 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - **Testes:** `tests/test_data_pipeline_agent.py` — 19/19 passando
 - **Regressão:** 649 passed, 22 skipped, 0 failed
 - **Pendências:** Sprint 5 (DesktopControlAgent)
+
+### 2026-03-19 — Sprint 5: DesktopControlAgent (Colmeia)
+
+- **Novo agente:** `agents/desktop_control_agent.py` — Abelha Operária
+- **Dependências Python:** `pyautogui`, `mss`, `pytesseract`, `Pillow`
+- **Dependências sistema:** `xdotool`, `tesseract-ocr`, `tesseract-ocr-por` (opcional)
+- **Capacidades:**
+  - **Mouse:** click, double_click, right_click, move_to, drag_to, scroll
+  - **Teclado:** type_text, press_key, hotkey, key_down, key_up
+  - **Tela:** screenshot, ocr_screen (por+eng), find_on_screen, get_screen_size
+  - **Janelas:** list_windows, find_window, focus_window, resize_window, move_window, close_window, get_active_window (via xdotool)
+  - **Macro:** run_macro — sequência de ações com abort_on_error + delay_after
+- **Segurança:** FAILSAFE=True, MIN_ACTION_INTERVAL=0.3s, lazy import
+- **Graceful degradation:** modo limitado sem DISPLAY
+- **Subscreve:** `desktop.action`
+- **Publica:** `desktop.result`, `hive.heartbeat` (60s)
+- **Screenshots:** `data/screenshots/` (gitignored)
+- **Testes:** `tests/test_desktop_control_agent.py` — 27/27 passando (100% mockados)
+- **Regressão:** 676 passed, 22 skipped, 0 failed
+- **COLMEIA COMPLETA:** 5/5 sprints implementados ✅
+  - Sprint 1: SchedulerAgent (Rainha)
+  - Sprint 2: MemoryAgent (Favo)
+  - Sprint 3: DeepWebResearchAgent (Coletora)
+  - Sprint 4: DataPipelineAgent (Processadora)
+  - Sprint 5: DesktopControlAgent (Operária)

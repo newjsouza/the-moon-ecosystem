@@ -116,3 +116,4 @@ runtime/flows/runs.jsonl
 data/pipeline/*.db
 data/pipeline/*.csv
 data/pipeline/*.json
+data/screenshots/
