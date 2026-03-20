@@ -1748,3 +1748,19 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - **Testes:** `tests/test_scheduler_agent.py` — 15/15 passando
 - **Regressão:** 588 passed, 22 skipped, 0 failed (exceto test_news_monitor.py timeout preexistente)
 - **Pendências:** Sprint 2 (MemoryAgent com sentence-transformers + Supabase pgvector)
+
+### 2026-03-19 — Sprint 2: MemoryAgent (Colmeia)
+
+- **Novo agente:** `agents/memory_agent.py` — Favo de Memória da Colmeia
+- **Dependências:** `sentence-transformers` (embeddings locais), `supabase` (cliente Python)
+- **Modelo:** `all-MiniLM-L6-v2` (384 dimensões, zero custo — sem API key)
+- **Persistência:** Supabase pgvector (tabela `moon_memory`)
+- **Comandos _execute:** `store`, `query`, `delete`, `list_by_topic`, `health`
+- **Tópicos assinados:** `memory.store` (sincronização)
+- **Funções SQL necessárias:**
+  - Tabela `moon_memory` com coluna `embedding vector(384)`
+  - Função `moon_memory_search()` para busca semântica
+  - Índice `ivfflat` para similaridade de cosseno
+- **Testes:** `tests/test_memory_agent.py` — 21/21 passando
+- **Regressão:** 609 passed, 22 skipped, 0 failed
+- **Pendências:** Sprint 3 (DeepWebResearchAgent com Crawl4AI)
