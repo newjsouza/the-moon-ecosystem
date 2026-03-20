@@ -52,7 +52,7 @@ def mock_orchestrator():
         "skills_online": 0,
         "channels_online": 0,
     })
-    orchestrator._agent_instances = {}
+    orchestrator._agents = {}
     return orchestrator
 
 
@@ -187,7 +187,7 @@ async def test_moonsystem_bootstrap_architect(mock_orchestrator):
         # Verifica que Architect foi inicializado
         assert mock_architect.initialize.called
         assert system.architect is not None
-        assert "ArchitectAgent" in mock_orchestrator._agent_instances
+        assert "ArchitectAgent" in mock_orchestrator._agents
 
 
 @pytest.mark.unit
@@ -287,7 +287,7 @@ async def test_bootstrap_system_success():
     mock_orchestrator.start = AsyncMock()
     mock_orchestrator.stop = AsyncMock()
     mock_orchestrator.get_status = MagicMock(return_value={})
-    mock_orchestrator._agent_instances = {}
+    mock_orchestrator._agents = {}
 
     mock_architect = MagicMock()
     mock_architect.initialize = AsyncMock()
@@ -363,7 +363,7 @@ async def test_architect_is_central_coordinator(mock_orchestrator):
 
         # Verifica que Architect foi registrado no orchestrator
         assert mock_orchestrator.register_agent.called
-        assert "ArchitectAgent" in mock_orchestrator._agent_instances
+        assert "ArchitectAgent" in mock_orchestrator._agents
 
         # Verifica que Architect está acessível
         assert system.architect is not None

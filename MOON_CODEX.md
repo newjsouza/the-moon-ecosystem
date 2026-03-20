@@ -1838,3 +1838,19 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - **Testes:** `tests/test_hive.py` — 11/11 passando
 - **Regressão:** 687 passed, 22 skipped, 0 failed
 - **ARQUITETURA COLMEIA:** 100% operacional ✅
+
+### 2026-03-19 — Sprint 7: HiveIntegration + main.py
+
+- **Novo módulo:** `core/hive_integration.py` — classe `HiveIntegration`
+- **Integra Hive ao Orchestrator** via `register_agent()` sem modificar o core
+- **Patches cirúrgicos em main.py:**
+  - `+ import HiveIntegration`
+  - `+ self.hive_integration` no `__init__`
+  - `+ await hive_integration.start()` no `start()`
+  - `+ await hive_integration.stop()` no `shutdown`
+- **Inicialização:** `python3 main.py` já sobe toda a colmeia automaticamente
+- **Todos os 5 agentes** visíveis via `orchestrator.get_agent(name)`
+- **Testes:** `tests/test_hive_integration.py` — 9/9 passando
+- **Correção:** `test_main_bootstrap.py` — `_agent_instances` → `_agents`
+- **Regressão:** 696 passed, 22 skipped, 0 failed
+- **SISTEMA MOON COMPLETO:** Orchestrator + Hive coexistem ✅

@@ -54,8 +54,8 @@ class Hive:
         self._started_at = datetime.now(timezone.utc)
 
         self._agents = {
-            "SchedulerAgent":        SchedulerAgent(self._bus, self._llm),
-            "MemoryAgent":           MemoryAgent(self._bus, self._llm),
+            "SchedulerAgent":        SchedulerAgent(),
+            "MemoryAgent":           MemoryAgent(),
             "DeepWebResearchAgent":  DeepWebResearchAgent(self._bus, self._llm),
             "DataPipelineAgent":     DataPipelineAgent(self._bus, self._llm),
             "DesktopControlAgent":   DesktopControlAgent(self._bus, self._llm),

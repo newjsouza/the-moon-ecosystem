@@ -31,6 +31,7 @@ from core.config import Config
 from core.orchestrator import Orchestrator
 from core.message_bus import MessageBus
 from core.agent_base import AgentPriority
+from core.hive_integration import HiveIntegration
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -167,7 +168,8 @@ class MoonSystem:
         self.orchestrator = Orchestrator()
         self.architect: Optional["ArchitectAgent"] = None
         self.message_bus = self.orchestrator.message_bus
-        
+        self.hive_integration: HiveIntegration | None = None
+
         # Estado do sistema
         self._initialized = False
         self._shutdown_event = asyncio.Event()
@@ -410,14 +412,26 @@ class MoonSystem:
           3. Configura handlers de shutdown
         """
         logger.info("🚀 Starting The Moon Ecosystem...")
-        
+
         try:
             # Inicia Orchestrator (agentes, canais, loops)
             await self.orchestrator.start()
-            
+
+            # ── Hive: Colmeia de Agentes Especializados ──
+            try:
+                self.hive_integration = HiveIntegration(
+                    orchestrator=self.orchestrator,
+                    bus=self.message_bus,
+                    llm=self.orchestrator.llm,
+                )
+                await self.hive_integration.start()
+                logger.info("🐝 Hive integrada ao sistema Moon")
+            except Exception as e:
+                logger.error("❌ Hive falhou ao iniciar: %s", e)
+
             self._initialized = True
             logger.info("✅ The Moon Ecosystem is ONLINE.")
-            
+
         except Exception as e:
             logger.error(f"Erro ao iniciar sistema: {e}")
             raise
@@ -432,19 +446,23 @@ class MoonSystem:
           3. Limpa recursos
         """
         logger.info("🛑 Stopping The Moon Ecosystem...")
-        
+
         self._shutdown_event.set()
-        
+
         try:
+            # Para Hive primeiro (graceful shutdown dos 5 agentes)
+            if self.hive_integration:
+                await self.hive_integration.stop()
+
             # Para Orchestrator
             await self.orchestrator.stop()
-            
+
             # Shutdown do Architect
             if self.architect:
                 await self.architect.shutdown()
-            
+
             logger.info("✅ The Moon Ecosystem stopped.")
-            
+
         except Exception as e:
             logger.error(f"Erro durante shutdown: {e}")
             raise
