@@ -1779,3 +1779,18 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - **Testes:** `tests/test_deep_web_research_agent.py` — 21/21 passando
 - **Regressão:** 630 passed, 22 skipped, 0 failed
 - **Pendências:** Sprint 4 (DataPipelineAgent com DuckDB)
+
+### 2026-03-19 — Sprint 4: DataPipelineAgent (Colmeia)
+
+- **Novo agente:** `agents/data_pipeline_agent.py` — Abelha Processadora
+- **Motor:** DuckDB in-process + pandas (zero servidor, zero custo)
+- **Persistência:** `data/pipeline/moon_pipeline.db` (gitignored)
+- **Tabelas:** `research_results`, `pipeline_runs`
+- **Subscreve:** `pipeline.process`
+- **Publica:** `pipeline.result`, `memory.store` (insights), `hive.heartbeat` (60s)
+- **Tasks _execute:** `process` (research|json) | `query` | `summarize` | `export_csv` | `export_json` | `status`
+- **Integração:** DeepWebResearchAgent → DataPipelineAgent → MemoryAgent
+- **Dependências:** `duckdb`, `pandas`, `tabulate`
+- **Testes:** `tests/test_data_pipeline_agent.py` — 19/19 passando
+- **Regressão:** 649 passed, 22 skipped, 0 failed
+- **Pendências:** Sprint 5 (DesktopControlAgent)

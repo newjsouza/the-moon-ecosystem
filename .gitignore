@@ -113,3 +113,6 @@ runtime/
 runtime/flows/
 *.jsonl_*
 runtime/flows/runs.jsonl
+data/pipeline/*.db
+data/pipeline/*.csv
+data/pipeline/*.json
