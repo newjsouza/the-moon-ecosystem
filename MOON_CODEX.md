@@ -1819,3 +1819,22 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
   - Sprint 3: DeepWebResearchAgent (Coletora)
   - Sprint 4: DataPipelineAgent (Processadora)
   - Sprint 5: DesktopControlAgent (Operária)
+
+### 2026-03-19 — Sprint 6: HiveOrchestrator
+
+- **Novo módulo:** `core/hive.py` — classe `Hive`
+- **Inicializa 5 agentes em ordem determinística:**
+  1. MemoryAgent (base de todos)
+  2. DataPipelineAgent
+  3. DeepWebResearchAgent
+  4. DesktopControlAgent
+  5. SchedulerAgent (último — dispara eventos)
+- **Métodos:** `start()`, `stop()`, `status()`, `get_agent(name)`
+- **Properties:** `scheduler`, `memory`, `researcher`, `pipeline`, `desktop`
+- **stop() graceful:** `DataPipelineAgent.close()` antes de cancelar tasks
+- **status() com timeout de 5s por agente**
+- **NÃO modifica core/orchestrator.py** ✅
+- **Publicação:** `hive.heartbeat` no `start()`
+- **Testes:** `tests/test_hive.py` — 11/11 passando
+- **Regressão:** 687 passed, 22 skipped, 0 failed
+- **ARQUITETURA COLMEIA:** 100% operacional ✅
