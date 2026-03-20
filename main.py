@@ -226,7 +226,7 @@ class MoonSystem:
         self.orchestrator.register_agent(self.architect)
         
         # Injeta instância do Architect no Orchestrator para coordenação
-        self.orchestrator._agent_instances["ArchitectAgent"] = self.architect
+        self.orchestrator._agents["ArchitectAgent"] = self.architect
         
         # Inicializa Architect
         await self.architect.initialize()
