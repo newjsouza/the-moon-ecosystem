@@ -2227,3 +2227,23 @@ Both coexist and complement each other.
 **Tests Sprint H:** +35 (total estimado: ~544)
 **FASE 4: 33% (H ✅ — I e J pendentes)**
 
+
+---
+
+## P3 — SportsAnalyticsAgent Wire [2026-03-21]
+
+**Arquivos modificados:**
+- `skills/sports/api_client.py` — +24 linhas
+  - `get_standings(competition_id)` → GET /v4/competitions/{id}/standings
+  - `get_scorers(competition_id, limit)` → GET /v4/competitions/{id}/scorers
+
+- `agents/sports_analytics_agent.py` — _call_sports_api() wireado
+  - endpoint `matches` → `client.get_matches()`
+  - endpoint `standings` → `client.get_standings()`
+  - endpoint `scorers` → `client.get_scorers()`
+
+**Resultado:**
+- SportsAnalyticsAgent agora busca dados REAIS da football-data.org API
+- CircuitBreaker protege todas as chamadas
+- 31 testes Sprint I: 100% pass
+- Suite completa: 1039 passed, 0 failed ✅
