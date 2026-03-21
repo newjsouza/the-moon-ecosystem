@@ -21,7 +21,7 @@ import asyncio
 import logging
 from core.agent_base import AgentBase, TaskResult
 from core.observability.decorators import observe_agent
-from core.llm import LLMRouter
+from agents.llm import LLMRouter
 from core.circuit_breaker import CircuitBreaker, CircuitBreakerConfig
 from core.youtube_config import (
     YOUTUBE_DOMAINS, DEFAULT_DOMAINS, ScriptConfig, SCRIPT_SECTIONS

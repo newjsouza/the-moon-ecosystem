@@ -2363,3 +2363,49 @@ npm install -g @qwen-code/qwen-code
 - Suite completa: 1053 passed, 0 failed ✅
 
 ---
+
+---
+
+## EXP-1: YouTubeAgent — Concluído [2026-03-21]
+
+### Visão Multimodal 2026 — YouTube Content Automation
+
+**Novos arquivos:**
+- `skills/youtube/__init__.py` + `skills/youtube/youtube_client.py`
+  - YouTubeClient: YouTube Data API v3 (free tier — 10k units/day)
+  - search_trending(): busca vídeos trending por domínio + região BR
+  - get_video_stats(): metadata + estatísticas de vídeos
+  - get_channel_info(): dados de canal
+  - Quota tracking: usage/limit/remaining em tempo real
+  - Degraded mode: sem API key → retorna listas vazias com warning
+
+- `core/youtube_config.py` — YouTubeConfig
+  - YOUTUBE_DOMAINS: tech, economy, sports, philosophy, ufology
+  - SCRIPT_SECTIONS: hook, intro, development, data_points, analysis, cta, outro
+  - ScriptConfig: dataclass de configuração por execução
+
+- `agents/youtube_agent.py` — YouTubeAgent (AGENT_ID: "youtube")
+  - @observe_agent + CircuitBreaker na API
+  - 6 commands: pipeline, script, trending, seo, repurpose, quota
+  - Full pipeline: trending → script → SEO → thumbnail → blog → RAG → Telegram
+  - SEO: título otimizado, description, tags, keywords via LLM (JSON)
+  - Thumbnail: ffmpeg harness (text overlay 1280x720)
+  - Repurpose: blog post → video script e vice-versa
+  - RAG indexing em collection "youtube_scripts"
+
+- `tests/test_youtube_agent.py` — 23 testes (100% pass)
+
+**Arquivos modificados:**
+- `agents/architect.py` — YouTubeAgent registrado no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
+- `core/env_validator.py` — YOUTUBE_API_KEY adicionado como opcional
+- `.env.example` — template YOUTUBE_API_KEY adicionado
+
+**Integrações:**
+- BlogPipeline: scripts repurposados como posts
+- OmniChannelStrategist: cross-post do conteúdo gerado
+- NexusIntelligence: trending topics como input
+- RAGEngine: anti-repetição de tópicos de vídeo
+- ffmpeg harness: geração de thumbnails
+- Telegram: notificação de pipeline concluído
+
+**Testes:** 1076 passed, 19 skipped, 0 failed ✅ (+37 novos testes)

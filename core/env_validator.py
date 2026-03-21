@@ -54,6 +54,9 @@ OPTIONAL_VARS = [
            description="Supabase project URL"),
     EnvVar("SUPABASE_KEY", required=False,
            description="Supabase anon/service key"),
+    EnvVar("YOUTUBE_API_KEY", required=False,
+           description="YouTube Data API v3 — free tier 10k units/day",
+           example="AIzaSy..."),
 ]
 
 

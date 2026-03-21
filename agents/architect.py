@@ -89,6 +89,12 @@ DOMAIN_AGENT_MAP = {
     "codex": "CodexUpdaterAgent",
     "docs": "CodexUpdaterAgent",
     "documentation": "CodexUpdaterAgent",
+    # YouTube Agent
+    "youtube": "YouTubeAgent",
+    "video": "YouTubeAgent",
+    "roteiro": "YouTubeAgent",
+    "script": "YouTubeAgent",
+    "multimodal": "YouTubeAgent",
     # Sports Analytics Agent
     "sports_analytics": "SportsAnalyticsAgent",
     "futebol": "SportsAnalyticsAgent",
@@ -137,6 +143,8 @@ KEYWORD_PATTERNS = {
     "sports_analytics": r"(esporte|futebol|jogo|partida|brasileirao|campeonato|liga|copa|champions|liga dos campeões|liga dos campeões europeus|liga dos campeões da uefa|liga dos campeões da uefa europeus)",
     # Codex Updater patterns
     "codex": r"(codex|moon_codex|atualizar.*documento|documentação|log|histórico|sprint|feat)",
+    # YouTube patterns
+    "youtube": r"(youtube|vídeo|roteiro|script|thumbnail|seo.*youtube|trending|vídeo.*youtube)",
     # QwenCodeAgent patterns
     "code_generation": r"(gerar.*código|criar.*código|gerar.*função|criar.*classe|implementar|scaffold|boilerplate|code generation)",
     "refactoring": r"(refatorar|refatoração|refactor|limpar.*código|otimizar.*código|melhorar.*código)",
@@ -711,6 +719,8 @@ class ArchitectAgent(AgentBase):
             "TextToSQLAgent": ("agents.text_to_sql_agent", ["sql.command", "query.command", "db.command"]),
             # Codex Updater Agent
             "CodexUpdaterAgent": ("agents.codex_updater", ["codex.update", "codex.command"]),
+            # YouTube Agent
+            "YouTubeAgent": ("agents.youtube_agent", ["youtube.command", "video.command", "script.command"]),
         }
 
         for name, (module_path, topics) in known_agents.items():
