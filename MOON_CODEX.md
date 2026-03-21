@@ -300,6 +300,37 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
     - Atalho dedicado no desktop para acesso rápido via porta 3000.
 - **Data:** Março 2026.
 
+
+---
+
+## 🆕 [FEAT] CodexUpdaterAgent + Fix P1 — [2026-03-21 10:36]
+
+**Agent:** `codex_updater`
+
+### CodexUpdaterAgent Implementation
+- Criado: `agents/codex_updater.py` (257 linhas)
+- Criado: `tests/test_codex_updater.py` (11 testes, 100% pass)
+- Modificado: `core/autonomous_loop.py` — publish evento `autonomous_loop.task_completed`
+- Modificado: `agents/architect.py` — registrado no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS
+
+**Funcionalidades:**
+- Auto-update MOON_CODEX.md via MessageBus
+- Atomic append (tmp file + rename)
+- LLM summary via Groq (fallback rule-based)
+- Commands: `update`, `verify`, `status`
+- Decorado com @observe_agent
+
+### Fix P1 — 21 Falhas Pré-existentes Corrigidas
+- `agents/sports_analytics_agent.py` — import `core.llm` → `agents.llm`
+- `tests/test_sprint_j_deployment.py` — adicionado `import signal`
+- `tests/test_sprint_i_sports.py` — mock `_call_agent` ao invés de `dispatch`
+- `tests/test_sprint_a_skills.py` — assert flexível para openpyxl não instalado
+
+**Resultado:**
+- Antes: 22 ImportErrors + 2 AssertionErrors + vários ERRORs
+- Depois: **1039 passed, 19 skipped, 0 failed** ✅
+
+---
 ---
 *Este documento é a fonte única de verdade para a arquitetura do The Moon.*
 
