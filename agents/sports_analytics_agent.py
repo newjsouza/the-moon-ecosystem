@@ -222,24 +222,17 @@ class SportsAnalyticsAgent(AgentBase):
         try:
             from skills.sports import FootballDataClient
             client = FootballDataClient()
-            
+
             if endpoint == 'matches':
-                return client.get_matches(competition_id=competition_id, **kwargs)
+                matches = client.get_matches(competition_id=competition_id, **kwargs)
+                return {"matches": matches}
             elif endpoint == 'standings':
-                # The API doesn't have a direct standings endpoint, need to get competition info
-                competitions = client.get_competitions()
-                for comp in competitions:
-                    if comp.get('id') == competition_id or comp.get('code') == competition_id:
-                        # We need to get specific competition table which may not be directly available
-                        # This is a simplified implementation - in reality we'd need to check API docs
-                        # for the specific endpoint to get standings
-                        return {"standings": []}
-                return {}
+                standings = client.get_standings(competition_id=competition_id)
+                return {"standings": standings}
             elif endpoint == 'scorers':
-                # The API doesn't have a direct scorers endpoint either
-                # For now, returning an empty result - would need to implement 
-                # a method to get this data from the API
-                return {"scorers": []}
+                limit = kwargs.get('limit', 10)
+                scorers = client.get_scorers(competition_id=competition_id, limit=limit)
+                return {"scorers": scorers}
             else:
                 self.logger.warning(f"Unknown endpoint: {endpoint}")
                 return {}

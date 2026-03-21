@@ -55,3 +55,24 @@ class FootballDataClient:
         response = requests.get(url, headers=self.headers)
         response.raise_for_status()
         return response.json().get("odds", {})
+
+    def get_standings(self, competition_id: str) -> List[Dict]:
+        """Get league standings for a competition"""
+        url = f"{self.BASE_URL}/competitions/{competition_id}/standings"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        data = response.json()
+        # Return first standings table (usually overall standings)
+        tables = data.get("standings", [])
+        if tables:
+            return tables[0].get("table", [])
+        return []
+
+    def get_scorers(self, competition_id: str, limit: int = 10) -> List[Dict]:
+        """Get top scorers for a competition"""
+        url = f"{self.BASE_URL}/competitions/{competition_id}/scorers"
+        params = {"limit": limit}
+        response = requests.get(url, headers=self.headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        return data.get("scorers", [])
