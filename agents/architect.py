@@ -109,6 +109,15 @@ DOMAIN_AGENT_MAP = {
     "inbox": "GmailAgent",
     "triage": "GmailAgent",
     "draft": "GmailAgent",
+    # Linux Native Agent
+    "linux": "LinuxNativeAgent",
+    "linux_native": "LinuxNativeAgent",
+    "volume": "LinuxNativeAgent",
+    "audio": "LinuxNativeAgent",
+    "sistema": "LinuxNativeAgent",
+    "battery": "LinuxNativeAgent",
+    "hotkey": "LinuxNativeAgent",
+    "notify": "LinuxNativeAgent",
     # Sports Analytics Agent
     "sports_analytics": "SportsAnalyticsAgent",
     "futebol": "SportsAnalyticsAgent",
@@ -743,6 +752,8 @@ class ArchitectAgent(AgentBase):
             "HedgeAgent": ("agents.hedge_agent", ["hedge.command", "bet.command", "kelly.command"]),
             # Gmail Agent
             "GmailAgent": ("agents.gmail_agent", ["gmail.command", "email.command", "triage.command"]),
+            # Linux Native Agent
+            "LinuxNativeAgent": ("agents.linux_native_agent", ["linux.command", "volume.command", "audio.command", "notify.command"]),
         }
 
         for name, (module_path, topics) in known_agents.items():

@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>🌙 The Moon — Workspace Monitor v2</title>
+<style>:root{--bg:#0a0a0f;--surface:#12121a;--border:#1e1e2e;--accent:#7c3aed;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:18px;font-weight:700}header h1 span{color:var(--accent)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-right:8px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}main{padding:24px;max-width:1400px;margin:0 auto}
+.grid{display:grid;gap:16px}.grid-4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-title{font-size:11px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.metric-value{font-size:32px;font-weight:800}.metric-label{font-size:12px;color:var(--muted);margin-top:4px}
+.agent-list{display:flex;flex-direction:column;gap:8px}.agent-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.agent-name{font-weight:600;font-size:13px}.agent-meta{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.badge{padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-green{background:#10b98120;color:var(--green)}.badge-yellow{background:#f59e0b20;color:var(--yellow)}.badge-red{background:#ef444420;color:var(--red)}
+.event-feed{font-family:monospace;font-size:12px;max-height:320px;overflow-y:auto}
+.event-row{padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:10px}
+.event-time{color:var(--muted);white-space:nowrap}.event-topic{color:var(--accent);font-weight:600}.event-payload{color:var(--text);word-break:break-all}
+.conn-bar{padding:6px 12px;border-radius:6px;font-size:12px;background:var(--border)}.conn-bar.connected{background:#10b98115;color:var(--green)}.conn-bar.disconnected{background:#ef444415;color:var(--red)}
+section{margin-bottom:24px}section>h2{font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}</style></head>
+<body><header><h1>🌙 <span>The Moon</span> — Workspace Monitor <span style="color:var(--muted);font-weight:400">v2</span></h1>
+<div style="display:flex;align-items:center;gap:12px"><span id="conn-badge" class="conn-bar disconnected">⬤ Connecting…</span><span id="last-update" style="font-size:12px;color:var(--muted)"></span></div></header>
+<main><section><div class="grid grid-4" id="kpis"><div class="card"><div class="card-title">System Status</div><div class="metric-value" id="kpi-status">—</div><div class="metric-label">ecosystem health</div></div>
+<div class="card"><div class="card-title">Active Agents</div><div class="metric-value" id="kpi-agents">—</div><div class="metric-label">registered</div></div>
+<div class="card"><div class="card-title">Total Calls</div><div class="metric-value" id="kpi-calls">—</div><div class="metric-label">since startup</div></div>
+<div class="card"><div class="card-title">Events/min</div><div class="metric-value" id="kpi-evpm">0</div><div class="metric-label">messagebus rate</div></div></div></section>
+<div class="grid grid-4" style="grid-template-columns:repeat(auto-fit,minmax(400px,1fr))"><section><h2>Agents</h2><div class="card"><div id="agent-list" class="agent-list"><div style="color:var(--muted)">Loading agents…</div></div></div></section>
+<section><h2>Live Event Feed</h2><div class="card"><div id="event-feed" class="event-feed"><div style="color:var(--muted)">Waiting for events…</div></div></div></section></div></main>
+<script>const API=window.location.protocol+'//'+window.location.hostname+':3000';const WS_BASE='ws://'+window.location.hostname+':3000';let eventsLastMin=[];let liveWs;
+async function fetchMetrics(){try{const[status,agents]=await Promise.all([fetch(API+'/api/status').then(r=>r.json()),fetch(API+'/api/agents').then(r=>r.json())]);updateKPIs(status,agents);updateAgentList(agents.agents||[]);document.getElementById('last-update').textContent='Updated '+new Date().toLocaleTimeString('pt-BR')}catch(e){console.warn('REST fetch failed:',e)}}
+function updateKPIs(status,agents){const s=status.status||'unknown';const el=document.getElementById('kpi-status');el.textContent=s;el.style.color=s==='healthy'? 'var(--green)':s==='degraded'? 'var(--yellow)':'var(--red)';const agentData=agents.agents||[];document.getElementById('kpi-agents').textContent=agentData.length;const totalCalls=agentData.reduce((a,b)=>a+(b.total_calls||0),0);document.getElementById('kpi-calls').textContent=totalCalls.toLocaleString()}
+function updateAgentList(agents){const el=document.getElementById('agent-list');if(!agents.length){el.innerHTML='<div style="color:var(--muted)">No agents registered</div>';return}el.innerHTML=agents.map(a=>{const sr=Math.round((a.success_rate||0)*100);const badge=sr>=90?'badge-green':sr>=70?'badge-yellow':'badge-red';return `<div class="agent-row"><div><div class="agent-name">${a.id}</div><div class="agent-meta"><span>${a.total_calls} calls</span></div></div><span class="badge ${badge}">${sr}%</span></div>`}).join('')}
+function connectLiveWs(){liveWs=new WebSocket(WS_BASE+'/ws/live');liveWs.onopen=()=>{document.getElementById('conn-badge').textContent='⬤ Connected';document.getElementById('conn-badge').className='conn-bar connected'};liveWs.onmessage=(msg)=>{const event=JSON.parse(msg.data);if(event.type==='ping')return;appendEvent(event);eventsLastMin.push(Date.now());eventsLastMin=eventsLastMin.filter(t=>Date.now()-t<60000);document.getElementById('kpi-evpm').textContent=eventsLastMin.length};liveWs.onclose=()=>{document.getElementById('conn-badge').textContent='⬤ Reconnecting…';document.getElementById('conn-badge').className='conn-bar disconnected';setTimeout(connectLiveWs,3000)}}
+function appendEvent(event){const feed=document.getElementById('event-feed');const time=new Date(event.timestamp||Date.now()).toLocaleTimeString('pt-BR');const payload=typeof event.payload==='object'?JSON.stringify(event.payload).slice(0,80):String(event.payload||'').slice(0,80);const row=document.createElement('div');row.className='event-row';row.innerHTML=`<span class="event-time">${time}</span><span class="event-topic">${event.topic||'—'}</span><span class="event-payload">${payload}</span>`;feed.prepend(row);while(feed.children.length>100)feed.removeChild(feed.lastChild)}
+fetchMetrics();setInterval(fetchMetrics,10000);connectLiveWs();</script></body></html>

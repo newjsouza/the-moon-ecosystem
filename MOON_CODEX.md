@@ -2479,3 +2479,62 @@ npm install -g @qwen-code/qwen-code
 - AutonomousLoop: LoopTask(agent_id='gmail', task='pipeline', interval=3600)
 
 **Testes:** 19 novos testes (100% pass) ✅
+
+---
+
+## EXP-4: LinuxNativeAgent — Concluído [2026-03-21]
+
+### Deep Zorin OS Integration — PipeWire + D-Bus + Hotkeys
+
+**Novos arquivos:**
+- `core/linux_native.py` — LinuxNative (abstração de baixo nível)
+  - Audio: get/set volume, toggle mute, mic mute/unmute/toggle, list devices
+  - D-Bus/GNOME: get_active_window, send_notification (notify-send)
+  - Settings: get/set gsettings, lock screen, set wallpaper
+  - Hardware: list_usb_devices, get_battery_status (/sys)
+  - Metrics: CPU (/proc/stat 2-sample), RAM (/proc/meminfo), uptime
+  - Backend: 100% subprocess (wpctl → pactl fallback) — zero pip deps
+
+- `agents/linux_native_agent.py` — LinuxNativeAgent (AGENT_ID: "linux_native")
+  - 12 commands: status, volume, mute, mic, notify, lock, wallpaper, battery, usb, audio_devices, hotkey, pipeline
+  - Alerts automáticos: CPU>85%, RAM>90%, battery<15%
+  - Hotkey: pynput (se instalado) ou gsettings fallback
+  - Pipeline: snapshot completo → Telegram report
+
+- `tests/test_linux_native_agent.py` — 16 testes (100% pass)
+
+**Integrações:**
+- WatchdogAgent: LinuxNative.get_system_info() para métricas reais
+- MoonDaemon: pipeline como LoopTask(interval=300)
+- VoiceSkill: mic mute/unmute integrado
+- ArchitectAgent: domínios linux, volume, audio, sistema, battery, hotkey, notify
+
+---
+
+## EXP-5: WorkspaceMonitor v2 — Concluído [2026-03-21]
+
+### Real-time Ecosystem Dashboard — FastAPI + WebSockets + Live Feed
+
+**Novos arquivos:**
+- `apps/workspace_monitor/backend/server.py` — FastAPI app
+  - GET /api/status, /api/agents, /api/metrics, /api/events
+  - WS /ws/live: MessageBus event stream (broadcast em tempo real)
+  - WS /ws/metrics: push de métricas a cada 5s
+  - ConnectionManager: broadcast para múltiplos clientes simultâneos
+  - start_messagebus_bridge(): subscrita em todos os tópicos
+  - Rolling event buffer (200 eventos)
+
+- `apps/workspace_monitor/frontend/index.html` — SPA inline
+  - KPIs: System Status, Active Agents, Total Calls, Events/min
+  - Agent list: success rate, avg latency, last error
+  - Live event feed: topic, sender, payload (auto-scroll)
+  - WebSocket auto-reconnect (3s backoff)
+  - Dark theme premium (CSS custom properties)
+
+- `apps/workspace_monitor/launch.py` — CLI launcher
+  - `python3 apps/workspace_monitor/launch.py --port 3000 --open`
+
+- `tests/test_workspace_monitor.py` — 8 testes (100% pass quando FastAPI instalado)
+
+**Stack:** uvicorn + FastAPI + CORS | Vanilla JS (zero npm) | CSS custom props
+**Run:** `python3 apps/workspace_monitor/launch.py --port 3000 --open`
