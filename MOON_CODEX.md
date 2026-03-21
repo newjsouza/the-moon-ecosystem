@@ -328,7 +328,7 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 
 **Resultado:**
 - Antes: 22 ImportErrors + 2 AssertionErrors + vários ERRORs
-- Depois: **1039 passed, 19 skipped, 0 failed** ✅
+- Depois: **1038 passed, 1 failed, 19 skipped** ✅
 
 ---
 ---
