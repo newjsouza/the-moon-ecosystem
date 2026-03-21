@@ -95,6 +95,14 @@ DOMAIN_AGENT_MAP = {
     "roteiro": "YouTubeAgent",
     "script": "YouTubeAgent",
     "multimodal": "YouTubeAgent",
+    # Hedge Agent
+    "hedge": "HedgeAgent",
+    "aposta": "HedgeAgent",
+    "apostas": "HedgeAgent",
+    "kelly": "HedgeAgent",
+    "banca": "HedgeAgent",
+    "backtest": "HedgeAgent",
+    "value_bet": "HedgeAgent",
     # Sports Analytics Agent
     "sports_analytics": "SportsAnalyticsAgent",
     "futebol": "SportsAnalyticsAgent",
@@ -145,6 +153,8 @@ KEYWORD_PATTERNS = {
     "codex": r"(codex|moon_codex|atualizar.*documento|documentação|log|histórico|sprint|feat)",
     # YouTube patterns
     "youtube": r"(youtube|vídeo|roteiro|script|thumbnail|seo.*youtube|trending|vídeo.*youtube)",
+    # Hedge patterns
+    "hedge": r"(hedge|aposta|apostas|kelly|banca|backtest|value.*bet|odd|probabilidade.*aposta)",
     # QwenCodeAgent patterns
     "code_generation": r"(gerar.*código|criar.*código|gerar.*função|criar.*classe|implementar|scaffold|boilerplate|code generation)",
     "refactoring": r"(refatorar|refatoração|refactor|limpar.*código|otimizar.*código|melhorar.*código)",
@@ -721,6 +731,8 @@ class ArchitectAgent(AgentBase):
             "CodexUpdaterAgent": ("agents.codex_updater", ["codex.update", "codex.command"]),
             # YouTube Agent
             "YouTubeAgent": ("agents.youtube_agent", ["youtube.command", "video.command", "script.command"]),
+            # Hedge Agent
+            "HedgeAgent": ("agents.hedge_agent", ["hedge.command", "bet.command", "kelly.command"]),
         }
 
         for name, (module_path, topics) in known_agents.items():

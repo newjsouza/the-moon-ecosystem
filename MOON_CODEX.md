@@ -2409,3 +2409,42 @@ npm install -g @qwen-code/qwen-code
 - Telegram: notificação de pipeline concluído
 
 **Testes:** 1076 passed, 19 skipped, 0 failed ✅ (+37 novos testes)
+
+---
+
+## EXP-2: HedgeAgent v2 — Concluído [2026-03-21]
+
+### Scientific Betting — Kelly + APEX v2 + Monte Carlo + Backtesting
+
+**Novos arquivos:**
+- `core/kelly.py` — KellyEngine (motor matemático puro)
+  - calculate(): Kelly completo + fracionário (0.25x) + APEX v2
+  - monte_carlo(): N paths × M bets — distribuição de resultados
+  - backtest(): histórico RAG → ROI, Sharpe, max drawdown, win rate
+  - BetRecommendation: dataclass completo (edge, EV, stake, confidence)
+  - BacktestResult: dataclass completo (ROI, Sharpe, drawdown, calibration)
+
+- `agents/hedge_agent.py` — HedgeAgent (AGENT_ID: "hedge")
+  - 6 commands: pipeline, analyze, backtest, simulate, report, bankroll
+  - Full pipeline: fetch → analyze → simulate → RAG index → Telegram
+  - Banca persistida em data/hedge/bankroll.json (JSON, histórico 50 entries)
+  - CircuitBreaker na API sports (failure_threshold=3, recovery=120s)
+  - @observe_agent + @circuit_breaker
+
+- `tests/test_hedge_agent.py` — 27 testes (100% pass)
+
+**APEX v2 Rules:**
+  max_stake=5% | min_prob=40% | min_edge=3% | min_EV=2%
+  stop_loss=12% | max_drawdown=20% | max_concurrent=3 | kelly_fraction=25%
+
+**Integrações:**
+- skills/sports/api_client.py: dados de partidas (SCHEDULED matches)
+- RAGEngine: histórico de apostas + contexto histórico por time
+- LLMRouter: estimativa de probabilidade via análise contextual
+- Telegram: relatório formatado com recomendações APEX-aprovadas
+- ArchitectAgent: domínios hedge, aposta, apostas, kelly, banca, backtest
+
+**Arquivos modificados:**
+- `agents/architect.py` — HedgeAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
+
+**Testes:** 1095 passed, 8 failed (pre-existentes), 19 skipped ✅ (+27 novos testes HedgeAgent)
