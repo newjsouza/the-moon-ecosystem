@@ -71,6 +71,29 @@ DOMAIN_AGENT_MAP = {
     "web": "WebMCPAgent",
     "search": "WebMCPAgent",
     "fetch": "WebMCPAgent",
+    # Text-to-SQL Agent
+    "sql": "TextToSQLAgent",
+    "database": "TextToSQLAgent",
+    "query": "TextToSQLAgent",
+    "report": "TextToSQLAgent",
+    # Blog Pipeline Agent
+    "blog": "BlogPipelineAgent",
+    "post": "BlogPipelineAgent",
+    "artigo": "BlogPipelineAgent",
+    "article": "BlogPipelineAgent",
+    "publish": "BlogPipelineAgent",
+    # Codex Updater Agent
+    "codex": "CodexUpdaterAgent",
+    "docs": "CodexUpdaterAgent",
+    "documentation": "CodexUpdaterAgent",
+    # Sports Analytics Agent
+    "sports_analytics": "SportsAnalyticsAgent",
+    "futebol": "SportsAnalyticsAgent",
+    "football": "SportsAnalyticsAgent",
+    "soccer": "SportsAnalyticsAgent",
+    "standings": "SportsAnalyticsAgent",
+    "brasileirao": "SportsAnalyticsAgent",
+    "champions": "SportsAnalyticsAgent",
 }
 
 # Palavras-chave para fallback (regex)
@@ -98,6 +121,14 @@ KEYWORD_PATTERNS = {
     "cli": r"(cli|harness|libreoffice|mermaid|diagrama|documento|pdf|exportar|render|cli-anything)",
     # WebMCP Agent patterns
     "web": r"(web|http|https|site|página|url|fetch|buscar|pesquisar|search|scrap)",
+    # Text-to-SQL patterns
+    "sql": r"(sql|database|query|select|report|relatório|dados|tabela|consulta|banco|postgresql)",
+    # Blog Pipeline patterns
+    "blog": r"(blog|post|artigo|escrever|escreva|publique|publicar|artigo|conteúdo|redação|texto|postar)",
+    # Sports patterns
+    "sports_analytics": r"(esporte|futebol|jogo|partida|brasileirao|campeonato|liga|copa|champions|liga dos campeões|liga dos campeões europeus|liga dos campeões da uefa|liga dos campeões da uefa europeus)",
+    # Codex Updater patterns
+    "codex": r"(codex|moon_codex|atualizar.*documento|documentação|log|histórico|sprint|feat)",
 }
 
 
@@ -663,6 +694,10 @@ class ArchitectAgent(AgentBase):
             "MoonCLIAgent": ("agents.moon_cli_agent", ["cli.command", "cli.execute", "cli.generate", "cli.discover"]),
             # WebMCP Agent
             "WebMCPAgent": ("agents.webmcp_agent", ["web.command", "search.command", "fetch.command"]),
+            # Text-to-SQL Agent
+            "TextToSQLAgent": ("agents.text_to_sql_agent", ["sql.command", "query.command", "db.command"]),
+            # Codex Updater Agent
+            "CodexUpdaterAgent": ("agents.codex_updater", ["codex.update", "codex.command"]),
         }
 
         for name, (module_path, topics) in known_agents.items():
