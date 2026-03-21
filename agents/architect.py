@@ -34,6 +34,9 @@ from utils.logger import setup_logger
 
 logger = setup_logger("ArchitectAgent")
 
+# QwenCodeAgent import
+from agents.qwen_code_agent import QwenCodeAgent
+
 # ─────────────────────────────────────────────────────────────
 #  Constantes
 # ─────────────────────────────────────────────────────────────
@@ -94,6 +97,11 @@ DOMAIN_AGENT_MAP = {
     "standings": "SportsAnalyticsAgent",
     "brasileirao": "SportsAnalyticsAgent",
     "champions": "SportsAnalyticsAgent",
+    # QwenCodeAgent
+    "code_generation": "QwenCodeAgent",
+    "refactoring": "QwenCodeAgent",
+    "test_writing": "QwenCodeAgent",
+    "harness_generation": "QwenCodeAgent",
 }
 
 # Palavras-chave para fallback (regex)
@@ -129,6 +137,11 @@ KEYWORD_PATTERNS = {
     "sports_analytics": r"(esporte|futebol|jogo|partida|brasileirao|campeonato|liga|copa|champions|liga dos campeões|liga dos campeões europeus|liga dos campeões da uefa|liga dos campeões da uefa europeus)",
     # Codex Updater patterns
     "codex": r"(codex|moon_codex|atualizar.*documento|documentação|log|histórico|sprint|feat)",
+    # QwenCodeAgent patterns
+    "code_generation": r"(gerar.*código|criar.*código|gerar.*função|criar.*classe|implementar|scaffold|boilerplate|code generation)",
+    "refactoring": r"(refatorar|refatoração|refactor|limpar.*código|otimizar.*código|melhorar.*código)",
+    "test_writing": r"(criar.*teste|escrever.*teste|gerar.*teste|testes unitários|mock|pytest|unittest)",
+    "harness_generation": r"(harness|cli-anything|wrapper|cli.*tool|ferramenta.*cli)",
 }
 
 

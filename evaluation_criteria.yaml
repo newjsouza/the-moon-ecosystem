@@ -1,0 +1,79 @@
+# Evaluation criteria for The Moon EvaluatorAgent
+# Each domain has weighted criteria. Scores are 0.0–1.0.
+# threshold: minimum score before OptimizerAgent triggers retry
+
+default:
+  threshold: 0.65
+  max_retries: 3
+  criteria:
+    completeness:
+      weight: 0.30
+      description: "Response fully addresses the task"
+    relevance:
+      weight: 0.35
+      description: "Response is relevant to the input"
+    accuracy:
+      weight: 0.35
+      description: "Response is factually correct and coherent"
+
+blog:
+  threshold: 0.70
+  max_retries: 2
+  criteria:
+    coherence:
+      weight: 0.25
+      description: "Post flows logically and is well structured"
+    seo:
+      weight: 0.20
+      description: "Contains relevant keywords and proper headings"
+    tone:
+      weight: 0.25
+      description: "Matches The Moon voice — informative and engaging"
+    length:
+      weight: 0.15
+      description: "Appropriate length for blog content (300-1500 words)"
+    originality:
+      weight: 0.15
+      description: "Does not repeat content from recent posts"
+
+telegram:
+  threshold: 0.60
+  max_retries: 2
+  criteria:
+    clarity:
+      weight: 0.40
+      description: "Message is clear and direct"
+    answer_quality:
+      weight: 0.40
+      description: "Directly answers the user question"
+    brevity:
+      weight: 0.20
+      description: "Appropriate length for Telegram (not too long)"
+
+code:
+  threshold: 0.75
+  max_retries: 3
+  criteria:
+    functionality:
+      weight: 0.40
+      description: "Code is functional and correct"
+    readability:
+      weight: 0.30
+      description: "Code is clean and well-structured"
+    safety:
+      weight: 0.30
+      description: "No security issues or dangerous patterns"
+
+general:
+  threshold: 0.65
+  max_retries: 3
+  criteria:
+    completeness:
+      weight: 0.35
+      description: "Response fully addresses the task"
+    relevance:
+      weight: 0.35
+      description: "Response is on-topic"
+    quality:
+      weight: 0.30
+      description: "Overall quality and usefulness"

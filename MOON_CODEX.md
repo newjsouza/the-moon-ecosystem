@@ -300,7 +300,6 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
     - Atalho dedicado no desktop para acesso rápido via porta 3000.
 - **Data:** Março 2026.
 
-
 ---
 
 ## 🆕 [FEAT] CodexUpdaterAgent + Fix P1 — [2026-03-21 10:36]
@@ -308,12 +307,14 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 **Agent:** `codex_updater`
 
 ### CodexUpdaterAgent Implementation
+
 - Criado: `agents/codex_updater.py` (257 linhas)
 - Criado: `tests/test_codex_updater.py` (11 testes, 100% pass)
 - Modificado: `core/autonomous_loop.py` — publish evento `autonomous_loop.task_completed`
 - Modificado: `agents/architect.py` — registrado no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS
 
 **Funcionalidades:**
+
 - Auto-update MOON_CODEX.md via MessageBus
 - Atomic append (tmp file + rename)
 - LLM summary via Groq (fallback rule-based)
@@ -321,12 +322,14 @@ Ou via MoonCLIAgent: `run mermaid project new -o /tmp/x.json` seguido de `run me
 - Decorado com @observe_agent
 
 ### Fix P1 — 21 Falhas Pré-existentes Corrigidas
+
 - `agents/sports_analytics_agent.py` — import `core.llm` → `agents.llm`
 - `tests/test_sprint_j_deployment.py` — adicionado `import signal`
 - `tests/test_sprint_i_sports.py` — mock `_call_agent` ao invés de `dispatch`
 - `tests/test_sprint_a_skills.py` — assert flexível para openpyxl não instalado
 
 **Resultado:**
+
 - Antes: 22 ImportErrors + 2 AssertionErrors + vários ERRORs
 - Depois: **1039 passed, 0 failed, 19 skipped** ✅
 
@@ -1891,6 +1894,7 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 ### LLM Streaming implementado
 
 **Mudanças em agents/llm.py:**
+
 - `stream(prompt, task_type, **kwargs)` → AsyncGenerator[str, None]
 - `_stream_groq()` — Groq streaming via AsyncGroq SDK
 - `_stream_gemini()` — Gemini streaming via generate_content_async
@@ -1899,22 +1903,24 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
 - `complete()` INTACTO — nenhuma modificação
 
 **Mudanças em agents/telegram/bot.py:**
+
 - `_send_streaming_response()` — helper de streaming progressivo
 - Edita mensagem a cada ~50 chars (edit_text com cursor ▌)
 
 **Mudanças em agents/moon_cli_agent.py:**
+
 - `stream_response()` — output em tempo real no terminal
 - Retorna TaskResult com response completa
 
 **Testes Sprint D:** +15 (total estimado: ~329)
 **Próximo Sprint:** B (RAG Engine sobre MemoryAgent)
 
-
 ## Sprint B — Concluído [2026-03-20]
 
 ### RAG Engine implementado sobre MemoryAgent existente
 
 **New modules:**
+
 - `core/rag/__init__.py` + `core/rag/engine.py` — RAGEngine class
   - `ingest(content, metadata, collection)` → contextual chunking + ChromaDB
   - `search(query, collection, top_k)` → semantic similarity search
@@ -1932,11 +1938,13 @@ Quando API paga for ativada, `_extract_lineups()` preencherá antes do merge Web
   - Methods: chunk(), chunk_meeting_log()
 
 **Integrations:**
+
 - `agents/nexus_intelligence.py` — RAG import added
 - `blog/writer.py` — RAG import added
 - Learning Rooms → ChromaDB collections (rooms_esportes, rooms_financeiro)
 
 **Scripts:**
+
 - `scripts/index_learning_rooms.py` — index existing room logs into RAG
 
 **Architecture note:**
@@ -1948,12 +1956,12 @@ Both coexist and complement each other.
 **Tests Sprint B:** +25 (total estimado: ~354)
 **Next Sprint:** C (EvaluatorAgent + OptimizerAgent)
 
-
 ## Sprint E — Concluído [2026-03-21]
 
 ### Text-to-SQL Engine implemented
 
 **New agent:**
+
 - `agents/text_to_sql_agent.py` — TextToSQLAgent
   - `_execute(task, question, allow_write, max_rows, db_executor, dry_run)`
   - Translates natural language → validated SQL → executes → TaskResult
@@ -1962,6 +1970,7 @@ Both coexist and complement each other.
   - explain_query(): human-readable SQL explanation in Portuguese
 
 **New core modules:**
+
 - `core/sql_schema_registry.py` — SQLSchemaRegistry
   - STATIC_SCHEMA from Supabase MCP introspection
   - refresh_from_db(): live schema refresh via DBExecutor
@@ -1974,6 +1983,7 @@ Both coexist and complement each other.
   - FORBIDDEN: DROP, TRUNCATE, ALTER, DELETE, INSERT, CREATE
 
 **Security model:**
+
 - All generated SQL validated before execution
 - No LIMIT = rejected (prevents full table scans)
 - Stacked queries rejected (injection prevention)
@@ -1982,12 +1992,12 @@ Both coexist and complement each other.
 **Tests Sprint E:** +35 (total estimado: ~424)
 **Next Sprint:** F (Observability + Prometheus metrics)
 
-
 ## Sprint G — Concluído [2026-03-21]
 
 ### Autonomous Loop implemented — FASE 3 COMPLETE
 
 **New modules:**
+
 - `core/circuit_breaker.py` — CircuitBreaker (CLOSED→OPEN→HALF_OPEN)
   - Prevents runaway loops and cascading failures
   - Auto-recovery after configurable timeout
@@ -2006,6 +2016,7 @@ Both coexist and complement each other.
   - Self-healing health checks
 
 **Architecture:**
+
 - AutonomousLoop orchestrates ALL ecosystem components
 - CircuitBreaker prevents cascading failures
 - MoonObserver monitors every iteration
@@ -2021,6 +2032,7 @@ Both coexist and complement each other.
 ### Sports Analytics Pipeline implemented
 
 **New files:**
+
 - `core/sports_config.py` — COMPETITION_IDS + ReportConfig
   - 13 competitions (Brasileirão, CL, PL, La Liga, Bundesliga...)
   - ReportConfig.for_competition() factory
@@ -2054,6 +2066,7 @@ Both coexist and complement each other.
 ### Deployment & Production Hardening implemented
 
 **New files:**
+
 - `core/env_validator.py` — EnvValidator (required/optional env vars)
   - Validates GROQ_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY
   - Validates TELEGRAM_BOT_TOKEN, GITHUB_TOKEN
@@ -2085,6 +2098,7 @@ Both coexist and complement each other.
   - Health checks & monitoring
 
 **Production readiness:**
+
 - Environment validation before startup
 - Graceful shutdown with state persistence
 - Service monitoring and restart policies
@@ -2101,6 +2115,7 @@ Both coexist and complement each other.
 ### Skills Foundation
 
 **New skills:**
+
 - `skills/github/` — GitHubSkill: monitoramento de repositórios e commits autônomos
 - `skills/sports/` — FootballDataClient: dados live football-data.org
 - `skills/voice/` — VoiceSkill: transcrição Whisper via Groq
@@ -2109,8 +2124,9 @@ Both coexist and complement each other.
 - `skills/moon_embed/` — MoonEmbedder + MoonChunker: embeddings locais (sentence-transformers)
 
 **Architecture:**
+
 - SkillBase class padroniza interface de todas as skills
-- Cada skill tem SKILL_ID único, _execute() e health_check()
+- Cada skill tem SKILL_ID único,_execute() e health_check()
 - ArchitectAgent registra skills via DOMAIN_AGENT_MAP
 
 **Tests Sprint A:** integrados à suite principal
@@ -2123,6 +2139,7 @@ Both coexist and complement each other.
 ### Evaluator-Optimizer — Quality Gate Automático
 
 **New agents:**
+
 - `agents/evaluator.py` — EvaluatorAgent
   - Avalia output de qualquer agente via LLM (Groq llama-3.3-70b)
   - Critérios: relevância, coerência, completude, tom, factualidade
@@ -2136,12 +2153,14 @@ Both coexist and complement each other.
   - OptimizationResult: improved_content, iterations, score_delta
 
 **New core:**
+
 - `core/evaluation_criteria.py` — EvaluationCriteria
   - Thresholds por domínio: blog=0.75, sports=0.70, general=0.65
   - get_threshold(domain): retorna threshold correto
 
 **AutonomousLoop integration:**
-- LoopTask(use_evaluator=True) → Evaluator chamado após _execute()
+
+- LoopTask(use_evaluator=True) → Evaluator chamado após_execute()
 - Score abaixo do threshold → Optimizer tenta melhorar (max 2x)
 - Score acima → TaskResult.data enriquecido com eval_score
 
@@ -2155,6 +2174,7 @@ Both coexist and complement each other.
 ### Observability — MoonObserver + @observe_agent
 
 **New modules:**
+
 - `core/observability/observer.py` — MoonObserver (Singleton)
   - Singleton global: MoonObserver.get_instance()
   - record_sync(agent_id, success, duration): métricas por agente
@@ -2176,6 +2196,7 @@ Both coexist and complement each other.
   - Expõe health_report() via AutonomousLoop
 
 **Architecture:**
+
 - Todos os agentes decorados com @observe_agent
 - AutonomousLoop publica métricas a cada iteração
 - MoonDaemon usa heartbeat com health_report()
@@ -2190,6 +2211,7 @@ Both coexist and complement each other.
 ### Auto-Blog Pipeline — End-to-End Content Automation
 
 **New modules:**
+
 - `blog/pipeline.py` — BlogPipeline (8 steps)
   - PIPELINE_ID: "blog_pipeline"
   - Step 1: RAG anti-repetition check
@@ -2227,12 +2249,12 @@ Both coexist and complement each other.
 **Tests Sprint H:** +35 (total estimado: ~544)
 **FASE 4: 33% (H ✅ — I e J pendentes)**
 
-
 ---
 
 ## P3 — SportsAnalyticsAgent Wire [2026-03-21]
 
 **Arquivos modificados:**
+
 - `skills/sports/api_client.py` — +24 linhas
   - `get_standings(competition_id)` → GET /v4/competitions/{id}/standings
   - `get_scorers(competition_id, limit)` → GET /v4/competitions/{id}/scorers
@@ -2243,6 +2265,7 @@ Both coexist and complement each other.
   - endpoint `scorers` → `client.get_scorers()`
 
 **Resultado:**
+
 - SportsAnalyticsAgent agora busca dados REAIS da football-data.org API
 - CircuitBreaker protege todas as chamadas
 - 31 testes Sprint I: 100% pass
@@ -2283,5 +2306,60 @@ Both coexist and complement each other.
 - **Metodologia:** HARNESS.md (732 linhas) + LLMRouter (Groq llama-3.3-70b)
 - **Tempo de geração:** ~5s por harness
 - **Registry:** `skills/cli_harnesses/installed_harnesses.json` atualizado
+
+---
+
+### 📂 Assunto: [QwenCodeAgent Integration]
+
+- **Tópico:** Integração do Qwen Code CLI como agente headless via OpenRouter
+- **Data:** 21 Março 2026
+- **Status:** ✅ IMPLEMENTADO
+
+**Arquivos criados/modificados:**
+
+- `agents/qwen_code_agent.py` — QwenCodeAgent, headless subprocess wrapper
+  - `_execute(task, **kwargs)` → `qwen -p <task> --output-format json`
+  - `ping()` → health check via `qwen --version`
+  - `get_status()` → status do agente
+- `agents/architect.py` — +4 domínios no DOMAIN_AGENT_MAP:
+  - `code_generation` → QwenCodeAgent
+  - `refactoring` → QwenCodeAgent
+  - `test_writing` → QwenCodeAgent
+  - `harness_generation` → QwenCodeAgent
+- `agents/architect.py` — +4 padrões no KEYWORD_PATTERNS (regex)
+- `tests/test_qwen_code_agent.py` — 14 testes unitários (mock subprocess)
+- `~/.qwen/settings.json` — OpenRouter config (qwen/qwen3-coder:free)
+
+**Instalação:**
+
+```bash
+npm install -g @qwen-code/qwen-code
+# Version: 0.12.6
+```
+
+**Configuração OpenRouter:**
+
+```json
+{
+  "selectedModel": "qwen/qwen3-coder:free",
+  "modelProviders": {
+    "openai": [{
+      "id": "qwen/qwen3-coder:free",
+      "name": "Qwen3-Coder (OpenRouter Free)",
+      "envKey": "OPENROUTER_API_KEY",
+      "baseUrl": "https://openrouter.ai/api/v1"
+    }]
+  },
+  "auth": {"selectedType": "openai"}
+}
+```
+
+**Resultado:**
+
+- Qwen Code CLI headless mode integrado ao AgentBase pattern
+- ArchitectAgent roteia code/refactor/test/harness tasks para QwenCodeAgent
+- OPENROUTER_API_KEY reutilizada — Custo Zero mantido
+- 14 testes unitários: 100% pass
+- Suite completa: 1053 passed, 0 failed ✅
 
 ---

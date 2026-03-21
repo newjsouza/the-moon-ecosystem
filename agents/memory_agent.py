@@ -10,11 +10,11 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from supabase import create_client, Client
 from sentence_transformers import SentenceTransformer
 
 from core.agent_base import AgentBase, TaskResult
 from core.message_bus import MessageBus
+from core.supabase_client import get_supabase_client
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class MemoryAgent(AgentBase):
         self.description = "Memória semântica RAG com sentence-transformers + Supabase pgvector"
         self._bus = MessageBus()
         self._model: Optional[SentenceTransformer] = None
-        self._supabase: Optional[Client] = None
+        self._supabase_client = get_supabase_client()
         self._initialized = False
 
     async def initialize(self) -> None:
@@ -55,24 +55,14 @@ class MemoryAgent(AgentBase):
         logger.info("MemoryAgent inicializado")
 
     def _init_supabase(self) -> None:
-        """Inicializa cliente Supabase a partir de variáveis de ambiente."""
-        import os
-        supabase_url = os.environ.get("SUPABASE_URL")
-        supabase_key = os.environ.get("SUPABASE_ANON_KEY") or os.environ.get("SUPABASE_SERVICE_KEY")
-
-        if not supabase_url or not supabase_key:
+        """Inicializa cliente Supabase singleton."""
+        if not self._supabase_client.is_configured():
             logger.warning(
                 "SUPABASE_URL ou SUPABASE_ANON_KEY não configurados. "
                 "MemoryAgent operará em modo degradado (sem persistência)."
             )
-            self._supabase = None
         else:
-            try:
-                self._supabase = create_client(supabase_url, supabase_key)
-                logger.info("Conectado ao Supabase: %s", supabase_url)
-            except Exception as e:
-                logger.error("Erro ao conectar ao Supabase: %s", e)
-                self._supabase = None
+            logger.info("Supabase configurado: %s", self._supabase_client.url)
 
     def _embed(self, text: str) -> List[float]:
         """Gera embedding vetorial para um texto."""
@@ -105,7 +95,7 @@ class MemoryAgent(AgentBase):
         """
         start = time.time()
         try:
-            if not self._supabase:
+            if not self._supabase_client.client:
                 return TaskResult(
                     success=False,
                     error="Supabase não configurado — memória não persistida",
@@ -116,7 +106,7 @@ class MemoryAgent(AgentBase):
             embedding = self._embed(content)
 
             # Inserir no banco
-            result = self._supabase.table("moon_memory").insert({
+            result = self._supabase_client.client.table("moon_memory").insert({
                 "content": content,
                 "topic": topic,
                 "agent_source": agent_source,
@@ -162,7 +152,7 @@ class MemoryAgent(AgentBase):
         """
         start = time.time()
         try:
-            if not self._supabase:
+            if not self._supabase_client.client:
                 return TaskResult(
                     success=False,
                     error="Supabase não configurado — busca não disponível",
@@ -173,7 +163,7 @@ class MemoryAgent(AgentBase):
             query_embedding = self._embed(query_text)
 
             # Chamar função RPC de busca semântica
-            result = self._supabase.rpc(
+            result = self._supabase_client.client.rpc(
                 "moon_memory_search",
                 {
                     "query_embedding": query_embedding,
@@ -204,14 +194,14 @@ class MemoryAgent(AgentBase):
         """Remove uma memória pelo ID."""
         start = time.time()
         try:
-            if not self._supabase:
+            if not self._supabase_client.client:
                 return TaskResult(
                     success=False,
                     error="Supabase não configurado",
                     execution_time=time.time() - start
                 )
 
-            result = self._supabase.table("moon_memory").delete().eq("id", memory_id).execute()
+            result = self._supabase_client.client.table("moon_memory").delete().eq("id", memory_id).execute()
 
             logger.info("Memória %s removida", memory_id)
             return TaskResult(
@@ -232,14 +222,14 @@ class MemoryAgent(AgentBase):
         """Lista todas as memórias de um tópico."""
         start = time.time()
         try:
-            if not self._supabase:
+            if not self._supabase_client.client:
                 return TaskResult(
                     success=False,
                     error="Supabase não configurado",
                     execution_time=time.time() - start
                 )
 
-            result = self._supabase.table("moon_memory").select("*").eq("topic", topic).execute()
+            result = self._supabase_client.client.table("moon_memory").select("*").eq("topic", topic).execute()
 
             memories = result.data or []
             return TaskResult(
@@ -319,7 +309,7 @@ class MemoryAgent(AgentBase):
                     success=True,
                     data={
                         "model_loaded": self._model is not None,
-                        "supabase_connected": self._supabase is not None,
+                        "supabase_connected": self._supabase_client.client is not None,
                         "embedding_dim": self.EMBEDDING_DIM
                     },
                     execution_time=time.time() - start

@@ -5,6 +5,7 @@ Blog Writer Agent - Generates content and downloads images automatically.
 import os
 from core.agent_base import AgentBase, TaskResult, AgentPriority
 from utils.logger import setup_logger
+from core.rag import RAGEngine
 
 class BlogWriterAgent(AgentBase):
     def __init__(self):
@@ -12,6 +13,8 @@ class BlogWriterAgent(AgentBase):
         self.priority = AgentPriority.HIGH
         self.description = "Blog Writer - Pesquisa e Escrita"
         self.logger = setup_logger("BlogWriterAgent")
+        # Initialize RAG engine to store and retrieve blog content
+        self._rag_engine = RAGEngine()
 
     async def _execute(self, task: str, **kwargs) -> TaskResult:
         orchestrator = kwargs.get("orchestrator")
@@ -20,14 +23,24 @@ class BlogWriterAgent(AgentBase):
 
         self.logger.info(f"Iniciando pesquisa para: {task}")
         
-        # 1. Pesquisa
+        # 1. Search RAG for related content to avoid repetition
+        search_result = await self._rag_engine.search(query=task, collection="blog_posts", top_k=3)
+        if search_result.success and search_result.data.get("hits"):
+            related_content = "\n".join([hit["text"][:200] for hit in search_result.data["hits"]])
+            self.logger.info(f"Found related content in RAG: {related_content}")
+        else:
+            related_content = ""
+        
+        # 2. Research
         research_res = await orchestrator.execute(task, agent_name="ResearcherAgent")
         context = research_res.data if research_res.success else {"research_synthesis": "Análise básica inicial."}
 
-        # 2. Geração de Texto com LlmAgent formatado com Frontmatter
+        # 3. Geração de Texto com LlmAgent formatado com Frontmatter
         prompt = f'''
         Você é um jornalista de tecnologia de ponta. Escreva um artigo COMPLETO e PROFUNDO, formatado em Markdown com YAML Frontmatter no topo. O tema é: {task}. 
         Contexto extraído: {context}
+        
+        {f"NOTA: Evite repetir os seguintes tópicos já abordados em artigos anteriores: {related_content}" if related_content else ""}
         
         O artigo deve ser denso, profissional e altamente explicativo, seguindo estas regras:
         1. Mínimo de 6 parágrafos longos (cada parágrafo deve ter pelo menos 150 palavras).
@@ -192,5 +205,26 @@ A nova realidade do livre acesso à IA é um convite à experimentação. Nunca 
 
         # Ajusta a imagem no frontmatter para a imagem final.
         content = re.sub(r'image:\s*["\']?capa\.jpg["\']?', f'image: "{img_name}"', content)
+        
+        # 4. Ingest the generated content into RAG for future reference
+        try:
+            metadata = {
+                "title": task,
+                "topic": "blog",
+                "source": "blog_writer",
+                "date": "2026-03-20",
+                "author": "BlogWriterAgent"
+            }
+            rag_result = await self._rag_engine.ingest(
+                content=content,
+                metadata=metadata,
+                collection="blog_posts"
+            )
+            if rag_result.success:
+                self.logger.info(f"Blog content ingested into RAG collection 'blog_posts'")
+            else:
+                self.logger.warning(f"Failed to ingest content into RAG: {rag_result.error}")
+        except Exception as e:
+            self.logger.error(f"Error ingesting content into RAG: {e}")
         
         return TaskResult(success=True, data={"markdown": content, "title": task})

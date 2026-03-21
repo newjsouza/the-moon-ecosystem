@@ -849,6 +849,86 @@ FORMATO DE RESPOSTA:
             return f"⚠️ Erro ao processar com LLM: {e}\nTente novamente em instantes."
 
     # ════════════════════════════════════════════════════════
+    #  Streaming LLM Call — for progressive responses
+    # ════════════════════════════════════════════════════════
+
+    async def _ask_llm_streaming(
+        self,
+        user_id:       str,
+        user_message:  str,
+        extra_context: str = "",
+        model:         str = LLM_CAPABLE,
+        add_to_memory: bool = True,
+    ):
+        system_prompt = self._build_system_prompt(user_id, extra_context)
+        history       = self.memory.get_history(user_id)
+
+        messages = [{"role": "system", "content": system_prompt}]
+        messages.extend(history)
+        messages.append({"role": "user", "content": user_message})
+
+        try:
+            # Create streaming completion
+            stream = await self.groq.chat.completions.create(
+                model    = model,
+                messages = messages,
+                max_tokens = 1024,
+                temperature = 0.4,
+                stream     = True,
+            )
+            
+            full_response = ""
+            async for chunk in stream:
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    full_response += delta
+                    yield delta  # Yield incremental updates
+
+            if add_to_memory:
+                self.memory.add(user_id, "user",      user_message)
+                self.memory.add(user_id, "assistant", full_response)
+
+        except Exception as e:
+            logger.error(f"Groq streaming error: {e}")
+            yield f"⚠️ Erro ao processar streaming: {e}"
+
+    # ── Sprint D: Streaming helper ──────────────────────────────
+    async def _send_streaming_response(self, update, context, prompt: str) -> None:
+        """
+        Envia resposta progressiva via streaming do LLMRouter.
+        Edita a mensagem a cada chunk acumulado (batches de 50 chars).
+        """
+        from agents.llm import LLMRouter
+
+        llm = LLMRouter()
+        msg = await update.message.reply_text("⏳ Pensando...")
+        accumulated = ""
+        batch = ""
+        min_batch_size = 50  # editar mensagem a cada ~50 chars novos
+        user_id = str(update.effective_user.id)
+
+        try:
+            async for chunk in llm.stream(prompt, task_type="telegram"):
+                accumulated += chunk
+                batch += chunk
+                if len(batch) >= min_batch_size:
+                    try:
+                        await msg.edit_text(accumulated + " ▌")
+                        batch = ""
+                    except Exception:
+                        pass  # ignora erros de edição muito frequente (rate limit Telegram)
+
+            # Edição final sem cursor
+            if accumulated:
+                await msg.edit_text(accumulated)
+            else:
+                await msg.edit_text("_(sem resposta)_")
+
+        except Exception as e:
+            await msg.edit_text(f"⚠️ Erro no streaming: {str(e)}")
+    # ── fim Sprint D streaming helper ───────────────────────────
+
+    # ════════════════════════════════════════════════════════
     #  Intent routing — called before LLM for fast paths
     # ════════════════════════════════════════════════════════
 

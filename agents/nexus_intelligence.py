@@ -56,6 +56,7 @@ from typing import Any, Callable, Deque, Dict, List, Optional, Tuple
 
 from core.agent_base import AgentBase, AgentPriority, TaskResult
 from core.message_bus import MessageBus, Message
+from core.rag import RAGEngine
 
 logger = logging.getLogger("moon.agents.nexus")
 
@@ -946,6 +947,9 @@ class NexusIntelligence(AgentBase):
 
         self._groq        = groq_client
         self._message_bus = message_bus
+
+        # Initialize RAG engine for cross-domain knowledge retrieval
+        self._rag_engine = RAGEngine()
 
         # Modules
         self._stream      = EventStreamAggregator()

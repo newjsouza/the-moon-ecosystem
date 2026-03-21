@@ -223,7 +223,7 @@ class OpenRouterProvider(LLMProvider):
         return self._session
     
     async def complete(self, prompt: str, model: str = None, **kwargs) -> str:
-        """Executa completção via OpenRouter."""
+        """Executa completão via OpenRouter."""
         if not self.is_available():
             raise ServiceUnavailableError("OpenRouter API key não configurada")
         
@@ -375,7 +375,102 @@ class LLMRouter:
         self.usage_stats["degraded"] = self.usage_stats.get("degraded", 0) + 1
         await self._publish_usage("degraded", task_type)
         return self._degraded_response(prompt, task_type)
-    
+
+    # ──────────────────────────────────────────────────────────────
+    # stream() — método aditivo Sprint D
+    # NÃO modifica complete(). Usa os mesmos clientes/fallback.
+    # Retorna AsyncGenerator[str, None] — chunks de texto progressivo
+    # ──────────────────────────────────────────────────────────────
+    async def stream(self, prompt: str, task_type: str = "general", **kwargs):
+        """
+        Streaming version of complete(). Yields text chunks progressively.
+        Fallback chain: Groq → Gemini → OpenRouter (mirrors complete() logic).
+        Usage:
+            async for chunk in llm.stream("prompt"):
+                print(chunk, end="", flush=True)
+        """
+        # Tentar Groq primeiro (primário)
+        try:
+            async for chunk in self._stream_groq(prompt, task_type, **kwargs):
+                yield chunk
+            return
+        except Exception as e:
+            self.logger.warning(f"Groq stream falhou: {e} — tentando Gemini")
+
+        # Fallback: Gemini
+        try:
+            async for chunk in self._stream_gemini(prompt, task_type, **kwargs):
+                yield chunk
+            return
+        except Exception as e:
+            self.logger.warning(f"Gemini stream falhou: {e} — tentando OpenRouter")
+
+        # Fallback final: OpenRouter
+        try:
+            async for chunk in self._stream_openrouter(prompt, task_type, **kwargs):
+                yield chunk
+            return
+        except Exception as e:
+            self.logger.error(f"Todos os providers de stream falharam: {e}")
+            yield f"[ERRO DE STREAMING: {str(e)}]"
+
+    async def _stream_groq(self, prompt: str, task_type: str = "general", **kwargs):
+        """Groq streaming via SDK oficial."""
+        from groq import AsyncGroq
+        import os
+        client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
+        model = kwargs.get("model", "llama-3.3-70b-versatile")
+        stream = await client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            stream=True,
+            max_tokens=kwargs.get("max_tokens", 2048),
+            temperature=kwargs.get("temperature", 0.7),
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta
+            if delta and delta.content:
+                yield delta.content
+
+    async def _stream_gemini(self, prompt: str, task_type: str = "general", **kwargs):
+        """Gemini streaming via google.generativeai."""
+        import google.generativeai as genai
+        import os
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model_name = kwargs.get("model", "gemini-2.0-flash")
+        model = genai.GenerativeModel(model_name)
+        response = await model.generate_content_async(
+            prompt,
+            stream=True,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=kwargs.get("max_tokens", 2048),
+                temperature=kwargs.get("temperature", 0.7),
+            )
+        )
+        async for chunk in response:
+            if chunk.text:
+                yield chunk.text
+
+    async def _stream_openrouter(self, prompt: str, task_type: str = "general", **kwargs):
+        """OpenRouter streaming via OpenAI-compatible API."""
+        from openai import AsyncOpenAI
+        import os
+        client = AsyncOpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1"
+        )
+        model = kwargs.get("model", "mistralai/mistral-7b-instruct")
+        stream = await client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            stream=True,
+            max_tokens=kwargs.get("max_tokens", 2048),
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta
+            if delta and delta.content:
+                yield delta.content
+
     def _degraded_response(self, prompt: str, task_type: str) -> str:
         """
         Gera resposta estruturada mínima sem LLM (modo degradado).

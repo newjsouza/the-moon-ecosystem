@@ -6,6 +6,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch, PropertyMock
 from agents.memory_agent import MemoryAgent
 from core.agent_base import AgentPriority, TaskResult
+from core.supabase_client import SupabaseClient
 
 
 @pytest.fixture
@@ -20,14 +21,14 @@ def mock_model():
 def mock_supabase():
     """Mock do cliente Supabase."""
     client = MagicMock()
-    
+
     # Configurar chain de métodos para insert (usando MagicMock, não AsyncMock)
     insert_result = MagicMock()
     insert_result.data = [{"id": 123}]
     insert_mock = MagicMock()
     insert_mock.execute = MagicMock(return_value=insert_result)
     client.table.return_value.insert.return_value = insert_mock
-    
+
     # Configurar chain para select
     select_result = MagicMock()
     select_result.data = [{"id": 1, "content": "test"}]
@@ -35,7 +36,7 @@ def mock_supabase():
     select_mock.eq.return_value = select_mock
     select_mock.execute = MagicMock(return_value=select_result)
     client.table.return_value.select.return_value = select_mock
-    
+
     # Configurar chain para delete
     delete_result = MagicMock()
     delete_result.data = []
@@ -43,14 +44,24 @@ def mock_supabase():
     delete_mock.eq.return_value = delete_mock
     delete_mock.execute = MagicMock(return_value=delete_result)
     client.table.return_value.delete.return_value = delete_mock
-    
+
     # Configurar rpc para busca semântica
     rpc_result = MagicMock()
     rpc_result.data = [{"id": 1, "similarity": 0.85}]
     rpc_mock = MagicMock()
     rpc_mock.execute = MagicMock(return_value=rpc_result)
     client.rpc.return_value = rpc_mock
-    
+
+    return client
+
+
+@pytest.fixture
+def mock_supabase_client(mock_supabase):
+    """Mock do singleton SupabaseClient."""
+    client = MagicMock(spec=SupabaseClient)
+    client.client = mock_supabase
+    client.is_configured.return_value = True
+    client.url = "http://localhost:54321"
     return client
 
 
@@ -63,35 +74,40 @@ class TestMemoryAgentInstantiation:
         assert agent.name == "MemoryAgent"
         assert agent.priority == AgentPriority.MEDIUM
         assert agent._model is None
-        assert agent._supabase is None
+        assert agent._supabase_client is not None
 
     @pytest.mark.asyncio
     async def test_initialize_loads_model(self, mock_model):
         """Testa que initialize() carrega o modelo."""
+        # Cria mock de cliente não configurado
+        mock_client = MagicMock()
+        mock_client.is_configured.return_value = False
+        mock_client.client = None
+        
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch.dict('os.environ', {}, clear=True):  # Sem vars do Supabase
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_client):
             agent = MemoryAgent()
             await agent.initialize()
-            
+
             assert agent._initialized is True
             assert agent._model is not None
-            assert agent._supabase is None  # Sem vars de ambiente
+            assert agent._supabase_client.is_configured() is False  # Sem vars de ambiente
 
     @pytest.mark.asyncio
-    async def test_initialize_with_supabase(self, mock_model, mock_supabase):
+    async def test_initialize_with_supabase(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa initialize com Supabase configurado."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase), \
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client), \
              patch.dict('os.environ', {
                  'SUPABASE_URL': 'http://localhost:54321',
                  'SUPABASE_ANON_KEY': 'test-key'
              }):
             agent = MemoryAgent()
             await agent.initialize()
-            
+
             assert agent._initialized is True
             assert agent._model is not None
-            assert agent._supabase is not None
+            assert agent._supabase_client.client is not None
 
 
 class TestMemoryAgentEmbed:
@@ -122,21 +138,21 @@ class TestMemoryAgentStore:
     """Testes de armazenamento de memórias."""
 
     @pytest.mark.asyncio
-    async def test_store_success(self, mock_model, mock_supabase):
+    async def test_store_success(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa armazenamento de memória com sucesso."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent.store(
                 content="Test memory content",
                 topic="test_topic",
                 agent_source="TestAgent",
                 metadata={"key": "value"}
             )
-            
+
             assert result.success is True
             assert result.data["id"] == 123
             assert result.data["topic"] == "test_topic"
@@ -147,10 +163,14 @@ class TestMemoryAgentStore:
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = None
-            
+            # Cria um mock de cliente não configurado
+            mock_client = MagicMock()
+            mock_client.is_configured.return_value = False
+            mock_client.client = None
+            agent._supabase_client = mock_client
+
             result = await agent.store(content="test", topic="test")
-            
+
             assert result.success is False
             assert "Supabase não configurado" in result.error
 
@@ -159,21 +179,21 @@ class TestMemoryAgentQuery:
     """Testes de busca semântica."""
 
     @pytest.mark.asyncio
-    async def test_query_success(self, mock_model, mock_supabase):
+    async def test_query_success(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa busca semântica com sucesso."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent.query(
                 query_text="test query",
                 topic="test_topic",
                 match_count=5,
                 min_similarity=0.3
             )
-            
+
             assert result.success is True
             assert result.data["count"] >= 0
             assert "memories" in result.data
@@ -184,10 +204,14 @@ class TestMemoryAgentQuery:
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = None
-            
+            # Cria um mock de cliente não configurado
+            mock_client = MagicMock()
+            mock_client.is_configured.return_value = False
+            mock_client.client = None
+            agent._supabase_client = mock_client
+
             result = await agent.query(query_text="test")
-            
+
             assert result.success is False
             assert "Supabase não configurado" in result.error
 
@@ -196,16 +220,16 @@ class TestMemoryAgentDelete:
     """Testes de remoção de memórias."""
 
     @pytest.mark.asyncio
-    async def test_delete_success(self, mock_model, mock_supabase):
+    async def test_delete_success(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa remoção de memória com sucesso."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent.delete(memory_id=123)
-            
+
             assert result.success is True
             assert result.data["deleted_id"] == 123
 
@@ -214,16 +238,16 @@ class TestMemoryAgentListByTopic:
     """Testes de listagem por tópico."""
 
     @pytest.mark.asyncio
-    async def test_list_by_topic_success(self, mock_model, mock_supabase):
+    async def test_list_by_topic_success(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa listagem de memórias por tópico."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent.list_by_topic(topic="test_topic")
-            
+
             assert result.success is True
             assert "memories" in result.data
 
@@ -232,129 +256,129 @@ class TestMemoryAgentExecute:
     """Testes do método _execute."""
 
     @pytest.mark.asyncio
-    async def test_execute_store(self, mock_model, mock_supabase):
+    async def test_execute_store(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute com task 'store'."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
+            agent._supabase_client = mock_supabase_client
             agent._initialized = True  # Evita chamar initialize()
-            
+
             result = await agent._execute(
                 "store",
                 content="test content",
                 topic="test",
                 agent_source="TestAgent"
             )
-            
+
             assert result.success is True
             assert "id" in result.data
 
     @pytest.mark.asyncio
-    async def test_execute_query(self, mock_model, mock_supabase):
+    async def test_execute_query(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute com task 'query'."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
+            agent._supabase_client = mock_supabase_client
             agent._initialized = True  # Evita chamar initialize()
-            
+
             result = await agent._execute(
                 "query",
                 query="test query",
                 topic="test",
                 match_count=3
             )
-            
+
             assert result.success is True
             assert "memories" in result.data
 
     @pytest.mark.asyncio
-    async def test_execute_delete(self, mock_model, mock_supabase):
+    async def test_execute_delete(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute com task 'delete'."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
+            agent._supabase_client = mock_supabase_client
             agent._initialized = True  # Evita chamar initialize()
-            
+
             result = await agent._execute("delete", memory_id=123)
-            
+
             assert result.success is True
 
     @pytest.mark.asyncio
-    async def test_execute_list_by_topic(self, mock_model, mock_supabase):
+    async def test_execute_list_by_topic(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute com task 'list_by_topic'."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
+            agent._supabase_client = mock_supabase_client
             agent._initialized = True  # Evita chamar initialize()
-            
+
             result = await agent._execute("list_by_topic", topic="test")
-            
+
             assert result.success is True
 
     @pytest.mark.asyncio
-    async def test_execute_health(self, mock_model, mock_supabase):
+    async def test_execute_health(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute com task 'health'."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
+            agent._supabase_client = mock_supabase_client
             agent._initialized = True  # Evita chamar initialize()
-            
+
             result = await agent._execute("health")
-            
+
             assert result.success is True
             assert "model_loaded" in result.data
             assert result.data["model_loaded"] is True
             assert result.data["embedding_dim"] == 384
 
     @pytest.mark.asyncio
-    async def test_execute_missing_content(self, mock_model, mock_supabase):
+    async def test_execute_missing_content(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute store sem content."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent._execute("store", topic="test")
-            
+
             assert result.success is False
             assert "requer 'content'" in result.error
 
     @pytest.mark.asyncio
-    async def test_execute_missing_query(self, mock_model, mock_supabase):
+    async def test_execute_missing_query(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute query sem query."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent._execute("query", topic="test")
-            
+
             assert result.success is False
             assert "requer 'query'" in result.error
 
     @pytest.mark.asyncio
-    async def test_execute_unknown_task(self, mock_model, mock_supabase):
+    async def test_execute_unknown_task(self, mock_model, mock_supabase, mock_supabase_client):
         """Testa _execute com task desconhecida."""
         with patch('agents.memory_agent.SentenceTransformer', return_value=mock_model), \
-             patch('agents.memory_agent.create_client', return_value=mock_supabase):
+             patch('agents.memory_agent.get_supabase_client', return_value=mock_supabase_client):
             agent = MemoryAgent()
             agent._model = mock_model
-            agent._supabase = mock_supabase
-            
+            agent._supabase_client = mock_supabase_client
+
             result = await agent._execute("unknown_task")
-            
+
             assert result.success is False
             assert "desconhecida" in result.error
 

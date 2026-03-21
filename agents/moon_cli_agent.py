@@ -413,3 +413,44 @@ Gere o código completo agora:"""
             )
         except Exception as exc:
             logger.debug(f"MoonCLIAgent._publish: falha ao publicar '{topic}': {exc}")
+
+    # ── Sprint D: Streaming output ─────────────────────────────
+    async def stream_response(self, prompt: str, task_type: str = "general",
+                               show_cursor: bool = True, **kwargs):
+        """
+        Exibe resposta do LLM em tempo real no terminal.
+        Retorna TaskResult com o texto completo ao final.
+        """
+        import time
+        from agents.llm import LLMRouter
+
+        start = time.time()
+        llm = LLMRouter()
+        full_response = ""
+        cursor = "▌" if show_cursor else ""
+
+        try:
+            print(cursor, end="", flush=True)
+            async for chunk in llm.stream(prompt, task_type=task_type, **kwargs):
+                full_response += chunk
+                print(chunk, end="", flush=True)
+
+            # Limpar cursor e finalizar linha
+            if show_cursor:
+                print("\r" + full_response)
+            else:
+                print()
+
+            return TaskResult(
+                success=True,
+                data={"response": full_response, "chars": len(full_response)},
+                execution_time=time.time() - start
+            )
+        except Exception as e:
+            print(f"\n⚠️ Erro: {e}")
+            return TaskResult(
+                success=False,
+                error=str(e),
+                execution_time=time.time() - start
+            )
+    # ── fim Sprint D streaming ─────────────────────────────────
