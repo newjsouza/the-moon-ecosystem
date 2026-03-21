@@ -2247,3 +2247,41 @@ Both coexist and complement each other.
 - CircuitBreaker protege todas as chamadas
 - 31 testes Sprint I: 100% pass
 - Suite completa: 1039 passed, 0 failed ✅
+
+---
+
+### 📂 Assunto: [P4 — BlogCLIExporter → BlogPipeline Step 6]
+
+- **Tópico:** Wire BlogCLIExporter no BlogPipeline Step 6 (export real)
+- **Data:** 21 Março 2026
+- **Mudança:** `blog/pipeline.py` Step 6 conectado ao `BlogCLIExporter`
+  - `_step_export()` chama `exporter.post_to_pdf(content, filename)` via asyncio
+  - Falha no export é **não-fatal**: pipeline continua com `exports: {}`
+  - Retorna `exports: {artifacts: [{type, path}]}` no `TaskResult.data`
+- **Resultado:** Pipeline end-to-end: tópico → post → PDF/DOCX reais ✅
+
+---
+
+### 📂 Assunto: [P5 — OBS Studio Harness]
+
+- **Tópico:** OBS Studio harness já instalado
+- **Data:** 21 Março 2026
+- **Status:** ✅ INSTALADO
+  - `cli-anything-obs-studio` em `/home/johnathan/.local/bin/`
+  - Instalado via `pip install -e /tmp/cli-anything-src/obs-studio/agent-harness/`
+  - Harness gerado: `skills/cli_harnesses/generated/cli-anything-obs-studio.py` (8KB)
+
+---
+
+### 📂 Assunto: [P6 — Harnesses ffmpeg + pandoc via Opção A]
+
+- **Tópico:** Geração de harnesses CLI-Anything via HARNESS.md + LLMRouter
+- **Data:** 21 Março 2026
+- **Harnesses gerados:**
+  - `skills/cli_harnesses/generated/cli-anything-ffmpeg.py` (142 linhas) — conversão de mídia
+  - `skills/cli_harnesses/generated/cli-anything-pandoc.py` (153 linhas) — conversão de documentos
+- **Metodologia:** HARNESS.md (732 linhas) + LLMRouter (Groq llama-3.3-70b)
+- **Tempo de geração:** ~5s por harness
+- **Registry:** `skills/cli_harnesses/installed_harnesses.json` atualizado
+
+---
