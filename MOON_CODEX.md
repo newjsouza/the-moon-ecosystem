@@ -2448,3 +2448,34 @@ npm install -g @qwen-code/qwen-code
 - `agents/architect.py` — HedgeAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
 
 **Testes:** 1095 passed, 8 failed (pre-existentes), 19 skipped ✅ (+27 novos testes HedgeAgent)
+
+---
+
+## EXP-3: GmailAgent — Concluído [2026-03-21]
+
+### Intelligent Email Management — Triage + Draft + Digest
+
+**Novos arquivos:**
+- `agents/gmail_agent.py` — GmailAgent (AGENT_ID: "gmail")
+  - 6 commands: pipeline, triage, draft, summary, send, watch
+  - EmailSummary dataclass: priority, category, action_required, suggested_reply
+  - Priority system: CRITICAL → HIGH → MEDIUM → LOW → SPAM
+  - _classify_email(): LLM (JSON) + _rule_based_classify() fallback
+  - _draft_for_email(): resposta automática em pt-BR via LLM
+  - _build_digest_text(): digest formatado por prioridade
+  - _get_gmail_manager(): usa GmailManager (skills/gmail/)
+  - RAG indexing: collection "gmail_history" para contexto futuro
+
+- `tests/test_gmail_agent.py` — 19 testes (100% pass)
+
+**Arquivos modificados:**
+- `agents/architect.py` — GmailAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
+
+**Integrações:**
+- GmailManager (skills/gmail/): OAuth2 + Gmail API (list_unread, send_email)
+- LLMRouter: classificação + geração de rascunhos (task_type=fast)
+- RAGEngine: histórico de emails importantes
+- Telegram: digest diário formatado com emojis por prioridade
+- AutonomousLoop: LoopTask(agent_id='gmail', task='pipeline', interval=3600)
+
+**Testes:** 19 novos testes (100% pass) ✅

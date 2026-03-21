@@ -103,6 +103,12 @@ DOMAIN_AGENT_MAP = {
     "banca": "HedgeAgent",
     "backtest": "HedgeAgent",
     "value_bet": "HedgeAgent",
+    # Gmail Agent
+    "gmail": "GmailAgent",
+    "email": "GmailAgent",
+    "inbox": "GmailAgent",
+    "triage": "GmailAgent",
+    "draft": "GmailAgent",
     # Sports Analytics Agent
     "sports_analytics": "SportsAnalyticsAgent",
     "futebol": "SportsAnalyticsAgent",
@@ -155,6 +161,8 @@ KEYWORD_PATTERNS = {
     "youtube": r"(youtube|vídeo|roteiro|script|thumbnail|seo.*youtube|trending|vídeo.*youtube)",
     # Hedge patterns
     "hedge": r"(hedge|aposta|apostas|kelly|banca|backtest|value.*bet|odd|probabilidade.*aposta)",
+    # Gmail patterns
+    "gmail": r"(gmail|email|inbox|triage|draft|responder.*email|ler.*email|mensagem.*gmail)",
     # QwenCodeAgent patterns
     "code_generation": r"(gerar.*código|criar.*código|gerar.*função|criar.*classe|implementar|scaffold|boilerplate|code generation)",
     "refactoring": r"(refatorar|refatoração|refactor|limpar.*código|otimizar.*código|melhorar.*código)",
@@ -733,6 +741,8 @@ class ArchitectAgent(AgentBase):
             "YouTubeAgent": ("agents.youtube_agent", ["youtube.command", "video.command", "script.command"]),
             # Hedge Agent
             "HedgeAgent": ("agents.hedge_agent", ["hedge.command", "bet.command", "kelly.command"]),
+            # Gmail Agent
+            "GmailAgent": ("agents.gmail_agent", ["gmail.command", "email.command", "triage.command"]),
         }
 
         for name, (module_path, topics) in known_agents.items():
