@@ -1,0 +1,53 @@
+{
+  "tasks": [
+    {
+      "id": "gmail_pipeline_hourly",
+      "agent_id": "gmail",
+      "task": "pipeline",
+      "kwargs": {
+        "max_emails": 20,
+        "notify_telegram": true
+      },
+      "interval_seconds": 3600,
+      "description": "Gmail triage + draft + Telegram digest (hourly)",
+      "enabled": true
+    },
+    {
+      "id": "hedge_pipeline_daily",
+      "agent_id": "hedge",
+      "task": "pipeline",
+      "kwargs": {
+        "competitions": [
+          "BSA",
+          "CL"
+        ],
+        "dry_run": false
+      },
+      "interval_seconds": 86400,
+      "description": "Hedge analysis + recommendations (daily)",
+      "enabled": false
+    },
+    {
+      "id": "linux_health_5min",
+      "agent_id": "linux_native",
+      "task": "pipeline",
+      "kwargs": {
+        "dry_run": true
+      },
+      "interval_seconds": 300,
+      "description": "System health snapshot + alerts (5min)",
+      "enabled": true
+    },
+    {
+      "id": "youtube_trending_daily",
+      "agent_id": "youtube",
+      "task": "trending",
+      "kwargs": {
+        "dry_run": false
+      },
+      "interval_seconds": 86400,
+      "description": "YouTube trending topics (daily)",
+      "enabled": false
+    }
+  ]
+}
