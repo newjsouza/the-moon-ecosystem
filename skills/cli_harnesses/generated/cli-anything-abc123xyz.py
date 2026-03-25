@@ -1,1 +1,1 @@
-Olá! Estou em modo degradado (todos os providers de LLM estão indisponíveis). Por favor, tente novamente em alguns instantes.
+[PROMPT BLOQUEADO] Input muito longo (>4096 chars)
