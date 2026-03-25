@@ -18,8 +18,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
+# Security layer
+from core.security.validator import InputValidator
+from core.security.audit import SecurityAuditLog
+
 # Padrão de logging do projeto (mesmo padrão de core/orchestrator.py)
 logger = logging.getLogger("moon.core.cli_harness_adapter")
+
+# Security audit log
+_audit = SecurityAuditLog()
 
 # Paths resolvidos a partir da raiz do projeto
 _THIS_FILE = Path(__file__).resolve()
@@ -178,6 +185,25 @@ class CLIHarnessAdapter:
             timeout: timeout em segundos (default: 90)
             workdir: diretório de trabalho para o subprocess
         """
+        # Security: Validate args
+        actor = f"harness:{harness_name}"
+        try:
+            safe_args = [str(a) for a in args]
+            InputValidator.safe_cli_args(safe_args)
+            _audit.log_success("harness_exec", actor, resource=harness_name)
+        except ValueError as e:
+            _audit.log_failure("harness_exec", actor, resource=harness_name, reason=str(e))
+            return HarnessResult(
+                success=False,
+                output=None,
+                raw_stdout="",
+                raw_stderr=f"Security blocked: {e}",
+                exit_code=-3,
+                command=[harness_name] + [str(a) for a in args],
+                harness=harness_name,
+                duration_ms=0.0,
+            )
+        
         if not self.is_available(harness_name):
             return HarnessResult(
                 success=False,

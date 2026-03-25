@@ -8,6 +8,9 @@ import yaml
 from typing import Any, Dict
 from dotenv import load_dotenv
 
+# Security layer
+from core.security.secrets import SecretManager
+
 class Config:
     _instance = None
 
@@ -20,8 +23,15 @@ class Config:
     def __init__(self):
         if getattr(self, '_initialized', False):
             return
-            
+
         load_dotenv()
+        
+        # Security: Validate secrets on boot
+        _secrets = SecretManager()
+        if not _secrets.validate_boot():
+            import logging
+            logging.getLogger(__name__).error("BOOT: Missing required secrets — check .env")
+        
         self._config: Dict[str, Any] = {}
         self._load_defaults()
         self._load_yaml()

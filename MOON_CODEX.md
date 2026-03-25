@@ -2371,6 +2371,7 @@ npm install -g @qwen-code/qwen-code
 ### Visão Multimodal 2026 — YouTube Content Automation
 
 **Novos arquivos:**
+
 - `skills/youtube/__init__.py` + `skills/youtube/youtube_client.py`
   - YouTubeClient: YouTube Data API v3 (free tier — 10k units/day)
   - search_trending(): busca vídeos trending por domínio + região BR
@@ -2396,11 +2397,13 @@ npm install -g @qwen-code/qwen-code
 - `tests/test_youtube_agent.py` — 23 testes (100% pass)
 
 **Arquivos modificados:**
-- `agents/architect.py` — YouTubeAgent registrado no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
+
+- `agents/architect.py` — YouTubeAgent registrado no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS +_register_known_agents
 - `core/env_validator.py` — YOUTUBE_API_KEY adicionado como opcional
 - `.env.example` — template YOUTUBE_API_KEY adicionado
 
 **Integrações:**
+
 - BlogPipeline: scripts repurposados como posts
 - OmniChannelStrategist: cross-post do conteúdo gerado
 - NexusIntelligence: trending topics como input
@@ -2417,6 +2420,7 @@ npm install -g @qwen-code/qwen-code
 ### Scientific Betting — Kelly + APEX v2 + Monte Carlo + Backtesting
 
 **Novos arquivos:**
+
 - `core/kelly.py` — KellyEngine (motor matemático puro)
   - calculate(): Kelly completo + fracionário (0.25x) + APEX v2
   - monte_carlo(): N paths × M bets — distribuição de resultados
@@ -2438,6 +2442,7 @@ npm install -g @qwen-code/qwen-code
   stop_loss=12% | max_drawdown=20% | max_concurrent=3 | kelly_fraction=25%
 
 **Integrações:**
+
 - skills/sports/api_client.py: dados de partidas (SCHEDULED matches)
 - RAGEngine: histórico de apostas + contexto histórico por time
 - LLMRouter: estimativa de probabilidade via análise contextual
@@ -2445,7 +2450,8 @@ npm install -g @qwen-code/qwen-code
 - ArchitectAgent: domínios hedge, aposta, apostas, kelly, banca, backtest
 
 **Arquivos modificados:**
-- `agents/architect.py` — HedgeAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
+
+- `agents/architect.py` — HedgeAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS +_register_known_agents
 
 **Testes:** 1095 passed, 8 failed (pre-existentes), 19 skipped ✅ (+27 novos testes HedgeAgent)
 
@@ -2456,6 +2462,7 @@ npm install -g @qwen-code/qwen-code
 ### Intelligent Email Management — Triage + Draft + Digest
 
 **Novos arquivos:**
+
 - `agents/gmail_agent.py` — GmailAgent (AGENT_ID: "gmail")
   - 6 commands: pipeline, triage, draft, summary, send, watch
   - EmailSummary dataclass: priority, category, action_required, suggested_reply
@@ -2469,9 +2476,11 @@ npm install -g @qwen-code/qwen-code
 - `tests/test_gmail_agent.py` — 19 testes (100% pass)
 
 **Arquivos modificados:**
-- `agents/architect.py` — GmailAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS + _register_known_agents
+
+- `agents/architect.py` — GmailAgent no DOMAIN_AGENT_MAP + KEYWORD_PATTERNS +_register_known_agents
 
 **Integrações:**
+
 - GmailManager (skills/gmail/): OAuth2 + Gmail API (list_unread, send_email)
 - LLMRouter: classificação + geração de rascunhos (task_type=fast)
 - RAGEngine: histórico de emails importantes
@@ -2487,6 +2496,7 @@ npm install -g @qwen-code/qwen-code
 ### Deep Zorin OS Integration — PipeWire + D-Bus + Hotkeys
 
 **Novos arquivos:**
+
 - `core/linux_native.py` — LinuxNative (abstração de baixo nível)
   - Audio: get/set volume, toggle mute, mic mute/unmute/toggle, list devices
   - D-Bus/GNOME: get_active_window, send_notification (notify-send)
@@ -2504,6 +2514,7 @@ npm install -g @qwen-code/qwen-code
 - `tests/test_linux_native_agent.py` — 16 testes (100% pass)
 
 **Integrações:**
+
 - WatchdogAgent: LinuxNative.get_system_info() para métricas reais
 - MoonDaemon: pipeline como LoopTask(interval=300)
 - VoiceSkill: mic mute/unmute integrado
@@ -2516,6 +2527,7 @@ npm install -g @qwen-code/qwen-code
 ### Real-time Ecosystem Dashboard — FastAPI + WebSockets + Live Feed
 
 **Novos arquivos:**
+
 - `apps/workspace_monitor/backend/server.py` — FastAPI app
   - GET /api/status, /api/agents, /api/metrics, /api/events
   - WS /ws/live: MessageBus event stream (broadcast em tempo real)
@@ -2557,6 +2569,7 @@ npm install -g @qwen-code/qwen-code
 **Suite total:** 1120+ passed · 0 new failures · 5 pre-existentes (PDF converters)
 
 ### Smoke Test Final
+
 ```
 ✅ youtube       AGENT_ID=youtube
 ✅ hedge         Kelly edge=7.4% APEX=True
@@ -2575,6 +2588,58 @@ npm install -g @qwen-code/qwen-code
 | P4 | RAGEngine: implementação completa    | HIGH       |
 | P5 | Ativar HedgePipeline (bankroll cfg)  | MED        |
 | P6 | AutonomousLoop: carregar config      | HIGH       |
+
+---
+
+## 🔐 SECURITY-01 — Security Layer (2026-03-24)
+
+### Implementado
+
+- `core/security/` — módulo completo (SecretManager, InputValidator, AuditLog, RateLimiter, TelegramGuard, AgentPermissions)
+- `logs/security.jsonl` — audit log append-only de todas ações críticas
+- `pytest.ini` — timeout=10 padrão já existia no pyproject.toml
+- `bandit` instalado — 0 issues encontradas no core/security/
+- TelegramGuard integrado em `agents/telegram/bot.py` (todos os 10 handlers protegidos)
+- SecretManager.validate_boot() integrado em `core/config.py`
+- InputValidator.safe_cli_args() integrado em `core/cli_harness_adapter.py`
+- 27 novos testes de segurança — todos passando
+
+### Estrutura da Security Layer
+
+```
+core/security/
+├── __init__.py          # exports
+├── secrets.py           # SecretManager — validação de secrets no boot
+├── validator.py         # InputValidator — sanitização de CLI args
+├── audit.py             # SecurityAuditLog — log append-only em JSONL
+├── rate_limiter.py      # RateLimiter — limitação de taxa por actor
+└── guard.py             # TelegramGuard + AgentPermissions
+```
+
+### Testes de Segurança
+
+```bash
+$ python3 -m pytest tests/security/test_security_layer.py -v --timeout=10
+27 passed in 0.91s
+```
+
+### Auditorias
+
+- **bandit**: 0 issues (core/security/)
+- **pip-audit**: timeout (projeto grande)
+- **detect-secrets**: timeout (projeto grande)
+
+### Pendências Atualizadas
+
+| ID | Descrição                           | Prioridade |
+|----|-------------------------------------|------------|
+| P1 | OBS Studio harness                  | LOW        |
+| P2 | 5 falhas pré-existentes (PDF/Docx)  | MED        |
+| P3 | YOUTUBE_API_KEY → ativar YouTubeAgent| MED        |
+| P4 | RAGEngine: implementação completa    | HIGH       |
+| P5 | Ativar HedgePipeline (bankroll cfg)  | MED        |
+| P6 | AutonomousLoop: carregar config      | HIGH       |
+| P7 | pip-audit/detect-secrets: rodar em subprojeto | LOW |
 
 ### Próximo Sprint — Sugestões
 

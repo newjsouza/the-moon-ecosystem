@@ -56,10 +56,18 @@ from telegram.ext import (
     ContextTypes,
 )
 
+# Security layer
+from core.security.guard import TelegramGuard
+from core.security.audit import SecurityAuditLog
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("moon.bot")
 logging.getLogger("telegram").setLevel(logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
+
+# Security guards (singleton)
+_guard = TelegramGuard()
+_audit = SecurityAuditLog()
 
 # ─────────────────────────────────────────────────────────────
 #  APEX Oracle import (lazy — evita import circular)
@@ -1032,6 +1040,13 @@ FORMATO DE RESPOSTA:
 
     async def cmd_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_id = str(update.effective_user.id)
+        
+        # Security: Check authorization
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
+        
         await update.message.reply_text(
             "🌙 *The Moon — Assistente Pessoal*\n\n"
             "Olá! Posso ajudar com:\n"
@@ -1055,10 +1070,19 @@ FORMATO DE RESPOSTA:
         )
 
     async def cmd_tarefas(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         await update.message.reply_text(self.tasks.format_list(), parse_mode="Markdown")
 
     async def cmd_briefing(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         await update.message.reply_text("🧠 Gerando briefing...", parse_mode="Markdown")
         if self._orchestrator:
             try:
@@ -1078,6 +1102,10 @@ FORMATO DE RESPOSTA:
 
     async def cmd_busca(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         query   = " ".join(context.args) if context.args else ""
         if not query:
             await update.message.reply_text("Uso: `/busca <sua pesquisa>`", parse_mode="Markdown")
@@ -1091,6 +1119,11 @@ FORMATO DE RESPOSTA:
         await update.message.reply_text(response, parse_mode="Markdown")
 
     async def cmd_cmd(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         command = " ".join(context.args) if context.args else ""
         if not command:
             await update.message.reply_text("Uso: `/cmd <comando>`", parse_mode="Markdown")
@@ -1103,10 +1136,19 @@ FORMATO DE RESPOSTA:
 
     async def cmd_limpar(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         self.memory.clear(user_id)
         await update.message.reply_text("🧹 Histórico da conversa limpo.", parse_mode="Markdown")
 
     async def cmd_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         if self._orchestrator:
             status = self._orchestrator.get_status()
             agents_str  = ", ".join(status.get("agents", [])[:8])
@@ -1124,6 +1166,11 @@ FORMATO DE RESPOSTA:
         await update.message.reply_text(text, parse_mode="Markdown")
 
     async def cmd_get_id(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         chat_id = update.effective_chat.id
         await update.message.reply_text(
             f"🆔 Chat ID: `{chat_id}`\n"
@@ -1136,6 +1183,11 @@ FORMATO DE RESPOSTA:
         /browser <instrução em linguagem natural>
         Inicia uma sessão de navegação autônoma com o BrowserPilot.
         """
+        user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         task = " ".join(context.args) if context.args else ""
         if not task:
             await update.message.reply_text(
@@ -1172,6 +1224,11 @@ FORMATO DE RESPOSTA:
 
     async def cmd_cancelar_browser(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Cancela a sessão de navegação ativa."""
+        user_id = str(update.effective_user.id)
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
         pilot = _get_browser_pilot()
         if not pilot:
             await update.message.reply_text("Nenhuma sessão ativa.")
@@ -1187,6 +1244,12 @@ FORMATO DE RESPOSTA:
         user_id = str(update.effective_user.id)
         chat_id = str(update.effective_chat.id)
         text    = update.message.text
+
+        # Security: Check authorization
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
 
         # Normalize for intent routing
         text_lower = text.lower().strip()
@@ -1205,6 +1268,13 @@ FORMATO DE RESPOSTA:
     async def handle_voice(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Handles incoming voice messages."""
         user_id = str(update.effective_user.id)
+        
+        # Security: Check authorization
+        if not _guard.is_allowed(user_id):
+            _audit.log_auth_attempt(user_id, granted=False, reason="TelegramGuard blocked")
+            await update.message.reply_text("❌ Acesso não autorizado.")
+            return
+        
         file_obj = await update.message.voice.get_file()
         voice_bytes = await file_obj.download_as_bytearray()
 
