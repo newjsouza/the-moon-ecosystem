@@ -2593,7 +2593,7 @@ npm install -g @qwen-code/qwen-code
 
 ## 🔐 SECURITY-01 — Security Layer (2026-03-24)
 
-### Implementado
+### Phase B — Implementado (2026-03-24 23:30)
 
 - `core/security/` — módulo completo (SecretManager, InputValidator, AuditLog, RateLimiter, TelegramGuard, AgentPermissions)
 - `logs/security.jsonl` — audit log append-only de todas ações críticas
@@ -2604,13 +2604,22 @@ npm install -g @qwen-code/qwen-code
 - InputValidator.safe_cli_args() integrado em `core/cli_harness_adapter.py`
 - 27 novos testes de segurança — todos passando
 
+### Phase C — LLMRouter Security (2026-03-24 23:45)
+
+- `agents/llm.py` — Security layer no LLMRouter.complete():
+  - InputValidator.validate_user_input() para validação de prompts
+  - RateLimiter.acquire() para rate limiting (30 req/min por default)
+  - SecurityAuditLog para todas as requisições e respostas
+  - Novo parâmetro `actor: str` para tracking de requisições
+- 11 novos testes em `tests/security/test_llm_security.py` — todos passando
+
 ### Estrutura da Security Layer
 
 ```
 core/security/
 ├── __init__.py          # exports
 ├── secrets.py           # SecretManager — validação de secrets no boot
-├── validator.py         # InputValidator — sanitização de CLI args
+├── validator.py         # InputValidator — sanitização de CLI args + prompts
 ├── audit.py             # SecurityAuditLog — log append-only em JSONL
 ├── rate_limiter.py      # RateLimiter — limitação de taxa por actor
 └── guard.py             # TelegramGuard + AgentPermissions
@@ -2619,8 +2628,17 @@ core/security/
 ### Testes de Segurança
 
 ```bash
+# Security layer base
 $ python3 -m pytest tests/security/test_security_layer.py -v --timeout=10
 27 passed in 0.91s
+
+# LLMRouter security
+$ python3 -m pytest tests/security/test_llm_security.py -v --timeout=30
+11 passed in 7.64s
+
+# Total security tests
+$ python3 -m pytest tests/security/ -v --timeout=10
+38 passed in 6.46s
 ```
 
 ### Auditorias
@@ -2628,6 +2646,20 @@ $ python3 -m pytest tests/security/test_security_layer.py -v --timeout=10
 - **bandit**: 0 issues (core/security/)
 - **pip-audit**: timeout (projeto grande)
 - **detect-secrets**: timeout (projeto grande)
+
+### Resumo da Implementação
+
+| Componente | Arquivo | Status |
+|------------|---------|--------|
+| SecretManager | core/security/secrets.py | ✅ Validação de secrets no boot |
+| InputValidator | core/security/validator.py | ✅ CLI args + prompts LLM |
+| SecurityAuditLog | core/security/audit.py | ✅ logs/security.jsonl |
+| RateLimiter | core/security/rate_limiter.py | ✅ 30 req/min default |
+| TelegramGuard | core/security/guard.py | ✅ 10 handlers protegidos |
+| AgentPermissions | core/security/guard.py | ✅ Controle por agente |
+| LLMRouter Security | agents/llm.py | ✅ complete() protegido |
+| CLI Harness Security | core/cli_harness_adapter.py | ✅ Args validados |
+| Config Boot Security | core/config.py | ✅ validate_boot() |
 
 ### Pendências Atualizadas
 
