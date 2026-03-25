@@ -7,9 +7,17 @@ Hierarquia de Fallback:
   2. Google Gemini — Secondary (gemini-2.0-flash via GEMINI_API_KEY — free tier 15 req/min)
   3. OpenRouter — Tertiary (OPENROUTER_API_KEY free tier — modelos open-source)
   4. Modo Degradado — Final (resposta estruturada mínima sem LLM, apenas lógica determinística)
+
+Security Layer (SECURITY-01):
+  - InputValidator: Validação de prompts contra injection attacks
+  - RateLimiter: Limitação de taxa por actor
+  - SecurityAuditLog: Audit log de todos os prompts e respostas
 """
 from core.agent_base import AgentBase, TaskResult, AgentPriority
 from core.config import Config
+from core.security.validator import InputValidator
+from core.security.rate_limiter import RateLimiter
+from core.security.audit import SecurityAuditLog
 from utils.logger import setup_logger
 from typing import Optional, List, Dict, Any
 import asyncio
@@ -281,34 +289,42 @@ class LLMRouter:
     
     Tenta cada provider na ordem de prioridade até obter sucesso.
     """
-    
+
     def __init__(self, config: Optional[Config] = None):
         self.logger = setup_logger("LLMRouter")
         self._config = config or Config()
+
+        # Security layer (SECURITY-01)
+        self._validator = InputValidator()
+        self._rate_limiter = RateLimiter()
+        self._audit = SecurityAuditLog()
         
+        # Configura rate limit default para LLM: 30 req/min por actor
+        self._rate_limiter.set_limit("llm_default", max_calls=30, window_seconds=60)
+
         # Inicializa providers com as API keys do .env
         groq_key = self._config.get("llm.api_key") or os.getenv("GROQ_API_KEY")
         gemini_key = self._config.get("gemini.api_key") or os.getenv("GEMINI_API_KEY")
         openrouter_key = self._config.get("openrouter.api_key") or os.getenv("OPENROUTER_API_KEY")
-        
+
         self.providers: List[LLMProvider] = []
-        
+
         # Adiciona providers na ordem de prioridade
         if groq_key:
             self.providers.append(GroqProvider(groq_key))
         else:
             self.logger.warning("Groq API key não configurada")
-        
+
         if gemini_key:
             self.providers.append(GeminiProvider(gemini_key))
         else:
             self.logger.info("Gemini API key não configurada (fallback disponível)")
-        
+
         if openrouter_key:
             self.providers.append(OpenRouterProvider(openrouter_key))
         else:
             self.logger.info("OpenRouter API key não configurada (fallback disponível)")
-        
+
         # Contadores de uso para telemetria
         self.usage_stats: Dict[str, int] = {
             "groq": 0,
@@ -330,37 +346,68 @@ class LLMRouter:
         # Ordem padrão: providers configurados > modo degradado
         return self.providers.copy()
     
-    async def complete(self, prompt: str, task_type: str = "general", **kwargs) -> str:
+    async def complete(self, prompt: str, task_type: str = "general", actor: str = "unknown", **kwargs) -> str:
         """
         Tenta cada provider na ordem de fallback até obter sucesso.
-        
+
         Args:
             prompt: Prompt de entrada
             task_type: Tipo de tarefa ("fast" | "complex" | "coding" | "research")
+            actor: Identificador do actor fazendo a requisição (para rate limiting e audit)
             **kwargs: Argumentos adicionais (model, temperature, max_tokens)
-        
+
         Returns:
             Resposta do primeiro provider bem-sucedido ou resposta degradada
+            
+        Security (SECURITY-01):
+            - Valida prompt contra injection attacks
+            - Aplica rate limiting por actor
+            - Registra audit log de todas as requisições
         """
+        # Security: Validate prompt
+        is_valid, reason = InputValidator.validate_user_input(prompt)
+        if not is_valid:
+            self._audit.log_failure("llm_prompt", actor, resource="prompt", reason=reason)
+            self.logger.warning(f"Prompt bloqueado por security: {reason}")
+            return f"[PROMPT BLOQUEADO] {reason}"
+        
+        # Security: Check rate limit
+        if not self._rate_limiter.acquire("llm_default"):
+            remaining = self._rate_limiter.get_remaining("llm_default")
+            reset_time = self._rate_limiter.get_reset_time("llm_default")
+            self._audit.log_failure("llm_rate_limit", actor, reason=f"Rate limit excedido")
+            self.logger.warning(f"Rate limit excedido para {actor}: {remaining} restantes, reset em {reset_time:.0f}s")
+            return "[RATE LIMIT] Muitas requisições. Aguarde alguns segundos e tente novamente."
+        
+        # Security: Audit log da requisição
+        self._audit.log_success("llm_request", actor, resource=task_type, metadata={"prompt_length": len(prompt)})
+        
         providers = self._get_provider_order(task_type)
         last_error = None
-        
+
         if not providers:
             self.logger.warning("Nenhum provider configurado. Usando modo degradado.")
+            self._audit.log_success("llm_response", actor, resource="degraded", metadata={"reason": "no_providers"})
             return self._degraded_response(prompt, task_type)
-        
+
         for provider in providers:
             try:
                 self.logger.info(f"Tentando provider: {provider.name}")
                 result = await provider.complete(prompt, task_type=task_type, **kwargs)
-                
+
                 # Registrar uso para telemetria
                 await self._publish_usage(provider.name.lower(), task_type)
                 self.usage_stats[provider.name.lower()] = self.usage_stats.get(provider.name.lower(), 0) + 1
+
+                # Security: Audit log da resposta
+                self._audit.log_success("llm_response", actor, resource=provider.name, metadata={
+                    "task_type": task_type,
+                    "response_length": len(result) if result else 0
+                })
                 
                 self.logger.info(f"Provider {provider.name} executado com sucesso")
                 return result
-                
+
             except (RateLimitError, ServiceUnavailableError) as e:
                 last_error = e
                 self.logger.warning(f"Provider {provider.name} indisponível: {e}")
@@ -369,10 +416,11 @@ class LLMRouter:
                 last_error = e
                 self.logger.error(f"Provider {provider.name} falhou com erro inesperado: {e}")
                 continue
-        
+
         # Todos os providers falharam - modo degradado
         self.logger.error(f"Todos os providers falharam. Último erro: {last_error}")
         self.usage_stats["degraded"] = self.usage_stats.get("degraded", 0) + 1
+        self._audit.log_failure("llm_response", actor, resource="all_providers_failed", reason=str(last_error))
         await self._publish_usage("degraded", task_type)
         return self._degraded_response(prompt, task_type)
 
