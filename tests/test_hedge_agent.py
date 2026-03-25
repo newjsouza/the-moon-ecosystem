@@ -173,13 +173,15 @@ class TestHedgeAgent:
     def setup_method(self):
         from core.observability.observer import MoonObserver
         MoonObserver.reset_instance()
-        Path_mkdir_patcher = patch("pathlib.Path.mkdir")
-        self._p = Path_mkdir_patcher.start()
+        # Mock Path.mkdir to accept exist_ok parameter
+        self._mkdir_patcher = patch("pathlib.Path.mkdir", return_value=None)
+        self._mkdir_patcher.start()
 
     def teardown_method(self):
         from core.observability.observer import MoonObserver
         MoonObserver.reset_instance()
-        self._p.stop()
+        # Ensure patcher is stopped even if test fails
+        self._mkdir_patcher.stop()
 
     def test_import(self):
         from agents.hedge_agent import HedgeAgent

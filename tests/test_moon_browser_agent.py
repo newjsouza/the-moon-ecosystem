@@ -29,11 +29,11 @@ class TestBrowserBridgeReadsStateFile:
     def test_bridge_reads_state_file(self, tmp_path):
         """Mock do arquivo .gstack/browse.json, verificar que BrowserBridge lê port e token."""
         from core.browser_bridge import BrowserBridge
-        
+
         # Cria arquivo de estado mock
         state_file = tmp_path / ".gstack" / "browse.json"
-        state_file.parent.mkdir(parents=True)
-        
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+
         state_data = {
             "pid": 12345,
             "port": 8080,
@@ -61,10 +61,10 @@ class TestBridgeAutoStartsDaemon:
     async def test_bridge_auto_starts_daemon(self, tmp_path):
         """Simular arquivo inexistente, mock de subprocess.Popen."""
         from core.browser_bridge import BrowserBridge
-        
+
         # Cria script daemon mock
         daemon_script = tmp_path / "skills" / "moon_browse" / "start_daemon.sh"
-        daemon_script.parent.mkdir(parents=True)
+        daemon_script.parent.mkdir(parents=True, exist_ok=True)
         daemon_script.write_text("#!/bin/bash\necho 'daemon'\n")
         daemon_script.chmod(0o755)
         

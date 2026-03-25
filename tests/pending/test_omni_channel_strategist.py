@@ -130,7 +130,7 @@ def test_post_status_enum_values():
 @pytest.mark.asyncio
 async def test_strategist_initialization(temp_data_dir):
     """Testa inicialização do OmniChannelStrategist."""
-    with patch('pathlib.Path.mkdir'):
+    with patch('pathlib.Path.mkdir', return_value=None):
         strategist = OmniChannelStrategist()
         await strategist.initialize()
         await strategist.shutdown()

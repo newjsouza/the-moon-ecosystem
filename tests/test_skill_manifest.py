@@ -163,11 +163,11 @@ def test_discover():
     sub_dir = skills_dir / "sub"
     skills_dir.mkdir(parents=True, exist_ok=True)
     sub_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Now create two files named exactly "skill.json" in different locations
     skill_json1 = skills_dir / "skill.json"
     skill_json2 = sub_dir / "skill.json"
-    
+
     skill_json1_data = {
         "name": "main_skill",
         "version": "1.0.0",
@@ -176,7 +176,7 @@ def test_discover():
         "commands": ["main_cmd"],
         "examples": ["main_example"]
     }
-    
+
     skill_json2_data = {
         "name": "nested_skill",
         "version": "1.0.0",
@@ -185,10 +185,10 @@ def test_discover():
         "commands": ["nested_cmd"],
         "examples": ["nested_example"]
     }
-    
+
     with open(skill_json1, 'w') as f:
         json.dump(skill_json1_data, f)
-    
+
     with open(skill_json2, 'w') as f:
         json.dump(skill_json2_data, f)
     

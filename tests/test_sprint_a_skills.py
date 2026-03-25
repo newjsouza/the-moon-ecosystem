@@ -33,6 +33,7 @@ class TestMoonPDFConverter:
     @pytest.mark.asyncio
     async def test_unsupported_format(self, tmp_path):
         fake = tmp_path / "test.xyz"
+        fake.parent.mkdir(parents=True, exist_ok=True)
         fake.write_text("content")
         result = await self.converter.convert_to_pdf(str(fake))
         assert result.success is False
@@ -41,12 +42,14 @@ class TestMoonPDFConverter:
     @pytest.mark.asyncio
     async def test_convert_to_pdf_success(self, tmp_path):
         src = tmp_path / "test.docx"
+        src.parent.mkdir(parents=True, exist_ok=True)
         src.write_bytes(b"fake docx content")
         mock_proc = AsyncMock()
         mock_proc.returncode = 0
         mock_proc.communicate = AsyncMock(return_value=(b"", b""))
 
         pdf_out = tmp_path / "test.pdf"
+        pdf_out.parent.mkdir(parents=True, exist_ok=True)
         pdf_out.write_bytes(b"fake pdf content")
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
@@ -56,6 +59,7 @@ class TestMoonPDFConverter:
     @pytest.mark.asyncio
     async def test_convert_to_pdf_libreoffice_error(self, tmp_path):
         src = tmp_path / "test.docx"
+        src.parent.mkdir(parents=True, exist_ok=True)
         src.write_bytes(b"fake content")
         mock_proc = AsyncMock()
         mock_proc.returncode = 1
@@ -98,11 +102,13 @@ class TestMoonDocxConverter:
     @pytest.mark.asyncio
     async def test_convert_success_mock(self, tmp_path):
         src = tmp_path / "test.odt"
+        src.parent.mkdir(parents=True, exist_ok=True)
         src.write_bytes(b"fake odt")
         mock_proc = AsyncMock()
         mock_proc.returncode = 0
         mock_proc.communicate = AsyncMock(return_value=(b"", b""))
         docx_out = tmp_path / "test.docx"
+        docx_out.parent.mkdir(parents=True, exist_ok=True)
         docx_out.write_bytes(b"fake docx")
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):
@@ -194,11 +200,13 @@ class TestMoonPPTXPresenter:
     @pytest.mark.asyncio
     async def test_convert_to_pdf_mock(self, tmp_path):
         src = tmp_path / "test.pptx"
+        src.parent.mkdir(parents=True, exist_ok=True)
         src.write_bytes(b"fake pptx")
         mock_proc = AsyncMock()
         mock_proc.returncode = 0
         mock_proc.communicate = AsyncMock(return_value=(b"", b""))
         pdf_out = tmp_path / "test.pdf"
+        pdf_out.parent.mkdir(parents=True, exist_ok=True)
         pdf_out.write_bytes(b"fake pdf")
 
         with patch("asyncio.create_subprocess_exec", return_value=mock_proc):

@@ -53,6 +53,47 @@ class AutonomousLoop:
         (STATE_DIR / "checkpoints").mkdir(exist_ok=True)
 
     # ──────────────────────────────────────────────────────────────
+    # Config loading
+    # ──────────────────────────────────────────────────────────────
+
+    def load_config(self, config_path: str = "config/autonomous_loop.json") -> int:
+        """
+        Load tasks from JSON config file and enqueue enabled tasks.
+        Returns the number of tasks loaded.
+        """
+        try:
+            config_file = Path(config_path)
+            if not config_file.exists():
+                self.logger.warning(f"Config file not found: {config_path}")
+                return 0
+
+            with open(config_file) as f:
+                config = json.load(f)
+
+            tasks_loaded = 0
+            for task_cfg in config.get("tasks", []):
+                if task_cfg.get("enabled", False):
+                    task = LoopTask(
+                        task_id=task_cfg.get("id", f"task_{tasks_loaded}"),
+                        agent_id=task_cfg.get("agent_id", "unknown"),
+                        task=task_cfg.get("task", ""),
+                        kwargs=task_cfg.get("kwargs", {}),
+                        priority=task_cfg.get("priority", 5),
+                        domain=task_cfg.get("domain", "general"),
+                        use_evaluator=task_cfg.get("use_evaluator", False),
+                        max_retries=task_cfg.get("max_retries", 3),
+                    )
+                    self.enqueue(task)
+                    tasks_loaded += 1
+
+            self.logger.info(f"Loaded {tasks_loaded} tasks from {config_path}")
+            return tasks_loaded
+
+        except Exception as e:
+            self.logger.error(f"Failed to load config from {config_path}: {e}")
+            return 0
+
+    # ──────────────────────────────────────────────────────────────
     # Queue management
     # ──────────────────────────────────────────────────────────────
 
