@@ -19,15 +19,22 @@ MOON_RELEVANT_KEYWORDS: list[str] = [
 PYPI_RSS_URL = "https://pypi.org/rss/updates.xml"
 
 
+def _parse_feed(url: str):
+    """Wrapper around feedparser.parse for easier mocking in tests."""
+    return feedparser.parse(url)
+
+
 async def scan_pypi_new_packages(
     keywords: list[str] | None = None,
     max_items: int = 50,
+    _feed_parser=None,  # For dependency injection in tests
 ) -> list[RadarItem]:
     """Scan PyPI new releases filtered by Moon-relevant keywords."""
     kws = keywords or MOON_RELEVANT_KEYWORDS
     loop = asyncio.get_event_loop()
+    parser = _feed_parser or _parse_feed
     try:
-        feed = await loop.run_in_executor(None, feedparser.parse, PYPI_RSS_URL)
+        feed = await loop.run_in_executor(None, parser, PYPI_RSS_URL)
         items = []
         for entry in feed.entries[:max_items]:
             combined = f"{entry.get('title', '').lower()} {entry.get('summary', '').lower()}"

@@ -2,6 +2,7 @@
 Unit tests for radar scanner skills — all HTTP mocked.
 """
 import asyncio
+import feedparser
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from skills.radar import RadarItem
@@ -92,14 +93,31 @@ class TestLlmScanners:
 
 class TestPypiScanner:
     def test_keyword_filtering(self):
+        import skills.radar.pypi_scanner as pypi_module
+
         async def run():
+            # Create properly configured mocks that return real strings
+            entry1 = MagicMock()
+            entry1.get.side_effect = lambda key, default='': {
+                'title': 'llm-tools 1.0',
+                'summary': 'LLM utility',
+                'link': 'https://pypi.org/p/llm-tools',
+                'published': ''
+            }.get(key, default)
+
+            entry2 = MagicMock()
+            entry2.get.side_effect = lambda key, default='': {
+                'title': 'csv-reader 2.0',
+                'summary': 'CSV utilities only here',
+                'link': 'https://pypi.org/p/csv',
+                'published': ''
+            }.get(key, default)
+
             fake = MagicMock()
-            fake.entries = [
-                MagicMock(title="llm-tools 1.0", summary="LLM utility", link="https://pypi.org/p/llm-tools", published=""),
-                MagicMock(title="csv-reader 2.0", summary="CSV utilities only here", link="https://pypi.org/p/csv", published=""),
-            ]
-            with patch("feedparser.parse", return_value=fake):
-                return await scan_pypi_new_packages(keywords=["llm"])
+            fake.entries = [entry1, entry2]
+
+            # Use dependency injection to bypass run_in_executor
+            return await pypi_module.scan_pypi_new_packages(keywords=["llm"], _feed_parser=lambda url: fake)
         result = asyncio.run(run())
         assert len(result) == 1
         assert "llm-tools" in result[0].title

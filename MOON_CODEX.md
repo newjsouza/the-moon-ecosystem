@@ -2709,3 +2709,98 @@ $ python3 -m pytest tests/security/ -v --timeout=10
   N2 — HedgePipeline bankroll config (P5) — agents/hedge/ existe
   N3 — MoonDaemon systemd service — AutonomousLoop no boot do sistema
   N4 — RAGEngine ChromaDB/FAISS local — zero cost vector search
+
+## 🌕 FASE 1 — RADAR PROATIVO AUTÔNOMO (2026-03-26)
+
+### Resumo da Implementação
+
+**OBJETIVO:** Transformar The Moon de executor reativo em sistema proativo.
+Escaneia o ecossistema tecnológico de forma autônoma e entrega relatórios de inteligência via Telegram sem solicitação do usuário.
+
+### Novos Arquivos Criados
+
+| Componente | Arquivo | Descrição |
+|------------|---------|-----------|
+| RadarItem | `skills/radar/__init__.py` | Dataclass unificada com hash MD5 para deduplicação |
+| GitHub Scanner | `skills/radar/github_trending.py` | GitHub Search API — repositórios trending (usa GITHUB_TOKEN) |
+| HuggingFace Scanner | `skills/radar/huggingface_scanner.py` | HF trending models + Spaces (free API, sem auth) |
+| RSS Scanner | `skills/radar/rss_scanner.py` | 7 feeds: HN, ArXiv AI/ML/CV, GitHub Blog, HF Blog, Python News |
+| LLM Releases | `skills/radar/llm_releases_scanner.py` | OpenRouter free models + Groq catalog |
+| PyPI Scanner | `skills/radar/pypi_scanner.py` | PyPI releases filtrados por 20 keywords Moon-relevantes |
+| RadarAgent | `agents/radar_agent.py` | Orquestra 5 scanners, deduplicação, ring buffer 1000 hashes |
+| ReportComposer | `agents/report_composer.py` | LLM → relatório pt-BR + fallback estruturado |
+| MoonScheduler | `core/scheduler.py` | Asyncio puro, zero deps externas, agenda configurável |
+| Radar Schedule | `config/radar_schedule.yaml` | Agenda: 6h quick_pulse, 12h full_scan, 24h strategic_digest |
+| Telegram Commands | `telegram/radar_commands.py` | Handlers: !radar now | pulse | digest | status |
+| Radar State | `data/radar_state.json` | Memória persistente de deduplicação |
+
+### Pipeline Autônomo
+
+```
+MoonScheduler (asyncio background tasks)
+  → RadarAgent.execute(task)
+    → 5 scanners (GitHub, HF, RSS, LLM Releases, PyPI)
+    → deduplicação MD5 + persistência JSON
+  → ReportComposerAgent.execute("compose")
+    → LLMRouter → relatório Telegram pt-BR
+    → fallback estruturado se LLM indisponível
+  → Telegram delivery autônomo
+```
+
+### Agenda Configurada
+
+| Job | Intervalo | Descrição |
+|-----|-----------|-----------|
+| quick_pulse | 6h | GitHub Trending + HuggingFace — scan leve |
+| full_scan | 12h | Todos os 5 scanners — varredura completa |
+| strategic_digest | 24h | Síntese estratégica completa |
+
+### Comandos Telegram
+
+| Comando | Ação |
+|---------|------|
+| `!radar now` | full_scan imediato |
+| `!radar pulse` | quick_pulse imediato |
+| `!radar digest` | strategic_digest imediato |
+| `!radar status` | Status do scheduler + hashes armazenados |
+
+### Testes Adicionados
+
+| Arquivo | Descrição | Testes |
+|---------|-----------|--------|
+| `tests/test_radar_scanners.py` | RadarItem + 5 scanners (mocked) | 12 testes |
+| `tests/test_radar_agent.py` | deduplicação, ring buffer, routing | 6 testes |
+| `tests/test_report_composer.py` | LLM path + fallback + empty scan | 4 testes |
+| `tests/test_scheduler.py` | pipeline success/failure | 4 testes |
+
+**Total: 26 testes novos — TODOS PASSANDO ✅**
+
+### Status da Suite Completa
+
+- **1170 passed, 34 failed, 19 skipped** (falhas pré-existentes — P2)
+- **26 testes novos do Radar: 100% passando**
+
+### Pendências Atualizadas (2026-03-26)
+
+| ID | Descrição | Prioridade | Status |
+|----|-----------|------------|--------|
+| P1 | OBS Studio harness | LOW | ⏳ Pendente |
+| P2 | 34 falhas pré-existentes (policy/session/orchestrator) | MED | 🔍 Investigar |
+| P3 | BlogCLIExporter integrado ao blog agent | MED | ⏳ Pendente |
+| P4 | Fase 2: Motor de Objetivos Estratégicos (goals.yaml) | HIGH | ⏳ Pendente |
+| P5 | Fase 3: Loop de auto-evolução fechado | HIGH | ⏳ Pendente |
+
+### Contrato AgentBase Confirmado
+
+```python
+# Padrão real do repositório (2026-03-26):
+class RadarAgent(AgentBase):
+    def __init__(self, message_bus=None, llm=None) -> None:
+        super().__init__()  # SEM argumentos
+        self.name = "RadarAgent"  # definido após super()
+        self._message_bus = message_bus
+        self._llm = llm
+```
+
+**IMUTÁVEL:** `AgentBase.__init__(self)` — ZERO argumentos
+**Padrão:** `super().__init__()` → `self.name = "..."` → atributos próprios
