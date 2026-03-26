@@ -54,7 +54,10 @@ export function IntelligenceHub() {
             </div>
             
             <div className="text-xs text-gray-300 font-mono whitespace-pre-wrap break-words mt-1 leading-5">
-              {report.data?.report || (report.data?.findings ? report.data.findings.map((f: string, i: number) => <div key={i} className="mb-2">👉 {f}</div>) : 'Processing Data...')}
+              {report.data?.report || 
+                (Array.isArray(report.data?.findings) 
+                  ? report.data.findings.map((f: string, i: number) => <div key={i} className="mb-2">👉 {f}</div>) 
+                  : (report.data?.findings !== undefined ? `Findings count: ${report.data.findings}` : 'Processing Data...'))}
             </div>
           </motion.div>
         ))

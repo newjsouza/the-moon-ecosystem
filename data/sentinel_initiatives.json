@@ -86,5 +86,16 @@
     },
     "timestamp": 1774528033.6426516,
     "datetime": "2026-03-26T09:27:13.642652"
+  },
+  {
+    "key": "health_issue",
+    "type": "ecosystem_health",
+    "data": {
+      "issues": [
+        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
+      ]
+    },
+    "timestamp": 1774531634.6999924,
+    "datetime": "2026-03-26T10:27:14.699995"
   }
 ]

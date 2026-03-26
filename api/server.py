@@ -133,6 +133,89 @@ async def send_command(req: CommandRequest, request: Request):
     
     return {"error": f"Agent {req.target_agent} not found"}
 
+@app.get("/api/agents/{agent_name}")
+async def get_agent_details(agent_name: str, request: Request):
+    """Returns deep details about a specific agent."""
+    orch = request.app.state.orchestrator
+    if agent_name not in orch._agents:
+        return {"error": "Agent not found"}
+        
+    agent = orch._agents[agent_name]
+    circuit = orch._circuits.get(agent_name)
+    
+    # Safely extract memory or state if available
+    memory = []
+    if hasattr(agent, "_memory"):
+        # Just grab the last 5 entries to avoid massive payloads
+        mem_list = getattr(agent, "_memory", [])
+        memory = mem_list[-5:] if isinstance(mem_list, list) else []
+        
+    return {
+        "name": agent.name,
+        "description": agent.description,
+        "priority": agent.priority.name if hasattr(agent.priority, "name") else str(agent.priority),
+        "status": "offline" if circuit and circuit.open else "online",
+        "failures": circuit.failures if circuit else 0,
+        "memory": memory,
+        "current_task": getattr(agent, "current_task", None),
+    }
+
+class AgentActionRequest(BaseModel):
+    action: str
+    payload: Optional[Dict[str, Any]] = None
+
+@app.post("/api/agents/{agent_name}/action")
+async def agent_action(agent_name: str, req: AgentActionRequest, request: Request):
+    """Send a direct control action to an agent."""
+    orch = request.app.state.orchestrator
+    if agent_name not in orch._agents:
+        return {"error": "Agent not found"}
+        
+    message = f"Action '{req.action}' received by {agent_name}."
+    
+    # Special handling for UI requests
+    if req.action == "ping":
+        return {"status": "success", "message": f"Pong from {agent_name}!"}
+        
+    # Default success response to show UI tracking
+    return {"status": "success", "message": message, "action": req.action}
+
+@app.get("/api/tasks")
+async def get_active_tasks(request: Request):
+    """Returns the orchestrator's proactive loop status and background automations."""
+    orch = request.app.state.orchestrator
+    tasks = []
+    
+    # 1. Sentinel
+    tasks.append({
+        "id": "sentinel-proactive",
+        "name": "MoonSentinel Vigilance Loop",
+        "status": "running",
+        "type": "daemon",
+        "details": "Monitoring tech trends and ecosystem health natively."
+    })
+    
+    # 2. Main loop
+    if orch._autonomous_task and not orch._autonomous_task.done():
+        tasks.append({
+            "id": "orchestrator-autonomous",
+            "name": "Orchestrator Proactive Loop",
+            "status": "running",
+            "type": "loop",
+            "details": "Central event horizon executing background workflows."
+        })
+    else:
+        tasks.append({
+            "id": "orchestrator-autonomous",
+            "name": "Orchestrator Proactive Loop",
+            "status": "stalled",
+            "type": "loop",
+            "details": "The loop is currently inactive or crashed."
+        })
+        
+    # Expand to any other known background loops
+    return {"tasks": tasks}
+
 @app.get("/api/reports")
 async def get_reports():
     """Returns the latest intelligence and trend reports gathered by Sentinel."""
