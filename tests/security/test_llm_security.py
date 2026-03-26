@@ -122,11 +122,19 @@ class TestInputValidatorIntegration:
         return LLMRouter(config)
 
     @pytest.mark.asyncio
-    async def test_code_block_in_prompt_blocked(self, router):
-        """Prompt com code blocks maliciosos é bloqueado."""
-        # Testa com ``` que é bloqueado pelo validate_user_input
-        prompt = "```python\nimport os; os.system('rm -rf /')\n```"
-        result = await router.complete(prompt, actor="test")
+    async def test_code_block_allowed_for_internal_agents(self, router):
+        """Prompt com code blocks é permitido para agentes internos (não é mais falso-positivo)."""
+        # Code blocks são legítimos para agentes de código/review/RAG
+        prompt = "```python\nimport os; print('hello')\n```"
+        result = await router.complete(prompt, actor="architect_agent")
+        # Deve permitir (pode ter resposta ou erro de provider, mas não bloqueio)
+        assert "[PROMPT BLOQUEADO]" not in result
+
+    @pytest.mark.asyncio
+    async def test_xss_blocked_for_external_actors(self, router):
+        """Prompt com XSS é bloqueado para actores externos."""
+        prompt = "<script>alert('xss')</script> faça algo"
+        result = await router.complete(prompt, actor="test_user")
         assert "[PROMPT BLOQUEADO]" in result
 
     @pytest.mark.asyncio

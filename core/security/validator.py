@@ -182,18 +182,28 @@ class InputValidator:
 
         return True, "OK"
 
-    # External actors: strict limits + injection checks
-    _EXTERNAL_ACTORS = {"user", "telegram", "api", "unknown"}
+    # Internal agents: known agent naming patterns
+    # Any actor NOT matching these patterns is treated as external (stricter limits)
+    _INTERNAL_AGENT_PATTERNS = (
+        "_agent",  # architect_agent, blog_agent, etc.
+        "agent_",  # agent_name pattern
+    )
     _USER_MAX_LENGTH = 4_096
     _AGENT_MAX_LENGTH = 32_000
+
+    @classmethod
+    def _is_internal_agent(cls, actor: str) -> bool:
+        """Check if actor is an internal agent based on naming pattern."""
+        actor_lower = actor.lower()
+        return any(pattern in actor_lower for pattern in cls._INTERNAL_AGENT_PATTERNS)
 
     @classmethod
     def validate_llm_prompt(cls, text: str, actor: str = "unknown") -> Tuple[bool, str]:
         """
         Valida prompts de LLM com limite diferenciado por tipo de actor.
 
-        Actors externos (user, telegram, api, unknown) → 4096 chars + XSS check
-        Agents internos → 32000 chars, sem restrição de backticks/code blocks
+        Actors externos (user, telegram, api, unknown, test_user, etc.) → 4096 chars + XSS check
+        Agents internos (*_agent ou agent_*) → 32000 chars, sem restrição de backticks/code blocks
 
         Args:
             text: Texto do prompt.
@@ -205,15 +215,15 @@ class InputValidator:
         if not text:
             return False, "Empty prompt"
 
-        is_external = actor in cls._EXTERNAL_ACTORS
-        max_length = cls._USER_MAX_LENGTH if is_external else cls._AGENT_MAX_LENGTH
+        is_internal = cls._is_internal_agent(actor)
+        max_length = cls._AGENT_MAX_LENGTH if is_internal else cls._USER_MAX_LENGTH
 
         if len(text) > max_length:
             return False, f"Prompt too long (>{max_length} chars, actor={actor})"
 
         # Injection check ONLY for external/user actors
         # Internal agents legitimately use ```, """, ''' in code and RAG context
-        if is_external:
+        if not is_internal:
             dangerous_external = ["<script>", "javascript:", "data:text/html"]
             for pattern in dangerous_external:
                 if pattern.lower() in text.lower():
