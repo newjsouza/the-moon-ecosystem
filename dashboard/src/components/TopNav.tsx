@@ -10,7 +10,9 @@ interface TopNavProps {
 export function TopNav({ activeTab, setActiveTab }: TopNavProps) {
   const tabs = [
     { id: 'dashboard', label: 'SYSTEM MATRIX', icon: Network, color: 'text-cyber-accent', bgColor: 'bg-cyber-accent' },
-    { id: 'automations', label: 'AUTOMATIONS', icon: Settings, color: 'text-cyber-success', bgColor: 'bg-cyber-success' }
+    { id: 'intelligence', label: 'INTELLIGENCE', icon: BrainCircuit, color: 'text-cyber-success', bgColor: 'bg-cyber-success' },
+    { id: 'automations', label: 'AUTOMATIONS', icon: Settings, color: 'text-cyber-purple', bgColor: 'bg-cyber-purple' },
+    { id: 'terminal', label: 'UPLINK & LOGS', icon: TerminalSquare, color: 'text-cyber-danger', bgColor: 'bg-cyber-danger' }
   ];
 
   return (

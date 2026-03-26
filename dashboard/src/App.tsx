@@ -50,6 +50,28 @@ function App() {
           <AutomationsView />
         </div>
       )}
+
+      {activeTab === 'intelligence' && (
+        <div className="glass-panel p-6 h-[calc(100vh-8rem)] flex flex-col gap-4">
+          <h2 className="text-xl font-mono text-cyber-success border-b border-cyber-success/20 pb-4 flex justify-between items-center shrink-0">
+            <span>[ INTELLIGENCE NEXUS ]</span>
+            <span className="text-xs text-cyber-success/50 animate-pulse-slow">DEEP AI TRENDS</span>
+          </h2>
+          <IntelligenceHub />
+        </div>
+      )}
+
+      {activeTab === 'terminal' && (
+        <div className="glass-panel p-6 h-[calc(100vh-8rem)] flex flex-col gap-4">
+          <h2 className="text-xl font-mono text-cyber-purple border-b border-cyber-purple/20 pb-4 shrink-0">
+            [ UPLINK TERMINAL ]
+          </h2>
+          <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+            <LogTerminal />
+            <CommandUplink />
+          </div>
+        </div>
+      )}
     </CyberLayout>
   );
 }

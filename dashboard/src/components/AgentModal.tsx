@@ -78,13 +78,13 @@ export function AgentModal({ agentName, onClose }: AgentModalProps) {
               <div className="text-center text-cyber-accent animate-pulse py-10">SYNCING AGENT DATA...</div>
             ) : (
               <>
-                <div className="flex flex-wrap gap-4 text-xs">
-                  <div className={clsx("flex items-center gap-2 px-3 py-1.5 rounded border font-bold tracking-wider", details.status === 'online' ? "border-cyber-success/30 bg-cyber-success/10 text-cyber-success" : "border-cyber-danger/30 bg-cyber-danger/10 text-cyber-danger")}>
-                    {details.status === 'online' ? <Activity className="w-4 h-4" /> : <ServerCrash className="w-4 h-4" />}
-                    STATUS: {details.status.toUpperCase()}
+                <div className="flex flex-wrap gap-4 text-xs font-mono">
+                  <div className={clsx("flex items-center gap-2 px-3 py-1.5 rounded border font-bold tracking-wider", (details.status || 'online') === 'online' ? "border-cyber-success/30 bg-cyber-success/10 text-cyber-success" : "border-cyber-danger/30 bg-cyber-danger/10 text-cyber-danger")}>
+                    {(details.status || 'online') === 'online' ? <Activity className="w-4 h-4" /> : <ServerCrash className="w-4 h-4" />}
+                    STATUS: {(details.status || 'OFFLINE').toUpperCase()}
                   </div>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-white/10 bg-white/5 text-gray-300 font-bold tracking-wider">
-                    PRIORITY: {details.priority}
+                    PRIORITY: {(details.priority || 'NORMAL').toUpperCase()}
                   </div>
                   {details.failures > 0 && (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 font-bold tracking-wider">
@@ -93,8 +93,8 @@ export function AgentModal({ agentName, onClose }: AgentModalProps) {
                   )}
                 </div>
 
-                <div className="text-sm text-gray-400 leading-relaxed">
-                  {details.description}
+                <div className="text-sm text-gray-400 leading-relaxed font-mono">
+                  {details.description || "Synthesizing agent capabilities..."}
                 </div>
 
                 <div className="flex flex-col gap-2">

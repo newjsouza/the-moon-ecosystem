@@ -7,3 +7,4 @@
 [09:12:52] Sala inicializada para a skill SkillAlchemist. Bem-vindo, SkillAlchemist!
 [09:19:42] Sala inicializada para a skill SkillAlchemist. Bem-vindo, SkillAlchemist!
 [09:26:59] Sala inicializada para a skill SkillAlchemist. Bem-vindo, SkillAlchemist!
+[11:12:36] Sala inicializada para a skill SkillAlchemist. Bem-vindo, SkillAlchemist!
