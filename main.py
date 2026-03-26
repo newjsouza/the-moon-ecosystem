@@ -170,6 +170,10 @@ class MoonSystem:
         self.message_bus = self.orchestrator.message_bus
         self.hive_integration: HiveIntegration | None = None
 
+        # FastAPI Dashboard Support
+        self._api_server = None
+        self._api_server_task = None
+
         # Estado do sistema
         self._initialized = False
         self._shutdown_event = asyncio.Event()
@@ -283,6 +287,13 @@ class MoonSystem:
         groq_client = self.orchestrator.llm
         
         return [
+            # ── Autonomy & Proactivity (first, so they start watching immediately) ──
+            ("MoonSentinelAgent", lambda: self._safe_import_agent(
+                "agents.moon_sentinel",
+                "MoonSentinelAgent",
+                orchestrator=self.orchestrator
+            )),
+            
             # Infra / Base
             ("ProactiveAgent", lambda: self._safe_import_agent("agents.proactive", "ProactiveAgent")),
             ("NewsMonitorAgent", lambda: self._safe_import_agent("agents.news_monitor", "NewsMonitorAgent")),
@@ -292,6 +303,7 @@ class MoonSystem:
             ("ContextAgent", lambda: self._safe_import_agent("agents.context", "ContextAgent")),
             ("CrawlerAgent", lambda: self._safe_import_agent("agents.crawler", "CrawlerAgent")),
             ("ResearcherAgent", lambda: self._safe_import_agent("agents.researcher", "ResearcherAgent")),
+
             
             # Content / Writing
             ("BlogManagerAgent", lambda: self._safe_import_agent("agents.blog_manager", "BlogManagerAgent")),
@@ -429,6 +441,18 @@ class MoonSystem:
             except Exception as e:
                 logger.error("❌ Hive falhou ao iniciar: %s", e)
 
+            # ── Cyber-Agentic API Server ──
+            try:
+                import uvicorn
+                from api.server import app as fastapi_app
+                fastapi_app.state.orchestrator = self.orchestrator
+                config = uvicorn.Config(fastapi_app, host="0.0.0.0", port=8000, log_level="warning")
+                self._api_server = uvicorn.Server(config)
+                self._api_server_task = asyncio.create_task(self._api_server.serve(), name="moon.api_server")
+                logger.info("🌌 Cyber-Agentic API iniciada na porta 8000")
+            except Exception as e:
+                logger.error("❌ Cyber-Agentic API falhou ao iniciar: %s", e)
+
             self._initialized = True
             logger.info("✅ The Moon Ecosystem is ONLINE.")
 
@@ -450,6 +474,12 @@ class MoonSystem:
         self._shutdown_event.set()
 
         try:
+            # Para API Server
+            if getattr(self, "_api_server", None):
+                self._api_server.should_exit = True
+            if getattr(self, "_api_server_task", None) and not self._api_server_task.done():
+                self._api_server_task.cancel()
+
             # Para Hive primeiro (graceful shutdown dos 5 agentes)
             if self.hive_integration:
                 await self.hive_integration.stop()

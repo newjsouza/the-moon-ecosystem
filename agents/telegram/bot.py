@@ -102,6 +102,52 @@ def _get_browser_pilot():
     return _browser_pilot_instance
 
 # ─────────────────────────────────────────────────────────────
+#  Radar Proativo — imports lazy (Fase 1)
+# ─────────────────────────────────────────────────────────────
+_radar_agent_instance = None
+_report_composer_instance = None
+_scheduler_instance = None
+
+def _get_radar_agent():
+    global _radar_agent_instance
+    if _radar_agent_instance is None:
+        try:
+            from agents.radar_agent import RadarAgent
+            _radar_agent_instance = RadarAgent(message_bus=None, llm=None)
+            logger.info("RadarAgent carregado com sucesso")
+        except Exception as e:
+            logger.warning(f"RadarAgent não disponível: {e}")
+    return _radar_agent_instance
+
+def _get_report_composer(llm=None):
+    global _report_composer_instance
+    if _report_composer_instance is None:
+        try:
+            from agents.report_composer import ReportComposerAgent
+            _report_composer_instance = ReportComposerAgent(llm=llm, message_bus=None)
+            logger.info("ReportComposerAgent carregado com sucesso")
+        except Exception as e:
+            logger.warning(f"ReportComposerAgent não disponível: {e}")
+    return _report_composer_instance
+
+def _get_scheduler(telegram_sender=None):
+    global _scheduler_instance
+    if _scheduler_instance is None:
+        try:
+            from core.scheduler import MoonScheduler
+            radar = _get_radar_agent()
+            composer = _get_report_composer(llm=None)
+            _scheduler_instance = MoonScheduler(
+                radar_agent=radar,
+                report_composer=composer,
+                telegram_sender=telegram_sender,
+            )
+            logger.info("MoonScheduler carregado com sucesso")
+        except Exception as e:
+            logger.warning(f"MoonScheduler não disponível: {e}")
+    return _scheduler_instance
+
+# ─────────────────────────────────────────────────────────────
 #  Paths & constants
 # ─────────────────────────────────────────────────────────────
 from pathlib import Path as _P
@@ -1251,6 +1297,13 @@ FORMATO DE RESPOSTA:
             await update.message.reply_text("❌ Acesso não autorizado.")
             return
 
+        # ─────────────────────────────────────────────────────
+        #  Radar Proativo — !radar commands (Fase 1)
+        # ─────────────────────────────────────────────────────
+        if text.strip().lower().startswith("!radar"):
+            await self._handle_radar_command(update, text)
+            return
+
         # Normalize for intent routing
         text_lower = text.lower().strip()
 
@@ -1263,6 +1316,35 @@ FORMATO DE RESPOSTA:
         # Route to LLM
         response = await self._ask_llm(user_id, text)
         await update.message.reply_text(response, parse_mode="Markdown")
+
+    async def _handle_radar_command(self, update: Update, text: str) -> None:
+        """
+        Handles !radar commands: now, pulse, digest, status.
+        Pipeline: RadarAgent → ReportComposerAgent → Telegram.
+        """
+        from telegram.radar_commands import handle_radar_command
+        
+        user_id = str(update.effective_user.id)
+        
+        # Create async send_message helper
+        async def send_message(msg: str) -> None:
+            await update.message.reply_text(msg, parse_mode="Markdown")
+        
+        # Get scheduler (which includes radar_agent and report_composer)
+        scheduler = _get_scheduler(telegram_sender=send_message)
+        radar_agent = _get_radar_agent()
+        report_composer = _get_report_composer(llm=None)
+        
+        handled = await handle_radar_command(
+            text=text,
+            radar_agent=radar_agent,
+            report_composer=report_composer,
+            scheduler=scheduler,
+            send_message=send_message,
+        )
+        
+        if not handled:
+            await send_message("❌ Comando !radar não reconhecido. Use: !radar now | pulse | digest | status")
 
 
     async def handle_voice(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1385,6 +1467,27 @@ FORMATO DE RESPOSTA:
                 logger.info("ApexOracle loop autônomo iniciado junto ao bot")
             else:
                 logger.warning("ApexOracle não iniciado — verifique configuração")
+            # ─────────────────────────────────────────────────────
+            #  Radar Proativo — inicia scheduler autônomo (Fase 1)
+            # ─────────────────────────────────────────────────────
+            async def radar_telegram_sender(msg: str) -> None:
+                """Wrapper para enviar mensagens do Radar via Telegram."""
+                try:
+                    await application.bot.send_message(
+                        chat_id=self.chat_id,
+                        text=msg,
+                        parse_mode="Markdown",
+                    )
+                except Exception as e:
+                    logger.error(f"Radar Telegram send failed: {e}")
+            
+            scheduler = _get_scheduler(telegram_sender=radar_telegram_sender)
+            if scheduler:
+                scheduler.start()
+                logger.info("MoonScheduler (Radar Proativo) iniciado")
+            else:
+                logger.warning("MoonScheduler não iniciado — verifique configuração")
+            # ─────────────────────────────────────────────────────
             # Pré-carrega BrowserPilot
             _get_browser_pilot()
             # Set bot commands for Telegram UI
@@ -1398,6 +1501,7 @@ FORMATO DE RESPOSTA:
                 BotCommand("limpar",   "Limpar histórico da conversa"),
                 BotCommand("id",       "Mostrar Chat ID"),
                 BotCommand("browser",  "Navegar no browser com IA"),
+                BotCommand("radar",    "Radar proativo: now | pulse | digest | status"),
             ])
             logger.info("MoonBot initialized and ready.")
 

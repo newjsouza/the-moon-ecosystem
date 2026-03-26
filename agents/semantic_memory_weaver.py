@@ -415,6 +415,13 @@ class SemanticMemoryWeaver(AgentBase):
         # Load embedding engine (may download model on first run)
         await loop.run_in_executor(None, self.embedder.load)
 
+        # FASE 6D: Subscribe to Moon-Stack events
+        from core.message_bus import MessageBus
+        bus = MessageBus()
+        bus.subscribe("review.completed", self._on_review_completed)
+        bus.subscribe("qa.report_generated", self._on_qa_report_generated)
+        logger.info("SemanticMemoryWeaver subscribed to Moon-Stack events (review.completed, qa.report_generated)")
+
         self._stop_event.clear()
         self._consolidation_task = asyncio.create_task(
             self._consolidation_loop(), name="moon.weaver.consolidation"

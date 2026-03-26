@@ -17,10 +17,7 @@
       "agent_id": "hedge",
       "task": "pipeline",
       "kwargs": {
-        "competitions": [
-          "BSA",
-          "CL"
-        ],
+        "competitions": ["BSA", "CL"],
         "dry_run": false
       },
       "interval_seconds": 86400,
@@ -47,7 +44,16 @@
       },
       "interval_seconds": 86400,
       "description": "YouTube trending topics (daily)",
-      "enabled": false
+      "enabled": true
+    },
+    {
+      "id": "sentinel_watch_4h",
+      "agent_id": "MoonSentinelAgent",
+      "task": "tech-watch",
+      "kwargs": {},
+      "interval_seconds": 14400,
+      "description": "MoonSentinel: tech trend watch cycle (every 4h)",
+      "enabled": true
     }
   ]
 }

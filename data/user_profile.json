@@ -1,0 +1,47 @@
+{
+  "name": "Johnathan",
+  "language": "pt-BR",
+  "timezone": "America/Sao_Paulo",
+  "interests": [
+    "IA autônoma e multi-agente",
+    "automação de processos",
+    "apostas esportivas (APEX)",
+    "blog técnico",
+    "YouTube e criação de conteúdo",
+    "open-source e custo zero"
+  ],
+  "goals": [
+    "The Moon como sócio proativo e autônomo",
+    "renda passiva via blog/YouTube automatizado",
+    "o sistema evoluir e aprender sem precisar me pedir permissão para coisas rotineiras",
+    "relatórios de tendências sem eu solicitar"
+  ],
+  "preferences": {
+    "preferred_briefing_hour": 8,
+    "preferred_evening_report_hour": 20,
+    "approve_before_deploy": true,
+    "approve_before_skill_integration": true,
+    "notify_on_trend": true,
+    "notify_on_new_skill_discovered": true,
+    "notify_on_health_issue": true,
+    "notification_language": "pt-BR"
+  },
+  "watchlist_topics": [
+    "agentic AI",
+    "multi-agent systems",
+    "autonomous coding agents",
+    "LLM open source",
+    "browser automation",
+    "MCP (Model Context Protocol)",
+    "LangGraph",
+    "CrewAI",
+    "tendências de IA 2026",
+    "ferramentas open-source de automação"
+  ],
+  "do_not_disturb": {
+    "enabled": false,
+    "start_hour": 23,
+    "end_hour": 7
+  },
+  "last_updated": "2026-03-26T08:09:00-03:00"
+}

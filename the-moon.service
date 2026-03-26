@@ -1,28 +1,22 @@
 [Unit]
 Description=The Moon Ecosystem — Autonomous AI Agent Loop
-Documentation=https://github.com/johnathan/the-moon
+Documentation=https://github.com/newjsouza/the-moon-ecosystem
 After=network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=60
-StartLimitBurst=3
+StartLimitBurst=5
 
 [Service]
 Type=simple
-User=%i
-WorkingDirectory=/home/%i/moon
-EnvironmentFile=/home/%i/moon/.env
-ExecStart=/usr/bin/python3 moon_sync.py --serve
+User=johnathan
+WorkingDirectory=/home/johnathan
+ExecStart=/home/johnathan/moon_start.sh
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 KillMode=mixed
 TimeoutStopSec=30
 Restart=on-failure
-RestartSec=10
-
-# Security hardening
-NoNewPrivileges=yes
-ProtectSystem=strict
-ReadWritePaths=/home/%i/moon/data
+RestartSec=15
 
 # Logging
 StandardOutput=journal

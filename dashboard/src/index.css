@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cyber-background text-gray-200 font-sans antialiased overflow-x-hidden;
+    /* subtle hex grid background */
+    background-image: 
+      linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center center;
+  }
+}
+
+@layer components {
+  /* Glassmorphism panel */
+  .glass-panel {
+    @apply bg-cyber-panel backdrop-blur-md border border-gray-800/50 rounded-xl shadow-lg;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05);
+  }
+  
+  /* Cyber glowing borders */
+  .cyber-border-cyan {
+    @apply border border-cyber-accent shadow-[0_0_10px_rgba(0,240,255,0.4)];
+  }
+  .cyber-border-purple {
+    @apply border border-cyber-purple shadow-[0_0_10px_rgba(176,38,255,0.4)];
+  }
+
+  /* Fancy Terminal Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-accent/30 rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-cyber-accent/60;
+  }
+}

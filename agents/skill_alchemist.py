@@ -60,8 +60,12 @@ class SkillAlchemist(AgentBase):
             "huggingface": "https://huggingface.co/api/models?sort=downloads&direction=-1&limit=10"
         }
 
-        # Palavras-chave de interesse
-        self.keywords = ["agent", "llm", "automation", "scraping", "rpa", "vision", "voice", "mcp"]
+        # Palavras-chave de interesse (FASE 6C: Moon-Stack integration)
+        self.keywords = [
+            "agent", "llm", "automation", "scraping", "rpa", "vision", "voice", "mcp",
+            # Moon-Stack keywords
+            "moon_browse", "playwright", "browser-use", "browser-automation", "cookie-import"
+        ]
 
         # LLM Router para scoring semântico
         self._llm_router = None
