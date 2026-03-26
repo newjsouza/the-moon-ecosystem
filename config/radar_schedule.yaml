@@ -1,0 +1,28 @@
+# The Moon — Radar Schedule Configuration
+# Modifique intervalos aqui sem tocar em código Python.
+
+jobs:
+  - name: quick_pulse
+    interval_hours: 6
+    task: quick_pulse
+    enabled: true
+    description: "GitHub Trending + HuggingFace — scan leve"
+
+  - name: full_scan
+    interval_hours: 12
+    task: full_scan
+    enabled: true
+    description: "Todos os 5 scanners — varredura completa"
+
+  - name: strategic_digest
+    interval_hours: 24
+    task: strategic_digest
+    enabled: true
+    description: "Digest 24h — síntese estratégica para Johnathan"
+
+settings:
+  stagger_seconds:
+    quick_pulse: 60
+    full_scan: 300
+    strategic_digest: 600
+  log_level: INFO
