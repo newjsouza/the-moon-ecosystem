@@ -8,3 +8,4 @@
 [09:19:42] Sala inicializada para a skill EconomicSentinel. Bem-vindo, EconomicSentinel!
 [09:26:59] Sala inicializada para a skill EconomicSentinel. Bem-vindo, EconomicSentinel!
 [11:12:36] Sala inicializada para a skill EconomicSentinel. Bem-vindo, EconomicSentinel!
+[17:33:41] Sala inicializada para a skill EconomicSentinel. Bem-vindo, EconomicSentinel!
