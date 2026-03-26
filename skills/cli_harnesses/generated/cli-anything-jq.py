@@ -1,150 +1,121 @@
-**Análise do Software Alvo**
+### Fase 1: Análise do Software Alvo
 
-O software alvo é `/usr/bin/jq`, uma ferramenta de linha de comando para processar e manipular dados JSON. Para analisar o software, seguiremos a Fase 1 do HARNESS.md:
+O software alvo é `/usr/bin/jq`, uma ferramenta de linha de comando para processar JSON. 
 
-1. **Identificar o backend engine**: O `jq` é uma ferramenta autônoma que não depende de um backend específico.
-2. **Mapear ações GUI para chamadas de API**: Como o `jq` é uma ferramenta de linha de comando, não há ações GUI a serem mapeadas.
-3. **Identificar o modelo de dados**: O `jq` trabalha com dados JSON.
-4. **Encontrar ferramentas CLI existentes**: O `jq` já é uma ferramenta CLI.
-5. **Catalogar o sistema de comando/undo**: O `jq` não tem um sistema de comando/undo explícito.
+- **Identificar o motor de backend**: O próprio `jq` é o motor de backend, sendo um processador de JSON de linha de comando.
+- **Mapear ações GUI para chamadas de API**: Como `jq` é uma ferramenta de linha de comando, não há uma interface gráfica para mapear. Em vez disso, os comandos `jq` são usados diretamente na linha de comando.
+- **Identificar o modelo de dados**: O modelo de dados é JSON.
+- **Encontrar ferramentas CLI existentes**: A própria ferramenta `jq` é usada como uma ferramenta CLI.
+- **Catalogar o sistema de comando/desfazer**: O `jq` não tem um sistema de comando/desfazer no sentido tradicional, pois é uma ferramenta de processamento de uma vez.
 
-**Proposta de Arquitetura de Comandos**
+### Fase 2: Arquitetura de Comandos Click
 
-Seguindo a Fase 2 do HARNESS.md, propomos a seguinte arquitetura de comandos:
+Vamos escolher um modelo de interação **Stateful REPL** para sessões interativas e **Subcommand CLI** para operações de um único disparo.
 
-1. **Escolher o modelo de interação**: Utilizaremos um modelo de interação stateful REPL para sessões interativas e um modelo de subcomando CLI para operações de um só disparo.
-2. **Definir grupos de comandos**: Definiremos os seguintes grupos de comandos:
- * `projeto`: comandos para gerenciar projetos (não aplicável ao `jq`).
- * `core`: comandos para processar e manipular dados JSON.
- * `importacao`: comandos para importar dados JSON.
- * `exportacao`: comandos para exportar dados JSON.
-3. **Definir o modelo de estado**: O estado será armazenado em memória para sessões interativas e em arquivos para comandos CLI.
-4. **Planejar o formato de saída**: Utilizaremos JSON como formato de saída padrão, com opção para saída em formato humano legível.
+- **Grupos de comandos**:
+  - `parse`: Para comandos relacionados ao parse de JSON.
+  - `query`: Para comandos relacionados à consulta de JSON.
+  - `transform`: Para comandos relacionados à transformação de JSON.
+  - `info`: Para comandos que fornecem informações sobre o JSON processado.
 
-**Implementação do CLI Python**
+- **Modelo de estado**: O estado pode incluir o JSON atual sendo processado e qualquer filtro ou transformação aplicada.
 
-A implementação do CLI Python será feita utilizando a biblioteca Click. Criaremos os seguintes arquivos:
+- **Formato de saída**: A saída pode ser em JSON ou um formato legível por humanos, dependendo da flag `--json`.
 
-* `cli_anything/jq/__init__.py`: arquivo de inicialização do pacote.
-* `cli_anything/jq/cli.py`: arquivo que define o CLI.
-* `cli_anything/jq/utils.py`: arquivo que define funções utilitárias.
-* `cli_anything/jq/repl_skin.py`: arquivo que define a interface REPL.
+### Fase 3: Implementação
 
-**Código do CLI**
+Vamos começar implementando a estrutura básica do CLI com Click e, em seguida, adicionaremos os comandos específicos para `jq`.
 
 ```python
-# cli_anything/jq/cli.py
 import click
+import subprocess
 import json
-from cli_anything.jq.utils import process_json
+from cli_anything.jq.utils.repl_skin import ReplSkin
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
-    """CLI para processar e manipular dados JSON."""
-    ctx.obj = {}
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(repl)
 
 @cli.command()
-@click.argument('json_file', type=click.Path(exists=True))
-@click.option('--json', is_flag=True, help='Saída em formato JSON.')
-def processar(json_file, json):
-    """Processar um arquivo JSON."""
-    data = process_json(json_file)
-    if json:
-        click.echo(json.dumps(data))
-    else:
-        click.echo(data)
-
-@cli.command()
-@click.argument('json_file', type=click.Path(exists=True))
-@click.option('--json', is_flag=True, help='Saída em formato JSON.')
-def importar(json_file, json):
-    """Importar um arquivo JSON."""
-    data = process_json(json_file)
-    if json:
-        click.echo(json.dumps(data))
-    else:
-        click.echo(data)
-
-@cli.command()
-@click.argument('json_file', type=click.Path(exists=True))
-@click.option('--json', is_flag=True, help='Saída em formato JSON.')
-def exportar(json_file, json):
-    """Exportar um arquivo JSON."""
-    data = process_json(json_file)
-    if json:
-        click.echo(json.dumps(data))
-    else:
-        click.echo(data)
-
-@cli.command()
-@click.pass_context
-def repl(ctx):
-    """Iniciar uma sessão REPL."""
-    from cli_anything.jq.repl_skin import ReplSkin
-    skin = ReplSkin('jq', version='1.0.0')
+def repl():
+    skin = ReplSkin("jq", version="1.0.0")
     skin.print_banner()
     pt_session = skin.create_prompt_session()
-    line = skin.get_input(pt_session)
-    skin.help({'processar': 'Processar um arquivo JSON.', 'importar': 'Importar um arquivo JSON.', 'exportar': 'Exportar um arquivo JSON.'})
-    skin.success('Sessão REPL iniciada.')
+    while True:
+        line = skin.get_input(pt_session)
+        try:
+            resultado = subprocess.run(["jq", line], capture_output=True, text=True)
+            if resultado.returncode == 0:
+                skin.success(resultado.stdout)
+            else:
+                skin.error(resultado.stderr)
+        except Exception as e:
+            skin.error(str(e))
+
+@cli.command()
+@click.argument('filtro', type=click.STRING)
+@click.option('--json', is_flag=True, help='Saída em JSON')
+def parse(filtro, json):
+    try:
+        resultado = subprocess.run(["jq", filtro], capture_output=True, text=True)
+        if resultado.returncode == 0:
+            if json:
+                click.echo(json.loads(resultado.stdout))
+            else:
+                click.echo(resultado.stdout)
+        else:
+            click.echo(resultado.stderr, err=True)
+    except Exception as e:
+        click.echo(str(e), err=True)
+
+@cli.command()
+@click.argument('consulta', type=click.STRING)
+@click.option('--json', is_flag=True, help='Saída em JSON')
+def query(consulta, json):
+    try:
+        resultado = subprocess.run(["jq", consulta], capture_output=True, text=True)
+        if resultado.returncode == 0:
+            if json:
+                click.echo(json.loads(resultado.stdout))
+            else:
+                click.echo(resultado.stdout)
+        else:
+            click.echo(resultado.stderr, err=True)
+    except Exception as e:
+        click.echo(str(e), err=True)
+
+@cli.command()
+@click.argument('transformacao', type=click.STRING)
+@click.option('--json', is_flag=True, help='Saída em JSON')
+def transform(transformacao, json):
+    try:
+        resultado = subprocess.run(["jq", transformacao], capture_output=True, text=True)
+        if resultado.returncode == 0:
+            if json:
+                click.echo(json.loads(resultado.stdout))
+            else:
+                click.echo(resultado.stdout)
+        else:
+            click.echo(resultado.stderr, err=True)
+    except Exception as e:
+        click.echo(str(e), err=True)
+
+if __name__ == '__main__':
+    cli()
 ```
 
-**Código das Funções Utilitárias**
+### setup.py
 
 ```python
-# cli_anything/jq/utils.py
-import json
-
-def process_json(json_file):
-    with open(json_file, 'r') as f:
-        data = json.load(f)
-    return data
-```
-
-**Código da Interface REPL**
-
-```python
-# cli_anything/jq/repl_skin.py
-from prompt_toolkit import PromptSession
-from prompt_toolkit.completion import WordCompleter
-
-class ReplSkin:
-    def __init__(self, name, version):
-        self.name = name
-        self.version = version
-        self.banner = f'{self.name} {self.version}'
-
-    def print_banner(self):
-        print(self.banner)
-
-    def create_prompt_session(self):
-        return PromptSession('>', completer=WordCompleter(['processar', 'importar', 'exportar']))
-
-    def get_input(self, pt_session):
-        return pt_session.prompt()
-
-    def help(self, commands):
-        for command, description in commands.items():
-            print(f'{command}: {description}')
-
-    def success(self, message):
-        print(f'\033[92m{message}\033[0m')
-
-    def error(self, message):
-        print(f'\033[91m{message}\033[0m')
-```
-
-**Setup.py**
-
-```python
-# setup.py
 from setuptools import setup
 
 setup(
     name='cli-anything-jq',
     version='1.0.0',
     packages=['cli_anything.jq'],
+    install_requires=['click'],
     entry_points={
         'console_scripts': [
             'cli-anything-jq=cli_anything.jq.cli:cli',
@@ -153,16 +124,27 @@ setup(
 )
 ```
 
-Para instalar o pacote, execute o seguinte comando:
+### Fase 4: Planejamento de Testes
 
-```
-pip install -e .
-```
+No arquivo `TEST.md` dentro do diretório `tests/` do projeto, vamos planejar os testes:
 
-Após a instalação, você pode executar o CLI com o seguinte comando:
+1. **Inventário de Testes**:
+   - `test_core.py`: XX testes unitários planejados
+   - `test_full_e2e.py`: XX testes de ponta a ponta planejados
 
-```
-cli-anything-jq
-```
+2. **Plano de Teste Unitário**:
+   - Módulo `parse.py`:
+     - Funções a testar: `parse_json`
+     - Casos de bordo: JSON inválido, JSON vazio
+     - Contagem de testes esperada: 5
+   - Módulo `query.py`:
+     - Funções a testar: `query_json`
+     - Casos de bordo: Consulta inválida, JSON vazio
+     - Contagem de testes esperada: 5
 
-Isso iniciará uma sessão REPL onde você pode executar comandos para processar e manipular dados JSON. Você também pode executar comandos individuais com opções para processar, importar e exportar arquivos JSON.
+3. **Plano de Teste de Ponta a Ponta**:
+   - Fluxos de trabalho a simular: Parse de JSON, consulta de JSON, transformação de JSON
+   - Arquivos reais a gerar/processar: Exemplos de JSON para cada comando
+   - Saída esperada: JSON processado corretamente
+
+Esse é um ponto de partida. Os testes unitários e de ponta a ponta devem ser implementados com base nesse plano.
