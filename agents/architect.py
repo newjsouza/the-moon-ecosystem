@@ -442,7 +442,8 @@ class ArchitectAgent(AgentBase):
             response = await self._llm_router.complete(
                 prompt=prompt,
                 task_type="fast",
-                model="llama-3.1-8b-instant"
+                model="llama-3.1-8b-instant",
+                actor="architect_agent"
             )
             
             # Extrai domínio da resposta

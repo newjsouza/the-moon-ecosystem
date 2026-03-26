@@ -364,8 +364,8 @@ class LLMRouter:
             - Aplica rate limiting por actor
             - Registra audit log de todas as requisições
         """
-        # Security: Validate prompt
-        is_valid, reason = InputValidator.validate_user_input(prompt)
+        # Security: Validate prompt (actor-aware limits)
+        is_valid, reason = InputValidator.validate_llm_prompt(prompt, actor=actor)
         if not is_valid:
             self._audit.log_failure("llm_prompt", actor, resource="prompt", reason=reason)
             self.logger.warning(f"Prompt bloqueado por security: {reason}")
@@ -618,9 +618,10 @@ class LlmAgent(AgentBase):
                 task_type=task_type,
                 model=model,
                 temperature=temperature,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
+                actor="llm_agent"
             )
-            
+
             return TaskResult(
                 success=True,
                 data={

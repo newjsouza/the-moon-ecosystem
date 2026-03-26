@@ -322,7 +322,8 @@ Gere o código completo agora:"""
             llm = LLMRouter(Config())
             generated_code = await llm.complete(
                 prompt=prompt,
-                task_type="coding"
+                task_type="coding",
+                actor="moon_cli_agent"
             )
         except Exception as exc:
             return TaskResult(

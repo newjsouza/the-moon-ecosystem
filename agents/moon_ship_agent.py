@@ -340,7 +340,8 @@ class MoonShipAgent(AgentBase):
             response = await self._router.complete(
                 prompt=prompt,
                 task_type="fast",
-                model="llama-3.1-8b-instant"
+                model="llama-3.1-8b-instant",
+                actor="moon_ship_agent"
             )
             
             return response.strip()

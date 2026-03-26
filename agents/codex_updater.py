@@ -176,7 +176,7 @@ Format:
 Max 100 words total. Be specific, no filler."""
 
             summary = await self.llm.complete(
-                prompt, task_type="fast"
+                prompt, task_type="fast", actor="codex_updater_agent"
             )
             return summary.strip() if summary else fallback
         except Exception:

@@ -153,7 +153,7 @@ Question: {question}
 SQL:"""
 
         try:
-            response = await self.llm.complete(prompt, task_type="sql_generation")
+            response = await self.llm.complete(prompt, task_type="sql_generation", actor="text_to_sql_agent")
             sql = self._extract_sql(response)
             if not sql:
                 return "", "LLM returned empty SQL"
@@ -202,6 +202,6 @@ Question asked: {original_question}
 SQL: {sql}
 Explanation:"""
         try:
-            return await self.llm.complete(prompt, task_type="explanation")
+            return await self.llm.complete(prompt, task_type="explanation", actor="text_to_sql_agent")
         except Exception:
             return f"Query to answer: {original_question}"

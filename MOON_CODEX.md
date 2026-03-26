@@ -2663,21 +2663,49 @@ $ python3 -m pytest tests/security/ -v --timeout=10
 
 ### Pendências Atualizadas
 
-| ID | Descrição                           | Prioridade |
-|----|-------------------------------------|------------|
-| P1 | OBS Studio harness                  | LOW        |
-| P2 | 5 falhas pré-existentes (PDF/Docx)  | MED        |
-| P3 | YOUTUBE_API_KEY → ativar YouTubeAgent| MED        |
-| P4 | RAGEngine: implementação completa    | HIGH       |
-| P5 | Ativar HedgePipeline (bankroll cfg)  | MED        |
-| P6 | AutonomousLoop: carregar config      | HIGH       |
-| P7 | pip-audit/detect-secrets: rodar em subprojeto | LOW |
+| ID | Descrição                           | Prioridade | Status      |
+|----|-------------------------------------|------------|-------------|
+| P1 | OBS Studio harness                  | LOW        | ⏳ Pendente  |
+| P2 | 5 falhas pré-existentes (PDF/Docx)  | MED        | ✅ CORRIGIDO (Sprint L) |
+| P3 | YOUTUBE_API_KEY → ativar YouTubeAgent| MED       | ⏳ Pendente  |
+| P4 | RAGEngine: implementação completa    | HIGH       | ✅ COMPLETO  |
+| P5 | Ativar HedgePipeline (bankroll cfg)  | MED        | ⏳ Pendente  |
+| P6 | AutonomousLoop: carregar config      | HIGH       | ✅ COMPLETO (Sprint L) |
+| P7 | pip-audit/detect-secrets: rodar em subprojeto | LOW | ✅ COMPLETO (SECURITY-01) |
+| P8 | Security layer integração LLMRouter   | MED        | ✅ COMPLETO (SECURITY-01 Phase C) |
+| P9 | LLMRouter falso-positivo 4096 chars   | HIGH       | ✅ CORRIGIDO (Sprint M) |
+
+## 🌕 SPRINT M — Calibração + Limpeza (2026-03-25)
+
+### Implementado
+
+- `pytest.ini` — timeout=10, asyncio_mode=auto, warnings configurados
+- `core/security/validator.py` — `validate_llm_prompt()` com limite diferenciado por actor
+  - Actors externos (user/telegram/api/unknown): max 4096 chars + XSS check
+  - Agents internos: max 32000 chars, sem restrição de backticks/code blocks
+- `agents/*.py` — todas as chamadas `llm.complete()` e `router.complete()` agora passam `actor="<nome_agente>"`
+  - 27 agentes corrigidos: architect, blog, codex_updater, data_pipeline, deep_web_research, evaluator, gmail, hedge, moon_cli, moon_plan, moon_review, moon_ship, optimizer, skill_alchemist, sports_analytics, text_to_sql, youtube, llm
+- `.gitignore` — learning/workspaces_test/, data/loop_state/checkpoints/, data/metrics/sessions/
+- Runtime files removidos do tracking git via `git rm --cached`
+
+### Problema Resolvido
+
+**Causa raiz:** `InputValidator.validate_user_input()` aplicava limite de 4096 chars para TODOS os casos, incluindo prompts internos de agentes (RAG context + histórico + instruções = 8k-32k chars legítimos).
+
+**Solução:** Criar `validate_llm_prompt(text, actor)` que diferencia:
+
+- Actors externos → 4096 chars + XSS/injection check
+- Agents internos → 32000 chars, apenas check de empty prompt
+
+### Testes
+
+- `test_generate_jq_produces_file`: ✅ PASS (antes: FAILED por arquivo 50 bytes, agora: PASS por prompt não bloqueado)
+- `test_crawler.py`: ✅ 9 PASSED
 
 ### Próximo Sprint — Sugestões
 
-**SPRINT K — "Infraestrutura de Produção"**
-  K1 — RAGEngine completo (ChromaDB ou FAISS local — zero cost)
-  K2 — AutonomousLoop v2 (carregar config/autonomous_loop.json)
-  K3 — MoonDaemon: systemd service unit para autostart
-  K4 — Fix 5 falhas pré-existentes (PDF converters)
-  K5 — Supabase sync: persistir métricas dos agentes
+**SPRINT N — "YouTube + Hedge + Produção"**
+  N1 — YouTubeAgent ativo (P3) — YOUTUBE_API_KEY já configurada em skills/youtube/
+  N2 — HedgePipeline bankroll config (P5) — agents/hedge/ existe
+  N3 — MoonDaemon systemd service — AutonomousLoop no boot do sistema
+  N4 — RAGEngine ChromaDB/FAISS local — zero cost vector search

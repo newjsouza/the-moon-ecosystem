@@ -287,7 +287,7 @@ Requirements:
 Write the analysis:"""
 
         try:
-            return await self.llm.complete(prompt, task_type="sports_analysis")
+            return await self.llm.complete(prompt, task_type="sports_analysis", actor="sports_analytics_agent")
         except Exception as e:
             self.logger.warning(f"Narrative generation failed: {e}")
             return ""

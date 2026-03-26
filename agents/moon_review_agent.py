@@ -423,7 +423,8 @@ class MoonReviewAgent(AgentBase):
             response = await self._router.complete(
                 prompt=prompt,
                 task_type="complex",
-                model="llama-3.3-70b-versatile"
+                model="llama-3.3-70b-versatile",
+                actor="moon_review_agent"
             )
 
             return self._parse_llm_response(response)

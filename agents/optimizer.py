@@ -144,7 +144,7 @@ Instructions:
 Improved output:"""
 
         try:
-            improved = await self.llm.complete(prompt, task_type="optimization")
+            improved = await self.llm.complete(prompt, task_type="optimization", actor="optimizer_agent")
             return improved.strip()
         except Exception as e:
             self.logger.error(f"LLM improvement failed: {e}")

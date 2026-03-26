@@ -207,7 +207,7 @@ class DeepWebResearchAgent(AgentBase):
             f"Responda em português."
         )
         try:
-            synthesis = await self._llm.complete(prompt, task_type="research")
+            synthesis = await self._llm.complete(prompt, task_type="research", actor="deep_web_research_agent")
             return synthesis
         except Exception as e:
             logger.warning("LLM synthesis falhou: %s", e)

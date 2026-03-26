@@ -365,7 +365,7 @@ Respond in JSON only:
 Rules: probabilities must sum to 1.0. Respond ONLY with valid JSON:"""
 
         try:
-            response = await self.llm.complete(prompt, task_type="fast")
+            response = await self.llm.complete(prompt, task_type="fast", actor="hedge_agent")
             start = response.find("{")
             end = response.rfind("}") + 1
             if start < 0 or end <= start:

@@ -384,7 +384,7 @@ Rules:
 Respond ONLY with JSON:"""
 
         try:
-            response = await self.llm.complete(prompt, task_type="fast")
+            response = await self.llm.complete(prompt, task_type="fast", actor="gmail_agent")
             s = response.find("{")
             e = response.rfind("}") + 1
             if s >= 0 and e > s:
@@ -467,7 +467,7 @@ Guidelines:
 Reply:"""
 
         try:
-            return await self.llm.complete(prompt, task_type="fast")
+            return await self.llm.complete(prompt, task_type="fast", actor="gmail_agent")
         except Exception as e:
             self.logger.warning(f"Draft generation failed: {e}")
             return ""

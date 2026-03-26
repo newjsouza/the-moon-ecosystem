@@ -305,7 +305,8 @@ class SkillAlchemist(AgentBase):
                 response = await self._llm_router.complete(
                     prompt,
                     task_type="fast",  # llama-3.1-8b-instant
-                    max_tokens=200
+                    max_tokens=200,
+                    actor="skill_alchemist_agent"
                 )
 
                 # Parse JSON response

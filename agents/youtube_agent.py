@@ -241,7 +241,7 @@ Requirements:
 Write the complete script now:"""
 
         try:
-            script = await self.llm.complete(prompt, task_type="complex")
+            script = await self.llm.complete(prompt, task_type="complex", actor="youtube_agent")
             word_count = len(script.split()) if script else 0
             estimated_duration = round(word_count / 140, 1)
 
@@ -282,7 +282,7 @@ Respond ONLY with valid JSON:"""
 
         try:
             import json
-            response = await self.llm.complete(prompt, task_type="fast")
+            response = await self.llm.complete(prompt, task_type="fast", actor="youtube_agent")
             # Extract JSON from response
             start = response.find("{")
             end = response.rfind("}") + 1
@@ -441,7 +441,7 @@ Requirements:
 Write the adapted video script:"""
 
         try:
-            script = await self.llm.complete(prompt, task_type="complex")
+            script = await self.llm.complete(prompt, task_type="complex", actor="youtube_agent")
             return TaskResult(
                 success=True,
                 data={

@@ -157,7 +157,7 @@ class BlogWriterAgent(AgentBase):
                 prompt = "\n".join(prompt_parts)
 
                 # Generate the content
-                content = await llm.complete(prompt, task_type="blog_writing")
+                content = await llm.complete(prompt, task_type="blog_writing", actor="blog_agent")
 
                 if not content or len(content.strip()) < 100:
                     return TaskResult(
@@ -205,7 +205,7 @@ class BlogWriterAgent(AgentBase):
                 Format as Markdown.
                 """
 
-                outline = await llm.complete(prompt, task_type="blog_outlining")
+                outline = await llm.complete(prompt, task_type="blog_outlining", actor="blog_agent")
 
                 return TaskResult(
                     success=True,
@@ -363,7 +363,7 @@ class DirectWriterAgent(AgentBase):
                 Make it engaging and well-structured.
                 """
 
-                content = await llm.complete(prompt, task_type="direct_writing")
+                content = await llm.complete(prompt, task_type="direct_writing", actor="blog_agent")
 
                 if not content or len(content.strip()) < 50:
                     return TaskResult(

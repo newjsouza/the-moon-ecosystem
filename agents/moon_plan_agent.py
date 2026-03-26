@@ -165,7 +165,8 @@ class MoonPlanAgent(AgentBase):
             analysis = await self._router.complete(
                 prompt=prompt,
                 task_type="complex",
-                model="llama-3.3-70b-versatile"
+                model="llama-3.3-70b-versatile",
+                actor="moon_plan_agent"
             )
             
             # Salva o resultado

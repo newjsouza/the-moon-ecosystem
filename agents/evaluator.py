@@ -129,7 +129,7 @@ SCORE: <0.0 to 1.0>
 FEEDBACK: <one sentence of actionable feedback>"""
 
         try:
-            response = await self.llm.complete(prompt, task_type="evaluation")
+            response = await self.llm.complete(prompt, task_type="evaluation", actor="evaluator_agent")
             lines = response.strip().split("\n")
             score = 0.65
             feedback = "Evaluation completed."

@@ -118,3 +118,6 @@ data/pipeline/*.csv
 data/pipeline/*.json
 data/screenshots/
 .env
+data/loop_state/
+data/metrics/sessions/
+data/loop_state/checkpoints/

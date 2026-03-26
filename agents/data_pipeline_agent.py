@@ -272,7 +272,7 @@ class DataPipelineAgent(AgentBase):
             f"Responda em português."
         )
         try:
-            return await self._llm.complete(prompt, task_type="analysis")
+            return await self._llm.complete(prompt, task_type="analysis", actor="data_pipeline_agent")
         except Exception as e:
             logger.warning("LLM insights falhou: %s", e)
             return stats_text

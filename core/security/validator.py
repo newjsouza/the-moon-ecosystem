@@ -160,24 +160,63 @@ class InputValidator:
     def validate_user_input(cls, text: str, max_length: int = 4096) -> Tuple[bool, str]:
         """
         Valida input de usuário (para LLM prompts).
-        
+
         Args:
             text: Texto do usuário.
             max_length: Tamanho máximo permitido.
-            
+
         Returns:
             Tuple (is_valid, reason).
         """
         if not text:
             return False, "Input vazio"
-        
+
         if len(text) > max_length:
             return False, f"Input muito longo (>{max_length} chars)"
-        
+
         # Check para tentativas óbvias de injection
         dangerous = ['<script>', '```', '"""', "'''"]
         for d in dangerous:
             if d.lower() in text.lower():
                 return False, f"Conteúdo potencialmente malicioso: {d}"
-        
+
+        return True, "OK"
+
+    # External actors: strict limits + injection checks
+    _EXTERNAL_ACTORS = {"user", "telegram", "api", "unknown"}
+    _USER_MAX_LENGTH = 4_096
+    _AGENT_MAX_LENGTH = 32_000
+
+    @classmethod
+    def validate_llm_prompt(cls, text: str, actor: str = "unknown") -> Tuple[bool, str]:
+        """
+        Valida prompts de LLM com limite diferenciado por tipo de actor.
+
+        Actors externos (user, telegram, api, unknown) → 4096 chars + XSS check
+        Agents internos → 32000 chars, sem restrição de backticks/code blocks
+
+        Args:
+            text: Texto do prompt.
+            actor: Identificador do actor ("user", "telegram", "agent_name", etc.)
+
+        Returns:
+            Tuple (is_valid, reason).
+        """
+        if not text:
+            return False, "Empty prompt"
+
+        is_external = actor in cls._EXTERNAL_ACTORS
+        max_length = cls._USER_MAX_LENGTH if is_external else cls._AGENT_MAX_LENGTH
+
+        if len(text) > max_length:
+            return False, f"Prompt too long (>{max_length} chars, actor={actor})"
+
+        # Injection check ONLY for external/user actors
+        # Internal agents legitimately use ```, """, ''' in code and RAG context
+        if is_external:
+            dangerous_external = ["<script>", "javascript:", "data:text/html"]
+            for pattern in dangerous_external:
+                if pattern.lower() in text.lower():
+                    return False, f"Potentially malicious content detected: {pattern}"
+
         return True, "OK"
