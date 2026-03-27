@@ -1,4 +1,4 @@
-import React from 'react';
+/* React import removed */
 import { IntelligenceHub } from '../components/IntelligenceHub';
 
 export function IntelligenceView() {

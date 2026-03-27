@@ -1,4 +1,4 @@
-import React from 'react';
+/* React import removed */
 import { LogTerminal } from '../components/LogTerminal';
 import { CommandUplink } from '../components/CommandUplink';
 

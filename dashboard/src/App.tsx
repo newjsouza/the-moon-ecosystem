@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { CyberLayout } from './components/CyberLayout';
 import { AgentMatrix } from './components/AgentMatrix';
 import { LogTerminal } from './components/LogTerminal';

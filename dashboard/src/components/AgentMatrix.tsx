@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, ServerCrash, Cpu } from 'lucide-react';
 import clsx from 'clsx';

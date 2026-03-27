@@ -1,4 +1,4 @@
-import React from 'react';
+/* React import removed */
 import { Network, BrainCircuit, TerminalSquare, Settings } from 'lucide-react';
 import clsx from 'clsx';
 

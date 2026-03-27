@@ -1,4 +1,4 @@
-import React from 'react';
+/* React import removed */
 import { AgentMatrix } from '../components/AgentMatrix';
 
 export function DashboardView() {

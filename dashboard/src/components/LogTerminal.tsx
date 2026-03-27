@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Terminal } from 'lucide-react';
 
 export function LogTerminal() {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TerminalSquare, Send } from 'lucide-react';
 
 export function CommandUplink() {
