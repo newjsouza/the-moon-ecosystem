@@ -2804,3 +2804,12 @@ class RadarAgent(AgentBase):
 
 **IMUTÁVEL:** `AgentBase.__init__(self)` — ZERO argumentos
 **Padrão:** `super().__init__()` → `self.name = "..."` → atributos próprios
+
+## 2026-03-27 — Bug Fix: SportsManager + OpenCode
+
+- Fixed: `SportsManager` was missing `execute()` implementation required by `SkillBase`
+- Fixed: `OPENCODE_API_BASE` pointing to dead port 59974 — commented out in `.env`
+- Effect: eliminated infinite CPU loop (~58% CPU, 1h+ runtime)
+- Boot optimizations applied: e2scrub masked, journal limited to 100M, NM-wait-online disabled
+- Ollama fully removed (binary, service, models, user, group)
+- NVIDIA driver 470 incompatible with kernel 6.17 — keeping nouveau for GT 710

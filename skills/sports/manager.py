@@ -22,6 +22,30 @@ class SportsManager(SkillBase):
         self.scraper = SofaScoreScraper()
         self.active_monitors = {}
 
+    async def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Dispatch execution based on params['action'].
+        Satisfies SkillBase abstract contract.
+        """
+        action = params.get("action", "opportunities")
+        try:
+            if action == "analyze":
+                match_id = params.get("match_id")
+                if not match_id:
+                    return {"error": "match_id required for action=analyze"}
+                result = await self.analyze_match_live(int(match_id))
+                return result
+            elif action == "monitor":
+                await self.run_monitoring_loop()
+                return {"status": "monitor_loop_started"}
+            else:
+                days_offset = int(params.get("days_offset", 0))
+                opportunities = await self.get_upcoming_opportunities(days_offset=days_offset)
+                return {"opportunities": opportunities, "count": len(opportunities)}
+        except Exception as e:
+            self.logger.error(f"SportsManager.execute error: {e}")
+            return {"error": str(e)}
+
     async def get_upcoming_opportunities(self, days_offset: int = 0) -> List[Dict]:
         """
         Fetches upcoming matches for a specific day offset (0=today, 1=tomorrow).

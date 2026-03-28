@@ -199,5 +199,36 @@
     },
     "timestamp": 1774659267.6323314,
     "datetime": "2026-03-27T21:54:27.632332"
+  },
+  {
+    "key": "health_issue",
+    "type": "ecosystem_health",
+    "data": {
+      "issues": [
+        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
+      ]
+    },
+    "timestamp": 1774662869.1103642,
+    "datetime": "2026-03-27T22:54:29.110367"
+  },
+  {
+    "key": "tech_watch",
+    "type": "tech_trend",
+    "data": {
+      "topics": [
+        "VibeCoding e IA Generativa",
+        "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+        "agentic AI"
+      ],
+      "findings": [
+        "VibeCoding: Ferramentas de código automático.",
+        "IA Generativa: Modelos de arte e texto.",
+        "Novidades AI: Anthropic e GPT-4.",
+        "Agentic AI: Sistemas multiagentes open-source."
+      ],
+      "report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 27/03/2026 23:32\n\n1. VibeCoding: Ferramentas de código automático.\n2. IA Generativa: Modelos de arte e texto.\n3. Novidades AI: Anthropic e GPT-4.\n4. Agentic AI: Sistemas multiagentes open-source.\n\n_Próxima varredura em 4 horas._"
+    },
+    "timestamp": 1774665153.9566655,
+    "datetime": "2026-03-27T23:32:33.956666"
   }
 ]

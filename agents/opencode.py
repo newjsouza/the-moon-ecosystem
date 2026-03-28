@@ -34,13 +34,16 @@ logger = logging.getLogger("moon.agents.opencode")
 # ─────────────────────────────────────────────────────────────
 #  Constants
 # ─────────────────────────────────────────────────────────────
-OPENCODE_BASE          = os.getenv("OPENCODE_API_BASE", "http://localhost:59974/v1")
+OPENCODE_BASE          = os.getenv("OPENCODE_API_BASE", "").strip()
 CONNECT_TIMEOUT        = 5.0    # seconds — fast fail on offline server
 REQUEST_TIMEOUT        = 45.0   # seconds — allow time for large completions
 CIRCUIT_THRESHOLD      = 3      # consecutive failures before circuit opens
 CIRCUIT_RESET_S        = 60     # seconds before half-open probe attempt
 MAX_RETRIES            = 2      # max retry attempts per request
 HEALTH_PROBE_INTERVAL  = 60     # seconds between background health probes
+
+if not OPENCODE_BASE:
+    logger.warning("OPENCODE_API_BASE not set — OpenCode agent disabled.")
 
 # Model mapping — each key overridable via env var
 _DEFAULT_MODELS: Dict[str, str] = {
@@ -147,8 +150,11 @@ class OpenCodeAgent(AgentBase):
         await super().initialize()
         self._stop_event.clear()
 
-        # Probe immediately to set _is_online
-        self._is_online = await self._probe_health()
+        # Probe immediately to set _is_online (only if configured)
+        if self._api_base:
+            self._is_online = await self._probe_health()
+        else:
+            self._is_online = False
 
         self._health_task = asyncio.create_task(
             self._health_loop(), name="moon.opencode.health"
@@ -336,8 +342,12 @@ class OpenCodeAgent(AgentBase):
         Fetches the list of active models from the OpenCode server.
         Returns an empty list (with logged warning) if the server is unreachable.
         """
+        if not self._api_base:
+            logger.debug("list_models: OPENCODE_API_BASE not configured.")
+            return []
         try:
-            async with httpx.AsyncClient(timeout=httpx.Timeout(connect=3.0, read=10.0)) as client:
+            timeout = httpx.Timeout(connect=3.0, read=10.0, write=10.0, pool=5.0)
+            async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.get(f"{self._api_base}/models")
             if resp.status_code == 200:
                 data = resp.json()
@@ -398,4 +408,3 @@ class OpenCodeAgent(AgentBase):
             "models":          self._models,
             "groq_available":  self._groq is not None,
         }
-
