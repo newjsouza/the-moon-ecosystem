@@ -202,3 +202,24 @@
 [18:27:28] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [18:29:30] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [18:31:33] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[18:33:35] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[18:35:37] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[18:37:39] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[18:39:42] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[21:53:53] Sala inicializada para a skill orchestrator. Bem-vindo, Core System!
+[21:54:37] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[21:55:37] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[21:56:37] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[21:58:39] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:00:41] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:02:44] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:04:46] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:06:48] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:08:51] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:10:53] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:12:55] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:14:57] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:16:59] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:19:01] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:21:03] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[22:23:06] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}

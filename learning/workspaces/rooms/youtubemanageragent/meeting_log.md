@@ -11,3 +11,4 @@
 [17:33:40] Sala inicializada para a skill YoutubeManagerAgent. Bem-vindo, YoutubeManagerAgent!
 [16:42:35] Sala inicializada para a skill YoutubeManagerAgent. Bem-vindo, YoutubeManagerAgent!
 [17:31:57] Sala inicializada para a skill YoutubeManagerAgent. Bem-vindo, YoutubeManagerAgent!
+[21:54:25] Sala inicializada para a skill YoutubeManagerAgent. Bem-vindo, YoutubeManagerAgent!

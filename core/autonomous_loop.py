@@ -4,6 +4,7 @@ Integrates: RAG (B) + Evaluator-Optimizer (C) + Streaming (D)
             + Text-to-SQL (E) + Observability (F) + CircuitBreaker (G)
 Runs a priority task queue continuously with self-healing and persistence.
 """
+
 import asyncio
 import json
 import logging
@@ -32,9 +33,9 @@ class AutonomousLoop:
         await loop.run(max_iterations=10)
     """
 
-    DEFAULT_TICK_INTERVAL = 2.0    # seconds between queue checks
-    MAX_CONCURRENT_TASKS = 3       # max parallel task executions
-    HEALTH_CHECK_INTERVAL = 30     # seconds between health checks
+    DEFAULT_TICK_INTERVAL = 2.0  # seconds between queue checks
+    MAX_CONCURRENT_TASKS = 3  # max parallel task executions
+    HEALTH_CHECK_INTERVAL = 30  # seconds between health checks
 
     def __init__(self, orchestrator=None):
         self.orchestrator = orchestrator
@@ -121,9 +122,7 @@ class AutonomousLoop:
                 task.mark_skipped(f"Circuit breaker OPEN for {task.agent_id}")
                 self._queue.remove(task)
                 self._failed.append(task)
-                self.logger.warning(
-                    f"Task [{task.task_id}] skipped — CB open for {task.agent_id}"
-                )
+                self.logger.warning(f"Task [{task.task_id}] skipped — CB open for {task.agent_id}")
                 continue
             self._queue.remove(task)
             return task
@@ -141,26 +140,19 @@ class AutonomousLoop:
             self._circuit_breakers[agent_id] = CircuitBreaker(
                 agent_id,
                 CircuitBreakerConfig(
-                    failure_threshold=5,
-                    recovery_timeout=60.0,
-                    success_threshold=2,
-                    timeout=30.0
-                )
+                    failure_threshold=5, recovery_timeout=60.0, success_threshold=2, timeout=30.0
+                ),
             )
         return self._circuit_breakers[agent_id]
 
     def get_circuit_status(self) -> dict:
-        return {
-            aid: cb.get_status()
-            for aid, cb in self._circuit_breakers.items()
-        }
+        return {aid: cb.get_status() for aid, cb in self._circuit_breakers.items()}
 
     # ──────────────────────────────────────────────────────────────
     # Execution
     # ──────────────────────────────────────────────────────────────
 
-    async def run(self, max_iterations: int = None,
-                  tick_interval: float = None) -> TaskResult:
+    async def run(self, max_iterations: int = None, tick_interval: float = None) -> TaskResult:
         """
         Start the autonomous loop.
         Runs until: queue empty OR max_iterations reached OR stop() called.
@@ -171,16 +163,13 @@ class AutonomousLoop:
         self._iteration = 0
 
         self.logger.info(
-            f"AutonomousLoop starting — "
-            f"queue={self.queue_size()} max_iter={max_iterations}"
+            f"AutonomousLoop starting — queue={self.queue_size()} max_iter={max_iterations}"
         )
 
         try:
             while self._running:
                 if max_iterations and self._iteration >= max_iterations:
-                    self.logger.info(
-                        f"Max iterations ({max_iterations}) reached — stopping"
-                    )
+                    self.logger.info(f"Max iterations ({max_iterations}) reached — stopping")
                     break
 
                 if self.queue_size() == 0:
@@ -216,7 +205,7 @@ class AutonomousLoop:
                 "failed": len(self._failed),
                 "elapsed_seconds": round(elapsed, 2),
             },
-            execution_time=elapsed
+            execution_time=elapsed,
         )
 
     async def _tick(self) -> None:
@@ -231,12 +220,9 @@ class AutonomousLoop:
         if not tasks_this_tick:
             return
 
-        self.logger.debug(
-            f"Tick #{self._iteration}: executing {len(tasks_this_tick)} tasks"
-        )
+        self.logger.debug(f"Tick #{self._iteration}: executing {len(tasks_this_tick)} tasks")
         await asyncio.gather(
-            *[self._execute_task(t) for t in tasks_this_tick],
-            return_exceptions=True
+            *[self._execute_task(t) for t in tasks_this_tick], return_exceptions=True
         )
 
     async def _execute_task(self, task: LoopTask) -> None:
@@ -246,17 +232,13 @@ class AutonomousLoop:
             cb = self._get_circuit_breaker(task.agent_id)
 
             self.logger.info(
-                f"Executing [{task.task_id}] agent={task.agent_id} "
-                f"task='{task.task[:50]}'"
+                f"Executing [{task.task_id}] agent={task.agent_id} task='{task.task[:50]}'"
             )
 
             try:
                 if self.orchestrator:
                     result = await cb.call(
-                        self.orchestrator._call_agent,
-                        task.agent_id,
-                        task.task,
-                        **task.kwargs
+                        self.orchestrator._call_agent, task.agent_id, task.task, **task.kwargs
                     )
                 else:
                     # Fallback: direct execution without orchestrator
@@ -266,11 +248,11 @@ class AutonomousLoop:
                     task.mark_completed(str(result.data)[:200])
                     self._completed.append(task)
                     self.logger.info(
-                        f"Task [{task.task_id}] COMPLETED ✅ "
-                        f"in {task.execution_time:.2f}s"
+                        f"Task [{task.task_id}] COMPLETED ✅ in {task.execution_time:.2f}s"
                     )
                     # Publish event for CodexUpdaterAgent
                     from core.message_bus import MessageBus
+
                     bus = MessageBus()
                     await bus.publish(
                         sender="autonomous_loop",
@@ -280,7 +262,7 @@ class AutonomousLoop:
                             "title": task.task[:80],
                             "agent_id": task.agent_id,
                             "details": result.data or {},
-                        }
+                        },
                     )
                     # Optional: run through EvaluatorAgent
                     if task.use_evaluator and result.data:
@@ -291,14 +273,11 @@ class AutonomousLoop:
             except Exception as e:
                 await self._handle_failure(task, str(e))
 
-    async def _direct_execute(self, task: LoopTask,
-                               cb: CircuitBreaker) -> TaskResult:
+    async def _direct_execute(self, task: LoopTask, cb: CircuitBreaker) -> TaskResult:
         """Execute task without orchestrator (fallback mode)."""
         # This is a fallback implementation for when no orchestrator is available
         return TaskResult(
-            success=False,
-            error="No orchestrator provided for task execution",
-            execution_time=0.0
+            success=False, error="No orchestrator provided for task execution", execution_time=0.0
         )
 
     async def _handle_failure(self, task: LoopTask, error: str) -> None:
@@ -313,18 +292,15 @@ class AutonomousLoop:
             task.error = None
             self.enqueue(task)
             self.logger.info(
-                f"Task [{task.task_id}] re-queued "
-                f"(retry {task.retry_count}/{task.max_retries})"
+                f"Task [{task.task_id}] re-queued (retry {task.retry_count}/{task.max_retries})"
             )
         else:
             self._failed.append(task)
             self.logger.error(
-                f"Task [{task.task_id}] permanently failed "
-                f"after {task.retry_count} retries"
+                f"Task [{task.task_id}] permanently failed after {task.retry_count} retries"
             )
 
-    async def _evaluate_result(self, task: LoopTask,
-                                result: TaskResult) -> None:
+    async def _evaluate_result(self, task: LoopTask, result: TaskResult) -> None:
         """Optionally evaluate task result via EvaluatorAgent."""
         try:
             # Attempt to get evaluator from orchestrator
@@ -335,9 +311,9 @@ class AutonomousLoop:
                     result_data=str(result.data)[:500],
                     domain=task.domain,
                     original_task=task.task,
-                    agent_id=task.agent_id
+                    agent_id=task.agent_id,
                 )
-                
+
                 if eval_result.success:
                     score = eval_result.data.get("score", 0)
                     passed = eval_result.data.get("passed", True)
@@ -372,17 +348,13 @@ class AutonomousLoop:
         )
 
         if system_status == "critical":
-            self.logger.warning(
-                "System status CRITICAL — pausing queue for 30s"
-            )
+            self.logger.warning("System status CRITICAL — pausing queue for 30s")
             await asyncio.sleep(30)
 
         # Reset circuit breakers that have recovered
         for agent_id, cb in self._circuit_breakers.items():
             if cb.state.value == "half_open":
-                self.logger.info(
-                    f"Self-healing: {agent_id} circuit in HALF_OPEN — monitoring"
-                )
+                self.logger.info(f"Self-healing: {agent_id} circuit in HALF_OPEN — monitoring")
 
     # ──────────────────────────────────────────────────────────────
     # State persistence
@@ -420,9 +392,7 @@ class AutonomousLoop:
             ]
             if pending:
                 self.enqueue_many(pending)
-                self.logger.info(
-                    f"Restored {len(pending)} pending tasks from checkpoint"
-                )
+                self.logger.info(f"Restored {len(pending)} pending tasks from checkpoint")
             return True
         except Exception as e:
             self.logger.warning(f"Could not restore state: {e}")
@@ -472,14 +442,20 @@ class MoonSleepManager:
     findings through the Orchestrator's channels.
     """
 
-    def __init__(self, orchestrator: Optional["Orchestrator"] = None, topics: Optional[List[str]] = None):
+    # Cooldown for proactive reports (10 minutes)
+    _last_report_time: float = 0.0
+    _report_cooldown_seconds: float = 600  # 10 minutes
+
+    def __init__(
+        self, orchestrator: Optional["Orchestrator"] = None, topics: Optional[List[str]] = None
+    ):
         self.orchestrator = orchestrator
         self.topics = topics or [
             "GitHub open-source AI automation tools",
             "Machine Learning innovation 2026",
             "Autonomous Skill Agents development",
             "Multi-Agent System orchestration frameworks",
-            "New AI reasoning techniques (innovation-focused)"
+            "New AI reasoning techniques (innovation-focused)",
         ]
         self.is_running = False
         self.cycle_count = 0
@@ -528,18 +504,24 @@ class MoonSleepManager:
                     # Pause between topics
                     await asyncio.sleep(30)
 
-                # Broadcast findings via channels
+                # Broadcast findings via channels with cooldown to prevent spam
                 if self.orchestrator and findings:
-                    now = datetime.now().strftime("%H:%M")
-                    report = (
-                        f"🔬 *Pesquisa Autônoma — Ciclo #{self.cycle_count}*\n"
-                        f"🕐 {now}\n\n" +
-                        "\n".join(findings) +
-                        f"\n\n_Próximo ciclo em {interval_minutes} minutos._"
-                    )
-                    await self.orchestrator.broadcast(report)
+                    now = time.time()
+                    if now - self._last_report_time >= self._report_cooldown_seconds:
+                        current_time = datetime.now().strftime("%H:%M")
+                        report = (
+                            f"🔬 *Pesquisa Autônoma — Ciclo #{self.cycle_count}*\n"
+                            f"🕐 {current_time}\n\n"
+                            + "\n".join(findings)
+                            + f"\n\n_Próximo ciclo em {interval_minutes} minutos._"
+                        )
+                        await self.orchestrator.broadcast(report)
+                        self._last_report_time = now
+                    # else: skip silently to prevent duplicate reports
 
-                logger.info(f"Cycle #{self.cycle_count} complete. Resting for {interval_minutes} minutes...")
+                logger.info(
+                    f"Cycle #{self.cycle_count} complete. Resting for {interval_minutes} minutes..."
+                )
                 await asyncio.sleep(interval_minutes * 60)
 
         except asyncio.CancelledError:
@@ -552,6 +534,7 @@ class MoonSleepManager:
 
     async def _start_qa_loop(self) -> None:
         """Inicia loop de QA automático do Moon-Stack."""
+
         async def qa_cycle():
             logger.info(f"Moon-Stack QA started (interval: {self.qa_interval_hours}h)")
 
@@ -575,6 +558,7 @@ class MoonSleepManager:
 
                             # Report via MessageBus
                             from core.message_bus import MessageBus
+
                             message_bus = MessageBus()
                             await message_bus.publish(
                                 sender="AutonomousLoop",
@@ -583,7 +567,7 @@ class MoonSleepManager:
                                     "health": health,
                                     "apps_tested": apps,
                                     "timestamp": datetime.now().isoformat(),
-                                }
+                                },
                             )
 
                             logger.info(f"QA completed: health={health}, apps={apps}")

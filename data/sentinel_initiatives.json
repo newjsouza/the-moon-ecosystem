@@ -168,5 +168,36 @@
     },
     "timestamp": 1774643521.4666665,
     "datetime": "2026-03-27T17:32:01.466667"
+  },
+  {
+    "key": "health_issue",
+    "type": "ecosystem_health",
+    "data": {
+      "issues": [
+        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
+      ]
+    },
+    "timestamp": 1774647122.6994047,
+    "datetime": "2026-03-27T18:32:02.699407"
+  },
+  {
+    "key": "tech_watch",
+    "type": "tech_trend",
+    "data": {
+      "topics": [
+        "VibeCoding e IA Generativa",
+        "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+        "agentic AI"
+      ],
+      "findings": [
+        "VibeCoding: Ferramentas de codificação assistida por IA.",
+        "IA Generativa: GPT-4 e Gemini lideram inovações.",
+        "Novidades AI: Anthropic e Groq investem em agentic AI.",
+        "Multi-agent: Sistemas open-source como DeepSeek ganham destaque."
+      ],
+      "report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 27/03/2026 21:54\n\n1. VibeCoding: Ferramentas de codificação assistida por IA.\n2. IA Generativa: GPT-4 e Gemini lideram inovações.\n3. Novidades AI: Anthropic e Groq investem em agentic AI.\n4. Multi-agent: Sistemas open-source como DeepSeek ganham destaque.\n\n_Próxima varredura em 4 horas._"
+    },
+    "timestamp": 1774659267.6323314,
+    "datetime": "2026-03-27T21:54:27.632332"
   }
 ]
