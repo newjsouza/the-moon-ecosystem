@@ -431,86 +431,15 @@
     "datetime": "2026-03-28T01:13:40.488434"
   },
   {
-    "key": "tech_watch_20260328_012504",
-    "type": "tech_trend",
+    "key": "health_issue",
+    "type": "ecosystem_health",
     "data": {
-      "topics": [
-        "VibeCoding e IA Generativa",
-        "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
-        "agentic AI"
-      ],
-      "findings": [
-        "**VibeCoding e IA Generativa**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
-        "**Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
-        "**agentic AI**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline."
-      ],
-      "report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 28/03/2026 01:25\n\n1. **VibeCoding e IA Generativa**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\n2. **Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\n3. **agentic AI**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\n\n_Próxima varredura em 4 horas._",
-      "detailed_report_file": "data/sentinel_reports/research/tech_watch_20260328_012504.json"
+      "issues": [
+        "⚠️ Agente `ResearcherAgent` — circuit ABERTO (falhas consecutivas)",
+        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
+      ]
     },
-    "timestamp": 1774671904.4101567,
-    "datetime": "2026-03-28T01:25:04.410157"
-  },
-  {
-    "key": "research_implementation_20260328_012507",
-    "type": "research_implementation",
-    "data": {
-      "overall_success": true,
-      "report_file": "data/sentinel_reports/implementations/implementation_20260328_012507.json",
-      "actions_count": 4
-    },
-    "timestamp": 1774671907.1070018,
-    "datetime": "2026-03-28T01:25:07.107002"
-  },
-  {
-    "key": "research_implementation_20260328_013315",
-    "type": "research_implementation",
-    "data": {
-      "overall_success": true,
-      "report_file": "data/sentinel_reports/implementations/implementation_20260328_013315.json",
-      "actions_count": 4
-    },
-    "timestamp": 1774672395.974469,
-    "datetime": "2026-03-28T01:33:15.974469"
-  },
-  {
-    "key": "tech_watch_rejected_20260328_014030",
-    "type": "tech_trend_validation_failed",
-    "data": {
-      "cycle_id": "20260328_014030",
-      "topics": [
-        "VibeCoding e IA Generativa",
-        "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
-        "agentic AI"
-      ],
-      "rejected_count": 3,
-      "raw_packets_count": 3,
-      "detailed_report_file": "data/sentinel_reports/research/tech_watch_20260328_014036.json"
-    },
-    "timestamp": 1774672836.2655036,
-    "datetime": "2026-03-28T01:40:36.265504"
-  },
-  {
-    "key": "tech_watch_20260328_014036",
-    "type": "tech_trend",
-    "data": {
-      "cycle_id": "20260328_014036",
-      "topics": [
-        "VibeCoding e IA Generativa",
-        "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
-        "agentic AI"
-      ],
-      "findings": [
-        "**VibeCoding e IA Generativa**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
-        "**Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
-        "**agentic AI**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas."
-      ],
-      "validated_topics": 3,
-      "total_references": 6,
-      "content_signature": "e4dbe798d6d29aae106fe77a9fe51278b596214600c823e9c1e106d2aa1cbf04",
-      "report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 28/03/2026 01:40\n\n🆔 Ciclo: `20260328_014036`\n✅ Validação real: 3 tópicos, 6 evidências verificadas\n🔐 Assinatura: `e4dbe798d6d29aae`\n\n1. **VibeCoding e IA Generativa**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\n2. **Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\n3. **agentic AI**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\n\n_Próxima varredura em 4 horas._",
-      "detailed_report_file": "data/sentinel_reports/research/tech_watch_20260328_014042.json"
-    },
-    "timestamp": 1774672842.4242113,
-    "datetime": "2026-03-28T01:40:42.424212"
+    "timestamp": 1774674821.6450489,
+    "datetime": "2026-03-28T02:13:41.645052"
   }
 ]
