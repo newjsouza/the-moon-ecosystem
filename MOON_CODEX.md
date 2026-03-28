@@ -27,6 +27,7 @@ Não pergunte se deve atualizar: **apenas atualize**.
 
 1. **Organização Extrema:** Se o conceito for novo, crie uma subseção na aba apropriada (ex: Seção 8 - Enciclopédia de Implementações). Organize sempre por "Assuntos Diferentes".
 2. Você deve utilizar as ferramentas do seu ambiente (ex: `replace_file_content`) para inserir no índice ou nas seções de erro/arquitetura o que foi aprendido, mudado ou implementado.
+3. **Commit Obrigatório:** Após atualizar o `MOON_CODEX.md`, realizar commit git da implementação e documentação no mesmo ciclo de entrega, com mensagem clara e rastreável.
 
 ## ⛔ 0.2. DIRETRIZ DE CUSTO ZERO ABSOLUTO (GRATUIDADE)
 
