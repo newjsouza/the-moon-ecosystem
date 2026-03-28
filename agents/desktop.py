@@ -45,7 +45,9 @@ class DesktopAgent(AgentBase):
         try:
             import pyautogui
             self.dependencies["pyautogui"] = True
-        except ImportError: pass
+        except Exception:
+            # In headless/unauthorized DISPLAY environments, pyautogui import can fail.
+            self.dependencies["pyautogui"] = False
 
         try:
             from PIL import Image
@@ -134,8 +136,8 @@ class DesktopAgent(AgentBase):
         if not self.dependencies["pyautogui"]:
             return TaskResult(success=False, error="pyautogui not installed")
         
-        import pyautogui
         try:
+            import pyautogui
             pyautogui.screenshot(path)
             return TaskResult(success=True, data={"path": path})
         except Exception as e:
@@ -162,7 +164,11 @@ class DesktopAgent(AgentBase):
         if not self.dependencies["pyautogui"]:
             return TaskResult(success=False, error="pyautogui not installed")
         
-        import pyautogui
+        try:
+            import pyautogui
+        except Exception as e:
+            return TaskResult(success=False, error=f"pyautogui unavailable in this session: {e}")
+
         if action == "move":
             pyautogui.moveTo(*coords)
         elif action == "click":

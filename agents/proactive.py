@@ -111,11 +111,15 @@ class ProactiveAgent(AgentBase):
         now_str = now.strftime("%d/%m/%Y %H:%M")
 
         # Get recent message bus history for context
-        bus_history = self.message_bus.get_history()
-        recent_events = [
-            h for h in (bus_history or [])[-20:]
-            if h.get("topic", "") not in ("workspace.network",)
-        ]
+        bus_history = self.message_bus.get_history() or []
+        recent_events: List[Dict[str, Any]] = []
+        for event in bus_history[-20:]:
+            normalized = self._normalize_event(event)
+            if not normalized:
+                continue
+            if normalized.get("topic", "") in ("workspace.network",):
+                continue
+            recent_events.append(normalized)
         event_summary = self._summarize_recent_events(recent_events)
 
         # Generate LLM insight
@@ -145,6 +149,21 @@ class ProactiveAgent(AgentBase):
         lines.append("_/status para detalhes | /sentinel para relatório de vigilância_")
 
         return "\n".join(lines)
+
+    def _normalize_event(self, event: Any) -> Optional[Dict[str, Any]]:
+        """Normalizes MessageBus entries from dict or Message object to a dict."""
+        if isinstance(event, dict):
+            return event
+
+        topic = getattr(event, "topic", None)
+        if not topic:
+            return None
+
+        payload = getattr(event, "payload", {})
+        if not isinstance(payload, dict):
+            payload = {"value": payload}
+
+        return {"topic": topic, "payload": payload}
 
     def _summarize_recent_events(self, events: List[Dict]) -> str:
         """Summarizes recent message bus events for briefing context."""

@@ -303,16 +303,24 @@ class MoonSystem:
             ("ContextAgent", lambda: self._safe_import_agent("agents.context", "ContextAgent")),
             ("CrawlerAgent", lambda: self._safe_import_agent("agents.crawler", "CrawlerAgent")),
             ("ResearcherAgent", lambda: self._safe_import_agent("agents.researcher", "ResearcherAgent")),
+            ("WebMCPAgent", lambda: self._safe_import_agent("agents.webmcp_agent", "WebMCPAgent")),
+            ("MoonPlanAgent", lambda: self._safe_import_agent("agents.moon_plan_agent", "MoonPlanAgent")),
+            ("MoonReviewAgent", lambda: self._safe_import_agent("agents.moon_review_agent", "MoonReviewAgent")),
+            ("MoonBrowserAgent", lambda: self._safe_import_agent("agents.moon_browser_agent", "MoonBrowserAgent")),
 
             
             # Content / Writing
-            ("BlogManagerAgent", lambda: self._safe_import_agent("agents.blog_manager", "BlogManagerAgent")),
-            ("BlogWriterAgent", lambda: self._safe_import_agent("agents.blog_writer", "BlogWriterAgent")),
-            ("BlogPublisherAgent", lambda: self._safe_import_agent("agents.blog_publisher", "BlogPublisherAgent")),
+            ("BlogManagerAgent", lambda: self._safe_import_agent("agents.blog", "BlogManagerAgent")),
+            ("BlogWriterAgent", lambda: self._safe_import_agent("agents.blog", "BlogWriterAgent")),
+            ("BlogPublisherAgent", lambda: self._safe_import_agent("agents.blog", "BlogPublisherAgent")),
             ("PromptEnhancerAgent", lambda: self._safe_import_agent("agents.prompt_enhancer", "PromptEnhancerAgent")),
-            ("DirectWriterAgent", lambda: self._safe_import_agent("agents.direct_writer", "DirectWriterAgent")),
+            ("DirectWriterAgent", lambda: self._safe_import_agent("agents.blog", "DirectWriterAgent")),
             ("YoutubeManagerAgent", lambda: self._safe_import_agent("agents.youtube_manager", "YoutubeManagerAgent")),
-            ("EmailAgent", lambda: self._safe_import_agent("agents.email", "EmailAgent")),
+            ("YouTubeAgent", lambda: self._safe_import_agent("agents.youtube_agent", "YouTubeAgent")),
+            ("EmailAgent", lambda: self._safe_import_agent("agents.email_agent", "EmailAgent")),
+            ("GmailAgent", lambda: self._safe_import_agent("agents.gmail_agent", "GmailAgent")),
+            ("HedgeAgent", lambda: self._safe_import_agent("agents.hedge_agent", "HedgeAgent")),
+            ("LinuxNativeAgent", lambda: self._safe_import_agent("agents.linux_native_agent", "LinuxNativeAgent")),
             
             # Specialized
             ("OpenCodeAgent", lambda: self._safe_import_agent("agents.opencode", "OpenCodeAgent", groq_client=groq_client)),
@@ -384,10 +392,11 @@ class MoonSystem:
         """Registra agente com ArchitectAgent para orquestração."""
         if self.architect and agent:
             try:
+                module_path = getattr(agent.__class__, "__module__", f"agents.{self._to_snake_case(agent_name)}")
                 # Architect registra via register_agent
                 await self.architect.register_agent(
                     name=agent_name,
-                    module_path=f"agents.{self._to_snake_case(agent_name)}",
+                    module_path=module_path,
                     topics=[f"{agent_name.lower()}.command"]
                 )
             except Exception as e:
