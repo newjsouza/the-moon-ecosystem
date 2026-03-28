@@ -45,28 +45,36 @@ logger = logging.getLogger("moon.core.orchestrator")
 # ─────────────────────────────────────────────────────────────
 #  Constants
 # ─────────────────────────────────────────────────────────────
-AGENT_CALL_TIMEOUT = 30          # seconds before a single agent call is cancelled
-CIRCUIT_BREAKER_THRESHOLD = 3    # consecutive failures before circuit opens
-CIRCUIT_BREAKER_RESET = 120      # seconds until an open circuit tries to recover
-PROACTIVE_INTERVAL = 60          # seconds between proactive cycles
+AGENT_CALL_TIMEOUT = 30  # seconds before a single agent call is cancelled
+CIRCUIT_BREAKER_THRESHOLD = 3  # consecutive failures before circuit opens
+CIRCUIT_BREAKER_RESET = 120  # seconds until an open circuit tries to recover
+PROACTIVE_INTERVAL = 60  # seconds between proactive cycles
 
 
 # ─────────────────────────────────────────────────────────────
 #  Circuit Breaker
 # ─────────────────────────────────────────────────────────────
 
+
 @dataclass
 class _CircuitState:
     failures: int = 0
     opened_at: float = 0.0
     open: bool = False
+    last_error: str = ""
+    last_attempt: float = 0.0
 
     def record_success(self) -> None:
         self.failures = 0
+        self.opened_at = 0.0
         self.open = False
+        self.last_error = ""
+        self.last_attempt = 0.0
 
-    def record_failure(self) -> None:
+    def record_failure(self, error: str) -> None:
         self.failures += 1
+        self.last_error = error
+        self.last_attempt = time.monotonic()
         if self.failures >= CIRCUIT_BREAKER_THRESHOLD:
             self.open = True
             self.opened_at = time.monotonic()
@@ -86,14 +94,16 @@ class _CircuitState:
 #  Command Registry
 # ─────────────────────────────────────────────────────────────
 
+
 @dataclass
 class _CommandEntry:
     """Metadata for a registered command."""
+
     handler: Callable[..., Coroutine]
     description: str
     usage: str
     category: str
-    prefix_match: bool = False   # True = startswith, False = exact match
+    prefix_match: bool = False  # True = startswith, False = exact match
 
 
 class CommandRegistry:
@@ -124,6 +134,7 @@ class CommandRegistry:
             else:
                 self._exact[trigger.lower()] = entry
             return fn
+
         return decorator
 
     def resolve(self, text: str) -> Optional[tuple[_CommandEntry, str]]:
@@ -138,7 +149,7 @@ class CommandRegistry:
 
         for prefix, entry in self._prefix:
             if lower.startswith(prefix):
-                remainder = text.strip()[len(prefix):].strip()
+                remainder = text.strip()[len(prefix) :].strip()
                 return entry, remainder
 
         return None
@@ -154,6 +165,7 @@ class CommandRegistry:
 # ─────────────────────────────────────────────────────────────
 #  Orchestrator
 # ─────────────────────────────────────────────────────────────
+
 
 class Orchestrator:
     """
@@ -197,48 +209,55 @@ class Orchestrator:
 
         self.registry = CommandRegistry()
         self.message_bus.subscribe("devops.scan_complete", self._handle_devops_scan_complete)
-        
+
         # ── Session Manager ──────────────────────────────────────
         self.session_manager = get_session_manager()
-        
+
         # ── Flow Registry ────────────────────────────────────────
         self.flow_registry = get_flow_registry()
         self._load_default_flows()
-        
+
         # ── Template Registry ────────────────────────────────────
         from core.flow_template import get_template_registry
+
         self.template_registry = get_template_registry()
         self.template_registry.discover("flow_templates")
-        
+
         # ── Policy Engine ────────────────────────────────────────
         from core.policy_engine import get_policy_engine
+
         self.policy_engine = get_policy_engine()
         _policy_file = "config/default_policy.json"
         import pathlib
+
         if pathlib.Path(_policy_file).exists():
             self.policy_engine.load_from_file(_policy_file)
-        
+
         # ── Flow Scheduler ───────────────────────────────────────
         from core.flow_scheduler import get_flow_scheduler
+
         self.flow_scheduler = get_flow_scheduler()
         self.flow_scheduler.set_orchestrator(self)
         _jobs_file = "config/scheduled_jobs.json"
         if pathlib.Path(_jobs_file).exists():
             self.flow_scheduler.load_from_file(_jobs_file)
-        
+
         # ── Channel Gateway (Phase 5) ────────────────────────────
         from core.channel_gateway import get_channel_gateway
+
         self.channel_gateway = get_channel_gateway()
-        
+
         # Register the telegram adapter
         from agents.telegram.bot import register_telegram_adapter
+
         register_telegram_adapter()
-        
+
         # Initialize skill registry from Phase 3
         from core.skill_manifest import get_skill_registry
+
         self.skill_registry = get_skill_registry()
         self.skill_registry.discover("skills")
-        
+
         logger.info("Orchestrator initialized with all systems")
 
     # ═══════════════════════════════════════════════════════════
@@ -301,12 +320,11 @@ class Orchestrator:
         )
 
         # Start the flow scheduler
-        asyncio.create_task(
-            self.flow_scheduler.start(), name="moon.flow_scheduler"
-        )
+        asyncio.create_task(self.flow_scheduler.start(), name="moon.flow_scheduler")
 
         try:
             from core.services.workspace_monitor import start_monitor_service
+
             asyncio.create_task(
                 start_monitor_service(self.message_bus, self.workspace_manager),
                 name="moon.workspace_monitor",
@@ -328,9 +346,7 @@ class Orchestrator:
                 except asyncio.CancelledError:
                     pass
 
-        await asyncio.gather(
-            *[ch.stop() for ch in self.channels], return_exceptions=True
-        )
+        await asyncio.gather(*[ch.stop() for ch in self.channels], return_exceptions=True)
 
         for agent in self._agents.values():
             try:
@@ -415,7 +431,9 @@ class Orchestrator:
         """Registers all built-in slash commands into the CommandRegistry."""
         reg = self.registry
 
-        @reg.command("/status", description="Status do sistema", usage="/status", category="Sistema")
+        @reg.command(
+            "/status", description="Status do sistema", usage="/status", category="Sistema"
+        )
         async def cmd_status(remainder: str, metadata: dict) -> str:
             return self._format_status()
 
@@ -423,54 +441,106 @@ class Orchestrator:
         async def cmd_help(remainder: str, metadata: dict) -> str:
             return self._format_help()
 
-        @reg.command("/project", description="Resumo do projeto", usage="/project", category="Sistema")
+        @reg.command(
+            "/project", description="Resumo do projeto", usage="/project", category="Sistema"
+        )
         async def cmd_project(remainder: str, metadata: dict) -> str:
             return await self._project_summary()
 
-        @reg.command("/rooms", description="Status das salas de agentes", usage="/rooms", category="Sistema")
+        @reg.command(
+            "/rooms", description="Status das salas de agentes", usage="/rooms", category="Sistema"
+        )
         async def cmd_rooms(remainder: str, metadata: dict) -> str:
             return self._format_rooms_status()
 
-        @reg.command("/cmd ", description="Executar comando shell", usage="/cmd <comando>", category="Terminal", prefix_match=True)
+        @reg.command(
+            "/cmd ",
+            description="Executar comando shell",
+            usage="/cmd <comando>",
+            category="Terminal",
+            prefix_match=True,
+        )
         async def cmd_shell(remainder: str, metadata: dict) -> str:
             if not remainder:
                 return "⚠️ Uso: `/cmd <comando>`"
             return await self._exec_shell(remainder)
 
-        @reg.command("/git ", description="Operações Git", usage="/git <comando>", category="Terminal", prefix_match=True)
+        @reg.command(
+            "/git ",
+            description="Operações Git",
+            usage="/git <comando>",
+            category="Terminal",
+            prefix_match=True,
+        )
         async def cmd_git(remainder: str, metadata: dict) -> str:
             if not remainder:
                 return "⚠️ Uso: `/git <comando>`"
             return await self._exec_shell(f"git {remainder}")
 
-        @reg.command("/file ", description="Ler arquivo", usage="/file <caminho>", category="Arquivos", prefix_match=True)
+        @reg.command(
+            "/file ",
+            description="Ler arquivo",
+            usage="/file <caminho>",
+            category="Arquivos",
+            prefix_match=True,
+        )
         async def cmd_file(remainder: str, metadata: dict) -> str:
             if not remainder:
                 return "⚠️ Uso: `/file <caminho>`"
             return await self._exec_file_read(remainder)
 
-        @reg.command("/ls", description="Listar diretório", usage="/ls [caminho]", category="Arquivos", prefix_match=True)
+        @reg.command(
+            "/ls",
+            description="Listar diretório",
+            usage="/ls [caminho]",
+            category="Arquivos",
+            prefix_match=True,
+        )
         async def cmd_ls(remainder: str, metadata: dict) -> str:
             return await self._exec_file_action("ls", path=remainder or ".")
 
-        @reg.command("/tree", description="Árvore do projeto", usage="/tree [caminho]", category="Arquivos", prefix_match=True)
+        @reg.command(
+            "/tree",
+            description="Árvore do projeto",
+            usage="/tree [caminho]",
+            category="Arquivos",
+            prefix_match=True,
+        )
         async def cmd_tree(remainder: str, metadata: dict) -> str:
             return await self._exec_file_action("tree", path=remainder or ".")
 
-        @reg.command("/search ", description="Buscar no código", usage="/search <texto>", category="Arquivos", prefix_match=True)
+        @reg.command(
+            "/search ",
+            description="Buscar no código",
+            usage="/search <texto>",
+            category="Arquivos",
+            prefix_match=True,
+        )
         async def cmd_search(remainder: str, metadata: dict) -> str:
             if not remainder:
                 return "⚠️ Uso: `/search <texto>`"
             return await self._exec_file_action("search", query=remainder)
 
-        @reg.command("/edit ", description="Editar arquivo via LLM", usage="/edit <caminho> <instrução>", category="Arquivos", prefix_match=True)
+        @reg.command(
+            "/edit ",
+            description="Editar arquivo via LLM",
+            usage="/edit <caminho> <instrução>",
+            category="Arquivos",
+            prefix_match=True,
+        )
         async def cmd_edit(remainder: str, metadata: dict) -> str:
             parts = remainder.split(" ", 1)
             if len(parts) < 2:
                 return "⚠️ Uso: `/edit <caminho> <instrução>`"
             return await self._exec_edit(parts[0], parts[1])
 
-        @reg.command("/skill ", description="Executar skill", usage="/skill <nome>", category="Skills", prefix_match=True)
+        @reg.command(
+            "/skill ",
+            description="Executar skill",
+            usage="/skill <nome>",
+            category="Skills",
+            prefix_match=True,
+        )
         async def cmd_skill(remainder: str, metadata: dict) -> str:
             skill_name = remainder.lower()
             if skill_name in self.skills:
@@ -479,54 +549,90 @@ class Orchestrator:
             available = ", ".join(self.skills.keys()) or "nenhuma"
             return f"❌ Skill `{skill_name}` não encontrada.\nDisponíveis: {available}"
 
-        @reg.command("/alchemist ", description="Controle do SkillAlchemist", usage="/alchemist [status|discover]", category="Alquimia", prefix_match=True)
+        @reg.command(
+            "/alchemist ",
+            description="Controle do SkillAlchemist",
+            usage="/alchemist [status|discover]",
+            category="Alquimia",
+            prefix_match=True,
+        )
         async def cmd_alchemist(remainder: str, metadata: dict) -> str:
             return await self._call_agent("SkillAlchemist", remainder)
 
-        @reg.command("/nexus", description="Relatório de Inteligência Nexus", usage="/nexus [briefing]", category="Nexus", prefix_match=True)
+        @reg.command(
+            "/nexus",
+            description="Relatório de Inteligência Nexus",
+            usage="/nexus [briefing]",
+            category="Nexus",
+            prefix_match=True,
+        )
         async def cmd_nexus(remainder: str, metadata: dict) -> str:
             return await self._call_agent("NexusIntelligence", remainder or "status")
 
-        @reg.command("/apex", description="Executar pipeline APEX de análise de apostas", usage="/apex [args]", category="APEX", prefix_match=True)
+        @reg.command(
+            "/apex",
+            description="Executar pipeline APEX de análise de apostas",
+            usage="/apex [args]",
+            category="APEX",
+            prefix_match=True,
+        )
         async def cmd_apex(remainder: str, metadata: dict) -> str:
             """Executa o apex_pipeline via MoonFlow."""
             flow = self.flow_registry.get("apex_pipeline")
             if not flow:
                 return "❌ apex_pipeline não encontrado em flows/"
-            
+
             ctx = {"query": remainder.strip()} if remainder.strip() else {}
             result = await flow.execute(ctx, self)
-            
+
             if result.success:
                 return f"✅ APEX Pipeline executado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
             else:
                 return f"❌ APEX Pipeline falhou: {result.error}"
 
-        @reg.command("/flow-status", description="Status de execução de um flow", usage="/flow-status <run_id>", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-status",
+            description="Status de execução de um flow",
+            usage="/flow-status <run_id>",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_status(remainder: str, metadata: dict) -> str:
             """Retorna detalhes de uma execução específica de flow."""
             if not remainder.strip():
                 return "⚠️ Uso: `/flow-status <run_id>`"
-                
+
             from core.flow_run_store import get_flow_run_store
+
             store = get_flow_run_store()
             run_record = store.load_run(remainder.strip())
-            
+
             if not run_record:
                 return f"❌ Run ID '{remainder.strip()}' não encontrado."
-                
+
             # Format the response
             import datetime
-            started = datetime.datetime.fromtimestamp(run_record.started_at).strftime('%Y-%m-%d %H:%M:%S')
-            finished = datetime.datetime.fromtimestamp(run_record.finished_at).strftime('%Y-%m-%d %H:%M:%S') if run_record.finished_at > 0 else "Em andamento"
-            
+
+            started = datetime.datetime.fromtimestamp(run_record.started_at).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            finished = (
+                datetime.datetime.fromtimestamp(run_record.finished_at).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+                if run_record.finished_at > 0
+                else "Em andamento"
+            )
+
             steps_info = []
             for step in run_record.steps:
-                status_icon = "✅" if step.status == "success" else "❌" if step.status == "failed" else "⏳"
+                status_icon = (
+                    "✅" if step.status == "success" else "❌" if step.status == "failed" else "⏳"
+                )
                 steps_info.append(f"  {status_icon} {step.step_name} ({step.agent})")
-            
+
             steps_str = "\n".join(steps_info) if steps_info else "  Nenhum step registrado"
-            
+
             return (
                 f"📊 *Status do Flow Run*\n"
                 f"ID: `{run_record.run_id}`\n"
@@ -537,40 +643,60 @@ class Orchestrator:
                 f"\n*Steps:*\n{steps_str}"
             )
 
-        @reg.command("/flow-runs", description="Histórico de execuções", usage="/flow-runs [flow_name]", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-runs",
+            description="Histórico de execuções",
+            usage="/flow-runs [flow_name]",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_runs(remainder: str, metadata: dict) -> str:
             """Retorna últimas execuções de flows."""
             from core.flow_run_store import get_flow_run_store
+
             store = get_flow_run_store()
-            
+
             flow_name = remainder.strip() if remainder.strip() else None
             runs = store.list_runs(flow_name=flow_name)
-            
+
             if not runs:
                 if flow_name:
                     return f"❌ Nenhuma execução encontrada para o flow '{flow_name}'."
                 else:
                     return "❌ Nenhuma execução de flow encontrada."
-            
+
             # Sort by start time, most recent first
             runs = sorted(runs, key=lambda r: r.started_at, reverse=True)[:10]  # Limit to last 10
-            
+
             runs_info = []
             for run in runs:
                 import datetime
-                started = datetime.datetime.fromtimestamp(run.started_at).strftime('%Y-%m-%d %H:%M:%S')
-                status_icon = "✅" if run.status == "success" else "❌" if run.status == "failed" else "⏳"
-                
-                runs_info.append(f"{status_icon} `{run.run_id[:8]}...`: {run.flow_name} - {run.status} ({started})")
-            
+
+                started = datetime.datetime.fromtimestamp(run.started_at).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+                status_icon = (
+                    "✅" if run.status == "success" else "❌" if run.status == "failed" else "⏳"
+                )
+
+                runs_info.append(
+                    f"{status_icon} `{run.run_id[:8]}...`: {run.flow_name} - {run.status} ({started})"
+                )
+
             runs_str = "\n".join(runs_info)
-            
+
             if flow_name:
                 return f"📋 *Últimas execuções de `{flow_name}`*:\n{runs_str}"
             else:
                 return f"📋 *Últimas execuções de flows*:\n{runs_str}"
 
-        @reg.command("/flow-retry", description="Re-executa um flow do zero", usage="/flow-retry <run_id>", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-retry",
+            description="Re-executa um flow do zero",
+            usage="/flow-retry <run_id>",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_retry(remainder: str, metadata: dict) -> str:
             """
             /flow-retry <run_id>
@@ -579,25 +705,32 @@ class Orchestrator:
             run_id = remainder.strip()
             if not run_id:
                 return "⚠️ Uso: `/flow-retry <run_id>`"
-            
+
             from core.flow_run_store import get_flow_run_store
+
             store = get_flow_run_store()
             record = store.load_run(run_id)
             if not record:
                 return f"❌ Run ID '{run_id}' não encontrado."
-            
+
             flow = self.flow_registry.get(record.flow_name)
             if not flow:
                 return f"❌ Flow '{record.flow_name}' não encontrado."
-            
+
             result = await flow.execute(record.context or {}, self)
-            
+
             if result.success:
                 return f"✅ Flow re-executado com sucesso em {result.total_time:.2f}s (Novo ID: {result.run_id})"
             else:
                 return f"❌ Flow re-executado falhou: {result.error}"
 
-        @reg.command("/flow-resume", description="Retoma flow a partir do step falho", usage="/flow-resume <run_id>", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-resume",
+            description="Retoma flow a partir do step falho",
+            usage="/flow-resume <run_id>",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_resume(remainder: str, metadata: dict) -> str:
             """
             /flow-resume <run_id>
@@ -606,25 +739,32 @@ class Orchestrator:
             run_id = remainder.strip()
             if not run_id:
                 return "⚠️ Uso: `/flow-resume <run_id>`"
-            
+
             from core.flow_run_store import get_flow_run_store
+
             store = get_flow_run_store()
             record = store.load_run(run_id)
             if not record:
                 return f"❌ Run ID '{run_id}' não encontrado."
-            
+
             flow = self.flow_registry.get(record.flow_name)
             if not flow:
                 return f"❌ Flow '{record.flow_name}' não encontrado."
-            
+
             result = await flow.resume(run_id, self)
-            
+
             if result.success:
                 return f"✅ Flow retomado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
             else:
                 return f"❌ Flow retomado falhou: {result.error}"
 
-        @reg.command("/flow-new", description="Instancia e executa um flow a partir de template", usage="/flow-new <template> [var=value ...]", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-new",
+            description="Instancia e executa um flow a partir de template",
+            usage="/flow-new <template> [var=value ...]",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_new(remainder: str, metadata: dict) -> str:
             """
             /flow-new <template_name> [var1=valor1 var2=valor2]
@@ -632,28 +772,30 @@ class Orchestrator:
             Exemplo: /flow-new blog topic=\"Python assíncrono\" tone=técnico
             """
             if not remainder.strip():
-                templates = [f"{t.name} ({t.domain})" for t in self.template_registry.list_templates()]
-                available = ', '.join(templates) if templates else "nenhum template disponível"
+                templates = [
+                    f"{t.name} ({t.domain})" for t in self.template_registry.list_templates()
+                ]
+                available = ", ".join(templates) if templates else "nenhum template disponível"
                 return f"⚠️ Uso: `/flow-new <template> [vars]`. Disponíveis: {available}"
-            
+
             parts = remainder.strip().split()
             template_name = parts[0]
             template = self.template_registry.get(template_name)
             if not template:
                 available = [t.name for t in self.template_registry.list_templates()]
                 return f"❌ Template '{template_name}' não encontrado. Disponíveis: {available}"
-            
+
             values = {}
             for part in parts[1:]:
                 if "=" in part:
                     k, v = part.split("=", 1)
                     values[k.strip()] = v.strip().strip('"').strip("'")
-            
+
             try:
                 flow = template.instantiate(values)
                 ctx = {v.name: values.get(v.name, v.default) for v in template.variables}
                 result = await flow.execute(ctx, self)
-                
+
                 if result.success:
                     return f"✅ Flow '{flow.name}' executado com sucesso em {result.total_time:.2f}s (ID: {result.run_id})"
                 else:
@@ -661,7 +803,13 @@ class Orchestrator:
             except Exception as e:
                 return f"❌ Erro ao instanciar/executar o flow: {str(e)}"
 
-        @reg.command("/flow-templates", description="Lista templates de flows disponíveis", usage="/flow-templates [domínio]", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-templates",
+            description="Lista templates de flows disponíveis",
+            usage="/flow-templates [domínio]",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_templates(remainder: str, metadata: dict) -> str:
             """
             /flow-templates [domain]
@@ -672,24 +820,30 @@ class Orchestrator:
                 templates = self.template_registry.list_by_domain(domain)
             else:
                 templates = self.template_registry.list_templates()
-            
+
             if not templates:
                 if domain:
                     return f"❌ Nenhum template encontrado para o domínio '{domain}'."
                 else:
                     return "❌ Nenhum template disponível."
-            
+
             templates_info = []
             for t in templates:
                 var_desc = t.get_variables_prompt()
                 templates_info.append(f"`{t.name}` ({t.domain}): {t.description}\n  {var_desc}")
-            
+
             if domain:
                 return f"📋 *Templates no domínio `{domain}`:*\n" + "\n".join(templates_info)
             else:
                 return f"📋 *Todos os templates disponíveis:*\n" + "\n".join(templates_info)
 
-        @reg.command("/flow-schedule", description="Agenda execução de flow/template", usage="/flow-schedule <flow> <HH:MM|every=N|once> [var=val...]", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-schedule",
+            description="Agenda execução de flow/template",
+            usage="/flow-schedule <flow> <HH:MM|every=N|once> [var=val...]",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_schedule(remainder: str, metadata: dict) -> str:
             """
             /flow-schedule <flow_name> <HH:MM|every=N|once> [var=val ...]
@@ -700,10 +854,11 @@ class Orchestrator:
             """
             if not remainder.strip():
                 return "⚠️ Uso: `/flow-schedule <flow> <HH:MM | every=N | once> [var=val...]`"
-            
+
             import uuid, time as _time
             from core.flow_scheduler import ScheduledJob
             import datetime
+
             parts = remainder.strip().split()
             flow_name = parts[0]
             schedule_arg = parts[1] if len(parts) > 1 else "once"
@@ -712,45 +867,60 @@ class Orchestrator:
                 if "=" in part:
                     k, v = part.split("=", 1)
                     ctx[k.strip()] = v.strip().strip('"').strip("'")
-            
+
             # Determine if it's a template or flow by trying to find it in both registries
             job_type = "flow"
             if self.template_registry.get(flow_name):
                 job_type = "template"
             elif not self.flow_registry.get(flow_name):
                 return f"❌ Flow ou template '{flow_name}' não encontrado."
-            
+
             if schedule_arg.startswith("every="):
                 minutes = int(schedule_arg.split("=")[1])
                 job = ScheduledJob(
                     job_id=str(uuid.uuid4())[:8],
-                    flow_name=flow_name, job_type=job_type,
-                    context=ctx, schedule_type="interval",
-                    interval_minutes=minutes, enabled=True,
-                    created_at=_time.time()
+                    flow_name=flow_name,
+                    job_type=job_type,
+                    context=ctx,
+                    schedule_type="interval",
+                    interval_minutes=minutes,
+                    enabled=True,
+                    created_at=_time.time(),
                 )
             elif ":" in schedule_arg and len(schedule_arg) == 5:
                 job = ScheduledJob(
                     job_id=str(uuid.uuid4())[:8],
-                    flow_name=flow_name, job_type=job_type,
-                    context=ctx, schedule_type="daily",
-                    time_of_day=schedule_arg, enabled=True,
-                    created_at=_time.time()
+                    flow_name=flow_name,
+                    job_type=job_type,
+                    context=ctx,
+                    schedule_type="daily",
+                    time_of_day=schedule_arg,
+                    enabled=True,
+                    created_at=_time.time(),
                 )
             else:
                 job = ScheduledJob(
                     job_id=str(uuid.uuid4())[:8],
-                    flow_name=flow_name, job_type=job_type,
-                    context=ctx, schedule_type="once",
-                    run_at=_time.time() + 5, enabled=True,
-                    created_at=_time.time()
+                    flow_name=flow_name,
+                    job_type=job_type,
+                    context=ctx,
+                    schedule_type="once",
+                    run_at=_time.time() + 5,
+                    enabled=True,
+                    created_at=_time.time(),
                 )
             job.next_run_at = job.compute_next_run()
             job_id = self.flow_scheduler.add_job(job)
             self.flow_scheduler.save_to_file("config/scheduled_jobs.json")
             return f"✅ Job agendado: `{job_id}` para `{flow_name}` (próxima execução: {datetime.datetime.fromtimestamp(job.next_run_at).strftime('%d/%m %H:%M')})"
 
-        @reg.command("/flow-unschedule", description="Remove job agendado", usage="/flow-unschedule <job_id>", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-unschedule",
+            description="Remove job agendado",
+            usage="/flow-unschedule <job_id>",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_unschedule(remainder: str, metadata: dict) -> str:
             """
             /flow-unschedule <job_id>
@@ -765,25 +935,44 @@ class Orchestrator:
             else:
                 return f"❌ Job `{job_id}` não encontrado."
 
-        @reg.command("/flow-jobs", description="Lista jobs agendados", usage="/flow-jobs", category="Flows", prefix_match=True)
+        @reg.command(
+            "/flow-jobs",
+            description="Lista jobs agendados",
+            usage="/flow-jobs",
+            category="Flows",
+            prefix_match=True,
+        )
         async def cmd_flow_jobs(remainder: str, metadata: dict) -> str:
             """
             /flow-jobs — lista todos os jobs agendados com próximo horário de execução
             """
             import datetime
+
             jobs = self.flow_scheduler.list_jobs()
             if not jobs:
                 return "📋 Nenhum job agendado."
-            
+
             jobs_info = []
             for j in jobs:
-                next_dt = datetime.datetime.fromtimestamp(j.next_run_at).strftime("%d/%m %H:%M") if j.next_run_at else "—"
+                next_dt = (
+                    datetime.datetime.fromtimestamp(j.next_run_at).strftime("%d/%m %H:%M")
+                    if j.next_run_at
+                    else "—"
+                )
                 status = "🟢" if j.enabled else "🔴"
-                jobs_info.append(f"{status} `{j.job_id}`: {j.flow_name} ({j.schedule_type}) - próximo: {next_dt} (execs: {j.run_count})")
-            
+                jobs_info.append(
+                    f"{status} `{j.job_id}`: {j.flow_name} ({j.schedule_type}) - próximo: {next_dt} (execs: {j.run_count})"
+                )
+
             return f"📋 *Jobs agendados* ({len(jobs_info)}):\n" + "\n".join(jobs_info)
 
-        @reg.command("/policy", description="Gerencia políticas de acesso", usage="/policy [list|check|stats]", category="Admin", prefix_match=True)
+        @reg.command(
+            "/policy",
+            description="Gerencia políticas de acesso",
+            usage="/policy [list|check|stats]",
+            category="Admin",
+            prefix_match=True,
+        )
         async def cmd_policy(remainder: str, metadata: dict) -> str:
             """
             /policy list — lista todas as regras ativas
@@ -794,11 +983,21 @@ class Orchestrator:
             sub = parts[0] if parts else "list"
             if sub == "list":
                 rules = self.policy_engine.list_rules()
-                data = [{"id": r.rule_id, "effect": r.effect, "priority": r.priority, "desc": r.description} for r in rules]
-                return f"📋 *Políticas ativas* (total: {len(data)}):\n" + "\n".join([
-                    f"  `{r['id']}`: {r['effect'].upper()} (prio: {r['priority']}) - {r['desc']}" 
-                    for r in data
-                ])
+                data = [
+                    {
+                        "id": r.rule_id,
+                        "effect": r.effect,
+                        "priority": r.priority,
+                        "desc": r.description,
+                    }
+                    for r in rules
+                ]
+                return f"📋 *Políticas ativas* (total: {len(data)}):\n" + "\n".join(
+                    [
+                        f"  `{r['id']}`: {r['effect'].upper()} (prio: {r['priority']}) - {r['desc']}"
+                        for r in data
+                    ]
+                )
             elif sub == "check" and len(parts) >= 3:
                 channel = parts[1]
                 command = parts[2]
@@ -814,9 +1013,14 @@ class Orchestrator:
     #  Helper Methods
     # ═══════════════════════════════════════════════════════════
 
-    def _check_policy(self, command: str, channel_type: str = "internal",
-                      user_id: str = "owner", agent: str = "*",
-                      domain: str = "*") -> tuple[bool, str]:
+    def _check_policy(
+        self,
+        command: str,
+        channel_type: str = "internal",
+        user_id: str = "owner",
+        agent: str = "*",
+        domain: str = "*",
+    ) -> tuple[bool, str]:
         """
         Check if a command is allowed based on the policy engine.
         Returns (allowed: bool, reason: str)
@@ -827,7 +1031,7 @@ class Orchestrator:
                 user_id=user_id,
                 agent=agent,
                 domain=domain,
-                command=command
+                command=command,
             )
             return decision.allowed, decision.reason
         except Exception as e:
@@ -849,7 +1053,6 @@ class Orchestrator:
             "session_id": raw.get("session_id", ""),
         }
 
-
     async def handle_channel_message(self, text: str, metadata: Dict[str, Any]) -> None:
         source = metadata.get("source", "unknown")
         user_id = metadata.get("user_id", "unknown")
@@ -867,28 +1070,28 @@ class Orchestrator:
         if source != "internal":
             # Determine if this looks like a command (starts with /)
             command = None
-            if text.startswith('/'):
+            if text.startswith("/"):
                 # Extract command (e.g. "/flow-status 123" -> "/flow-status")
                 parts = text.split()
                 if parts:
                     command = parts[0]
-            
+
             # Only check policy if we identified a command
             if command:
                 try:
                     allowed, reason = self._check_policy(
-                        command=command,
-                        channel_type=source,
-                        user_id=user_id
+                        command=command, channel_type=source, user_id=user_id
                     )
-                    
+
                     if not allowed:
                         # Send policy violation message back to the channel
                         rejection_msg = f"🔒 Acesso negado: {reason}"
-                        
+
                         for channel in self.channels:
                             if channel.name == source:
-                                await channel.send_message(rejection_msg, recipient_id=metadata.get("chat_id"))
+                                await channel.send_message(
+                                    rejection_msg, recipient_id=metadata.get("chat_id")
+                                )
                                 break
                         return  # Exit early, don't process the command
                 except Exception as e:
@@ -903,10 +1106,7 @@ class Orchestrator:
                 await channel.send_message(response, recipient_id=metadata.get("chat_id"))
                 break
 
-
-    async def _enrich_with_web_context(
-        self, text: str, metadata: dict
-    ) -> dict:
+    async def _enrich_with_web_context(self, text: str, metadata: dict) -> dict:
         """
         Pré-processador WebMCP: detecta queries que precisam de dados
         externos e injeta contexto em metadata["web_context"].
@@ -914,6 +1114,7 @@ class Orchestrator:
         """
         try:
             from skills.webmcp.web_context import needs_web_data, fetch_web_context
+
             if needs_web_data(text):
                 ctx = await fetch_web_context(text)
                 if ctx:
@@ -921,7 +1122,6 @@ class Orchestrator:
         except Exception:
             pass
         return metadata
-
 
     async def _route_command(self, text: str, metadata: Dict[str, Any]) -> str:
         """Routes text to the CommandRegistry or falls back to LlmAgent."""
@@ -998,9 +1198,7 @@ class Orchestrator:
             cost = await self._call_agent("WatchdogAgent", "check_cost", model="opencode")
             if not cost.success:
                 return f"🛡️ {cost.error}"
-            llm_result = await self._call_agent(
-                "OpenCodeAgent", edit_prompt, specialty="coding"
-            )
+            llm_result = await self._call_agent("OpenCodeAgent", edit_prompt, specialty="coding")
         else:
             llm_result = await self._call_agent("LlmAgent", edit_prompt)
 
@@ -1187,7 +1385,9 @@ class Orchestrator:
                 "OpenCodeAgent", "Latest AI and automation news", specialty="research"
             )
             if result.success:
-                report_lines.append("📡 *Pesquisa autônoma concluída via OpenCode (Nemotron 3 Super).*")
+                report_lines.append(
+                    "📡 *Pesquisa autônoma concluída via OpenCode (Nemotron 3 Super).*"
+                )
             else:
                 logger.warning(f"OpenCode research failed: {result.error}")
 
@@ -1203,9 +1403,49 @@ class Orchestrator:
             if result.success:
                 report_lines.append("⚽ *Análise esportiva disponível.*")
 
-        open_circuits = [n for n, c in self._circuits.items() if c.open]
-        if open_circuits:
-            report_lines.append(f"⚠️ *Agentes com falha*: {', '.join(open_circuits)}")
+        # Enhanced proactive report with detailed failure information
+        failed_agents = []
+        for name, circuit in self._circuits.items():
+            if circuit.open:
+                agent = self._agents.get(name)
+                agent_name = getattr(agent, "name", name) if agent else name
+                failure_count = circuit.failures
+                last_error = circuit.last_error or "Erro desconhecido"
+                last_attempt = circuit.last_attempt
+                timestamp_str = ""
+                if last_attempt > 0:
+                    from datetime import datetime
+
+                    timestamp_str = datetime.fromtimestamp(last_attempt).strftime("%H:%M:%S")
+
+                # Suggested action based on agent type
+                suggested_action = "Verificar logs e tentar novamente"
+                if "BettingAnalyst" in name:
+                    suggested_action = "Verificar conexão com API de esportes e credenciais"
+                elif "Watchdog" in name:
+                    suggested_action = "Verificar recursos do sistema e políticas de custos"
+                elif "Researcher" in name:
+                    suggested_action = "Verificar conexão com fontes de pesquisa"
+
+                failed_agents.append(
+                    {
+                        "name": agent_name,
+                        "failure_count": failure_count,
+                        "last_error": last_error,
+                        "timestamp": timestamp_str,
+                        "suggested_action": suggested_action,
+                    }
+                )
+
+        if failed_agents:
+            report_lines.append("⚠️ *Agentes com falha recorrente*:")
+            for agent_info in failed_agents:
+                report_lines.append(
+                    f"• *{agent_info['name']}* — falha #{agent_info['failure_count']}\n"
+                    f"   └ `{agent_info['last_error']}`\n"
+                    f"   └ 🕐 {agent_info['timestamp']}\n"
+                    f"   └ 💡 {agent_info['suggested_action']}"
+                )
 
         if not report_lines:
             logger.info("Proactive cycle: nothing to report — skipping broadcast.")
@@ -1283,11 +1523,7 @@ class Orchestrator:
     #  GitHub Auto-Sync Hook
     # ═══════════════════════════════════════════════════════════
 
-    async def _post_execution_sync(
-        self,
-        task_description: str = "",
-        force: bool = False
-    ) -> None:
+    async def _post_execution_sync(self, task_description: str = "", force: bool = False) -> None:
         """
         Hook pós-execução: sincroniza com GitHub se houver mudanças.
         Chamado automaticamente após cada ciclo de execução do Orchestrator.
@@ -1295,6 +1531,7 @@ class Orchestrator:
         """
         try:
             from core.services.auto_sync import get_auto_sync
+
             sync = get_auto_sync()
 
             if not force and not sync.is_dirty():
@@ -1334,9 +1571,7 @@ class Orchestrator:
                 "sha": result.commit_sha,
                 "timestamp": result.timestamp,
             }
-            await self.message_bus.publish(
-                "orchestrator", "system.sync", payload
-            )
+            await self.message_bus.publish("orchestrator", "system.sync", payload)
         except Exception:
             pass  # Não crítico
 
@@ -1353,8 +1588,7 @@ class Orchestrator:
             "skills": list(self.skills.keys()),
             "channels": [ch.name for ch in self.channels],
             "proactive_loop": (
-                self._autonomous_task is not None
-                and not self._autonomous_task.done()
+                self._autonomous_task is not None and not self._autonomous_task.done()
             ),
             "open_circuits": [n for n, c in self._circuits.items() if c.open],
         }
@@ -1363,9 +1597,7 @@ class Orchestrator:
     #  Code Verification
     # ═══════════════════════════════════════════════════════════
 
-    async def evaluate_solutions(
-        self, task_description: str, context: Dict[str, Any]
-    ) -> str:
+    async def evaluate_solutions(self, task_description: str, context: Dict[str, Any]) -> str:
         """
         Tree-of-Thoughts: delegates to LlmAgent to produce and rank 3 approaches,
         then returns the highest-scored plan.
@@ -1406,12 +1638,25 @@ class Orchestrator:
             "errors": final_state.error_message,
         }
 
-    def _get_session_context(self, user_id: str = None, channel: str = None, workspace: str = None, mode: str = "user") -> dict:
-        session_id = self.session_manager.build_session_id(mode, user_id or "", channel or "", workspace or "")
+    def _get_session_context(
+        self, user_id: str = None, channel: str = None, workspace: str = None, mode: str = "user"
+    ) -> dict:
+        session_id = self.session_manager.build_session_id(
+            mode, user_id or "", channel or "", workspace or ""
+        )
         return self.session_manager.get_session(session_id)
 
-    def _set_session_context(self, data: dict, user_id: str = None, channel: str = None, workspace: str = None, mode: str = "user") -> None:
-        session_id = self.session_manager.build_session_id(mode, user_id or "", channel or "", workspace or "")
+    def _set_session_context(
+        self,
+        data: dict,
+        user_id: str = None,
+        channel: str = None,
+        workspace: str = None,
+        mode: str = "user",
+    ) -> None:
+        session_id = self.session_manager.build_session_id(
+            mode, user_id or "", channel or "", workspace or ""
+        )
         self.session_manager.set_session(session_id, data)
 
     async def _handle_flow_command(self, args: str, metadata: dict) -> str:
@@ -1430,6 +1675,7 @@ class Orchestrator:
 
     def _load_default_flows(self) -> None:
         import pathlib
+
         flows_dir = pathlib.Path("flows")
         if flows_dir.exists():
             for f in flows_dir.glob("*.json"):
@@ -1447,8 +1693,8 @@ class Orchestrator:
         summary = message.get("summary", {})
         count = summary.get("total_issues", 0)
         critical = summary.get("critical", 0)
-        
+
         logger.info(f"DevOps Scan Complete: {count} issues found ({critical} critical).")
-        
+
         if critical > 0:
             logger.warning(f"CRITICAL implementation debt detected! Check data/devops_reports/")
