@@ -2822,3 +2822,39 @@ class RadarAgent(AgentBase):
 - Agent is non-critical (no dependency in llm/blog/telegram/sports flow)
 - Re-enable: revert `main.py` and `agents/__init__.py` when hardware overlay is needed again
 - Total CPU reduction session: 83% (loop) + 63% (bridge) -> target <10%
+
+## 2026-03-28 — Sentinel Telegram: Comunicação Real, Sem Repetição, Sem Placeholders
+
+- **Objetivo:** Garantir que o Telegram receba apenas comunicações reais, com evidências reais e confirmação real de execução.
+- **Arquivos alterados:** `agents/moon_sentinel.py`, `tests/test_moon_sentinel.py`, `.env.example`.
+
+### Implementações Aplicadas
+
+- **Validação rígida de pesquisa antes de publicar no Telegram:**
+  - Bloqueio de pacotes sem referências reais, com URLs placeholder (`example.com`, `localhost`, etc.) ou síntese genérica.
+  - Se a validação falhar, o ciclo é marcado como rejeitado e a auto-implementação não é executada.
+- **Relatórios com identidade e rastreabilidade real:**
+  - Adicionado `cycle_id` + assinatura de conteúdo (`sha256`) nos relatórios de tendência.
+  - Relatório final de implementação agora traz `execution_id`, contagem de evidências reais, duração por ação e confirmação de retorno real por agente.
+- **Anti-repetição no Telegram:**
+  - Implementada deduplicação por fingerprint de mensagem com janela temporal configurável.
+  - Suporte a `dedup_key` no envio normal e envio em chunks longos.
+- **Fluxo manual `implement-research`:**
+  - Se não existir pesquisa validada, envia status explícito de não execução (sem inventar resultado).
+  - Se houver, envia relatório final completo da execução.
+
+### Variáveis de Ambiente (documentadas)
+
+- `MOON_SENTINEL_AUTO_IMPLEMENT=true`
+- `MOON_SENTINEL_IMPL_COOLDOWN_SECONDS=1800`
+- `MOON_SENTINEL_TELEGRAM_DEDUP_SECONDS=21600`
+
+### Evidência de Testes
+
+- `tests/test_moon_sentinel.py`: validação de placeholder + deduplicação de Telegram adicionadas e passando.
+- Suítes executadas com sucesso:
+  - `pytest -q tests/test_moon_sentinel.py`
+  - `pytest -q tests/test_core.py tests/test_autonomy_evolution_agent.py tests/test_autonomous_devops_refactor.py`
+- Simulação validada:
+  - Ciclo com dados sintéticos foi rejeitado (`rejected_no_real_evidence`).
+  - Ciclo com evidências reais foi aceito (`validated`) com referências reais contabilizadas.
