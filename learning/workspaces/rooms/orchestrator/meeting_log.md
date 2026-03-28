@@ -431,3 +431,16 @@
 [03:06:56] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [03:09:28] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [03:12:01] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:14:17] Mensagem recebida de ResearcherAgent: {'type': 'agent_done', 'success': True}
+[03:14:17] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:17:19] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:19:51] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:22:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:24:57] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:27:28] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:30:01] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:32:33] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:33:37] Mensagem recebida de ResearcherAgent: {'type': 'agent_done', 'success': True}
+[03:35:13] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:38:16] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[03:40:49] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
