@@ -421,47 +421,37 @@
         "agentic AI"
       ],
       "findings": [
-        "**VibeCoding e IA Generativa**: {'vault_file': 'learning/research_vault/research_20260328_011310.json', 'summary': 'Found 0 web results and 0 videos.'}",
-        "**Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: {'vault_file': 'learning/research_vault/research_20260328_011323.json', 'summary': 'Found 0 web results and 3 videos.'}",
-        "**agentic AI**: {'vault_file': 'learning/research_vault/research_20260328_011335.json', 'summary': 'Found 0 web results and 0 videos.'}"
+        "VibeCoding: Ferramentas de código automático.",
+        "IA Generativa: Modelos de texto e imagem.",
+        "Novidades AI: Anthropic e GPT-4.",
+        "Agentic AI: Sistemas multiagentes open-source."
       ],
-      "report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 28/03/2026 01:13\n\n1. **VibeCoding e IA Generativa**: {'vault_file': 'learning/research_vault/research_20260328_011310.json', 'summary': 'Found 0 web results and 0 videos.'}\n2. **Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: {'vault_file': 'learning/research_vault/research_20260328_011323.json', 'summary': 'Found 0 web results and 3 videos.'}\n3. **agentic AI**: {'vault_file': 'learning/research_vault/research_20260328_011335.json', 'summary': 'Found 0 web results and 0 videos.'}\n\n_Próxima varredura em 4 horas._"
+      "report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 28/03/2026 05:13\n\n1. VibeCoding: Ferramentas de código automático.\n2. IA Generativa: Modelos de texto e imagem.\n3. Novidades AI: Anthropic e GPT-4.\n4. Agentic AI: Sistemas multiagentes open-source.\n\n_Próxima varredura em 4 horas._"
     },
-    "timestamp": 1774671220.4884334,
-    "datetime": "2026-03-28T01:13:40.488434"
+    "timestamp": 1774685586.8631115,
+    "datetime": "2026-03-28T05:13:06.863111"
   },
   {
-    "key": "health_issue",
-    "type": "ecosystem_health",
+    "key": "devops_issues_20260328_051603",
+    "type": "devops_scan",
     "data": {
-      "issues": [
-        "⚠️ Agente `ResearcherAgent` — circuit ABERTO (falhas consecutivas)",
-        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
-      ]
+      "type": "devops_report",
+      "critical": 101,
+      "high": 0,
+      "medium": 11,
+      "low": 219,
+      "issues_found": 331,
+      "summary": {
+        "critical": 101,
+        "high": 0,
+        "medium": 11,
+        "low": 219,
+        "fixable": 113
+      },
+      "actions": [],
+      "report_path": "data/devops_reports/scan_20260328_051603.json"
     },
-    "timestamp": 1774674821.6450489,
-    "datetime": "2026-03-28T02:13:41.645052"
-  },
-  {
-    "key": "health_issue",
-    "type": "ecosystem_health",
-    "data": {
-      "issues": [
-        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
-      ]
-    },
-    "timestamp": 1774678452.980337,
-    "datetime": "2026-03-28T03:14:12.980339"
-  },
-  {
-    "key": "health_issue",
-    "type": "ecosystem_health",
-    "data": {
-      "issues": [
-        "⚠️ Agente `BettingAnalystAgent` — circuit ABERTO (falhas consecutivas)"
-      ]
-    },
-    "timestamp": 1774682083.1035354,
-    "datetime": "2026-03-28T04:14:43.103538"
+    "timestamp": 1774685763.3746414,
+    "datetime": "2026-03-28T05:16:03.374641"
   }
 ]
