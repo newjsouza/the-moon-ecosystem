@@ -2813,3 +2813,6 @@ class RadarAgent(AgentBase):
 - Boot optimizations applied: e2scrub masked, journal limited to 100M, NM-wait-online disabled
 - Ollama fully removed (binary, service, models, user, group)
 - NVIDIA driver 470 incompatible with kernel 6.17 — keeping nouveau for GT 710
+- Fixed: `_CircuitState.record_failure()` called without required `error` arg in 5 sites (`core/orchestrator.py`: 405, 409, 416, 1484, 1486)
+- Fix: made `error` optional (`error: str = ""`) + passed contextual error strings at call sites
+- Effect: removed `record_failure()` TypeError loop; proactive cycle now runs without opening circuit from that exception

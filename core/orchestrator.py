@@ -71,7 +71,7 @@ class _CircuitState:
         self.last_error = ""
         self.last_attempt = 0.0
 
-    def record_failure(self, error: str) -> None:
+    def record_failure(self, error: str = "") -> None:
         self.failures += 1
         self.last_error = error
         self.last_attempt = time.monotonic()
@@ -401,19 +401,19 @@ class Orchestrator:
                 agent.execute(task, **kwargs), timeout=timeout
             )
         except asyncio.TimeoutError:
-            circuit.record_failure()
             msg = f"Agent '{agent_name}' timed out after {timeout}s."
+            circuit.record_failure(msg)
             logger.warning(msg)
             return TaskResult(success=False, error=msg)
         except Exception as exc:
-            circuit.record_failure()
+            circuit.record_failure(str(exc))
             logger.error(f"Agent '{agent_name}' raised: {exc}")
             return TaskResult(success=False, error=str(exc))
 
         if result.success:
             circuit.record_success()
         else:
-            circuit.record_failure()
+            circuit.record_failure(result.error or "TaskResult returned success=False.")
 
         await self.message_bus.publish(
             sender=agent_name,
@@ -1481,9 +1481,9 @@ class Orchestrator:
                     if ok:
                         self._circuits[name].record_success()
                     else:
-                        self._circuits[name].record_failure()
-            except Exception:
-                self._circuits[name].record_failure()
+                        self._circuits[name].record_failure("Health check ping returned False.")
+            except Exception as exc:
+                self._circuits[name].record_failure(str(exc))
                 logger.warning(f"Health check ping failed for '{name}'.")
 
         # Inject circuit breaker states into NexusIntelligence
