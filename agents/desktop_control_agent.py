@@ -63,7 +63,15 @@ class DesktopControlAgent(AgentBase):
             logger.warning("DesktopControlAgent: DISPLAY não encontrado — modo limitado")
             return
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self._do_imports)
+        try:
+            await loop.run_in_executor(None, self._do_imports)
+        except Exception as exc:
+            self._display_available = False
+            logger.warning(
+                "DesktopControlAgent: display indisponível (%s) — modo limitado",
+                exc,
+            )
+            return
         # Verificar xdotool
         try:
             result = subprocess.run(["xdotool", "--version"], capture_output=True, timeout=2)

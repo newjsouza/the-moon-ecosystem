@@ -11,6 +11,7 @@ import pytest
 
 from agents.moon_sentinel import MoonSentinelAgent
 from core.agent_base import TaskResult
+from core.message_bus import Message
 
 
 # ─────────────────────────────────────────────────────────────
@@ -61,6 +62,16 @@ async def test_execute_unknown_action(sentinel):
     result = await sentinel._execute("unknown_action_xyz")
     assert result.success
     assert "Sentinel recebeu" in result.data["message"]
+
+
+@pytest.mark.asyncio
+async def test_execute_implement_research(sentinel):
+    sentinel._implement_from_recent_research = AsyncMock(
+        return_value={"overall_success": True, "actions_executed": []}
+    )
+    result = await sentinel._execute("implement-research")
+    assert result.success is True
+    assert result.data["implementation_report"]["overall_success"] is True
 
 
 # ─────────────────────────────────────────────────────────────
@@ -137,6 +148,25 @@ async def test_llm_trend_synthesis_no_key(sentinel, monkeypatch):
     assert findings == []  # No GROQ_API_KEY
 
 
+def test_validate_research_packets_rejects_placeholder_data(sentinel):
+    packets = [
+        {
+            "topic": "agentic AI",
+            "source_agent": "ResearcherAgent",
+            "sources_used": ["web"],
+            "total_results": 2,
+            "synthesis": "Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
+            "references": [
+                {"source": "web", "title": "Framework A", "url": "https://example.com/a"},
+            ],
+        }
+    ]
+
+    validation = sentinel._validate_research_packets(packets)
+    assert validation["validated_packets_count"] == 0
+    assert validation["rejected_packets_count"] == 1
+
+
 # ─────────────────────────────────────────────────────────────
 #  Tests: Telegram Sender
 # ─────────────────────────────────────────────────────────────
@@ -150,6 +180,56 @@ async def test_send_telegram_no_config(sentinel, monkeypatch):
     assert result is False
 
 
+@pytest.mark.asyncio
+async def test_send_telegram_dedup_skips_duplicate_payload(sentinel, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "123456")
+
+    calls = {"count": 0}
+
+    class DummyResp:
+        status_code = 200
+
+    class DummyClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        async def post(self, *args, **kwargs):
+            calls["count"] += 1
+            return DummyResp()
+
+    import httpx
+    monkeypatch.setattr(httpx, "AsyncClient", lambda *args, **kwargs: DummyClient())
+
+    first = await sentinel._send_telegram("Relatorio real", parse_mode=None, dedup_key="k1")
+    second = await sentinel._send_telegram("Relatorio real", parse_mode=None, dedup_key="k1")
+
+    assert first is True
+    assert second is True
+    assert calls["count"] == 1
+
+
+def test_split_telegram_chunks_respects_size(sentinel):
+    text = ("linha-1234567890\n" * 40).strip()
+    chunks = sentinel._split_telegram_chunks(text, max_chars=80)
+    assert len(chunks) >= 2
+    assert all(len(chunk) <= 80 for chunk in chunks)
+
+
+@pytest.mark.asyncio
+async def test_send_telegram_long_sends_multiple_chunks(sentinel):
+    sentinel._send_telegram = AsyncMock(return_value=True)
+    long_text = ("abcde\n" * 900).strip()
+
+    delivered = await sentinel._send_telegram_long(long_text, parse_mode=None)
+
+    assert delivered is True
+    assert sentinel._send_telegram.await_count >= 2
+
+
 # ─────────────────────────────────────────────────────────────
 #  Tests: On-skill-proposed handler
 # ─────────────────────────────────────────────────────────────
@@ -161,6 +241,31 @@ async def test_on_skill_proposed_logs_initiative(sentinel):
         i["type"] == "skill_discovery" and "test-lib" in i["key"]
         for i in sentinel._initiatives
     )
+
+
+@pytest.mark.asyncio
+async def test_on_skill_proposed_accepts_message_object(sentinel):
+    message = Message(
+        sender="SkillAlchemist",
+        topic="alchemist.skill_proposed",
+        payload={"skill": "message-lib", "path": "/path/message"},
+    )
+    await sentinel._on_skill_proposed(message)
+    assert any(
+        i["type"] == "skill_discovery" and "message-lib" in i["key"]
+        for i in sentinel._initiatives
+    )
+
+
+@pytest.mark.asyncio
+async def test_on_devops_scan_accepts_message_object(sentinel):
+    message = Message(
+        sender="AutonomousDevOpsRefactor",
+        topic="devops.scan_complete",
+        payload={"summary": {"critical": 1, "high": 1, "medium": 0, "low": 0}},
+    )
+    await sentinel._on_devops_scan(message)
+    assert any(i["type"] == "devops_scan" for i in sentinel._initiatives)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -182,3 +287,55 @@ async def test_generate_initiative_report_with_initiatives(sentinel):
     report = await sentinel._generate_initiative_report(send_telegram=False)
     assert isinstance(report, str)
     assert len(report) > 50
+
+
+def test_format_detailed_trend_report_includes_evidence(sentinel):
+    packets = [
+        {
+            "topic": "Agentes autônomos",
+            "source_agent": "DeepWebResearchAgent",
+            "sources_used": ["github", "arxiv"],
+            "total_results": 7,
+            "synthesis": "Foram encontrados frameworks promissores para autonomia.",
+            "references": [
+                {"source": "github", "title": "org/projeto-legal", "url": "https://github.com/org/projeto-legal"},
+                {"source": "arxiv", "title": "Paper XYZ", "url": "https://arxiv.org/abs/0000.0000"},
+            ],
+        }
+    ]
+
+    detailed = sentinel._format_detailed_trend_report(packets)
+    assert "RELATORIO DETALHADO DE PESQUISA" in detailed
+    assert "Agentes autônomos" in detailed
+    assert "https://github.com/org/projeto-legal" in detailed
+
+
+@pytest.mark.asyncio
+async def test_auto_implement_research_improvements_generates_report(sentinel, tmp_path, monkeypatch):
+    impl_dir = tmp_path / "implementations"
+    monkeypatch.setattr("agents.moon_sentinel.IMPLEMENTATION_REPORTS_DIR", impl_dir)
+
+    orchestrator = MagicMock()
+    orchestrator._call_agent = AsyncMock(return_value=TaskResult(success=True, data={"ok": True}))
+    sentinel.orchestrator = orchestrator
+
+    packets = [
+        {
+            "topic": "Segurança em agentes",
+            "synthesis": "Há risco de vulnerabilidade e falhas de segurança.",
+            "references": [{"source": "github", "title": "repo", "url": "https://github.com/example/repo"}],
+            "sources_used": ["github"],
+            "source_agent": "DeepWebResearchAgent",
+            "total_results": 3,
+        }
+    ]
+
+    report = await sentinel._auto_implement_research_improvements(
+        detailed_packets=packets,
+        summary_report="Resumo",
+    )
+
+    assert report is not None
+    assert report["overall_success"] is True
+    assert Path(report["report_file"]).exists()
+    assert orchestrator._call_agent.await_count >= 3

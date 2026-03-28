@@ -266,88 +266,138 @@ class AutonomousDevOpsRefactor(AgentBase):
             await asyncio.sleep(3600)
 
     async def _execute(self, task: str, **kwargs) -> TaskResult:
-        if task == "run_scan":
+        action = (task or "").strip().lower()
+
+        if action in {"run_scan", "scan"}:
             return await self._run_scan()
-        elif task == "audit_dependencies":
+        elif action in {"audit_dependencies", "audit"}:
             issues = await self.auditor.audit()
             return TaskResult(success=True, data={"issues": issues})
+        elif action in {"auto_fix", "autofix"}:
+            return await self._auto_fix(kwargs.get("issues", []))
+        elif action == "status":
+            return TaskResult(
+                success=True,
+                data={
+                    "is_running": self._is_running,
+                    "last_scan_at": self._last_scan,
+                    "scan_interval_hours": self.scan_interval,
+                },
+            )
         else:
             return TaskResult(success=False, error=f"Task unknown: {task}")
 
     async def _run_scan(self) -> TaskResult:
+        if self._is_running:
+            return TaskResult(success=True, data={"status": "scan_already_running"})
         self._is_running = True
-        logger.info("Starting global DevOps scan...")
-        issues_list: List[Dict[str, Any]] = []
-        actions: List[str] = []
-        summary = {"critical": 0, "high": 0, "medium": 0, "low": 0, "fixable": 0}
-        
-        # 1. Scan Files
-        files_to_scan = self._get_scan_files()
-        for file_path in files_to_scan:
-            try:
-                with open(file_path, 'r') as f:
-                    content = f.read()
-                
-                if len(content.splitlines()) > MAX_FILE_LINES:
-                    continue
-                
-                # Structural & Compliance
-                results = self.analyzer.analyze(file_path, content)
-                results += self.checker.check(file_path, content)
-                
-                if results:
-                    summary["fixable"] += 1
-                    for issue in results:
-                        issue["file"] = file_path
-                        issues_list.append(issue)
-                        summary[issue["severity"].lower()] += 1
-                
-            except Exception as e:
-                logger.error(f"Error scanning {file_path}: {e}")
-
-        # 2. Auto-Healing
-        for issue in [i for i in issues_list if i["severity"] == "CRITICAL" and i.get("fixable")]:
-            try:
-                with open(issue["file"], 'r') as f:
-                    current_content = f.read()
-                fix = self.fixer.generate(issue, issue["file"], current_content)
-                if fix:
-                    if self.healer.heal(issue["file"], fix):
-                        actions.append(f"Auto-healed critical issue in {issue['file']}")
-            except Exception as e:
-                logger.error(f"Error during auto-healing for {issue['file']}: {e}")
-
-        # 3. Audit Dependencies
-        pip_audit_path = "pip-audit"
-        if os.path.exists("./.venv/bin/pip-audit"):
-            pip_audit_path = "./.venv/bin/pip-audit"
-        elif os.path.exists("./venv/bin/pip-audit"):
-            pip_audit_path = "./venv/bin/pip-audit"
-
-        vulnerabilities = await self.auditor.audit(pip_audit_path=pip_audit_path)
-        for issue in vulnerabilities:
-            issues_list.append(issue)
-            summary[issue["severity"].lower()] += 1
-
-        # Final Report Assembly
-        report = {
-            "version": "1.0",
-            "timestamp": datetime.now().isoformat(),
-            "issues": issues_list,
-            "actions_taken": actions,
-            "summary": summary
-        }
-        
-        # 4. Save & Notify
-        report_path = os.path.join(REPORT_DIR, f"scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-        with open(report_path, 'w') as f:
-            json.dump(report, f, indent=4)
+        try:
+            logger.info("Starting global DevOps scan...")
+            issues_list: List[Dict[str, Any]] = []
+            actions: List[str] = []
+            summary = {"critical": 0, "high": 0, "medium": 0, "low": 0, "fixable": 0}
             
-        await self._publish_report(report)
-        
-        self._last_scan = time.time()
-        self._is_running = False
-        return TaskResult(success=True, data={"report_path": report_path, "summary": summary})
+            # 1. Scan Files
+            files_to_scan = self._get_scan_files()
+            for file_path in files_to_scan:
+                try:
+                    with open(file_path, 'r') as f:
+                        content = f.read()
+                    
+                    if len(content.splitlines()) > MAX_FILE_LINES:
+                        continue
+                    
+                    # Structural & Compliance
+                    results = self.analyzer.analyze(file_path, content)
+                    results += self.checker.check(file_path, content)
+                    
+                    if results:
+                        summary["fixable"] += 1
+                        for issue in results:
+                            issue["file"] = file_path
+                            issues_list.append(issue)
+                            summary[issue["severity"].lower()] += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error scanning {file_path}: {e}")
+
+            # 2. Auto-Healing
+            for issue in [i for i in issues_list if i["severity"] == "CRITICAL" and i.get("fixable")]:
+                try:
+                    with open(issue["file"], 'r') as f:
+                        current_content = f.read()
+                    fix = self.fixer.generate(issue, issue["file"], current_content)
+                    if fix:
+                        if self.healer.heal(issue["file"], fix):
+                            actions.append(f"Auto-healed critical issue in {issue['file']}")
+                except Exception as e:
+                    logger.error(f"Error during auto-healing for {issue['file']}: {e}")
+
+            # 3. Audit Dependencies
+            pip_audit_path = "pip-audit"
+            if os.path.exists("./.venv/bin/pip-audit"):
+                pip_audit_path = "./.venv/bin/pip-audit"
+            elif os.path.exists("./venv/bin/pip-audit"):
+                pip_audit_path = "./venv/bin/pip-audit"
+
+            vulnerabilities = await self.auditor.audit(pip_audit_path=pip_audit_path)
+            for issue in vulnerabilities:
+                issues_list.append(issue)
+                summary[issue["severity"].lower()] += 1
+
+            # Final Report Assembly
+            report = {
+                "version": "1.0",
+                "timestamp": datetime.now().isoformat(),
+                "issues": issues_list,
+                "actions_taken": actions,
+                "summary": summary
+            }
+            
+            # 4. Save & Notify
+            report_path = os.path.join(REPORT_DIR, f"scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+            with open(report_path, 'w') as f:
+                json.dump(report, f, indent=4)
+
+            report["report_path"] = report_path
+            await self._publish_report(report)
+            
+            self._last_scan = time.time()
+            return TaskResult(success=True, data={"report_path": report_path, "summary": summary})
+        except Exception as e:
+            logger.exception("DevOps scan failed unexpectedly")
+            return TaskResult(success=False, error=str(e))
+        finally:
+            self._is_running = False
+
+    async def _auto_fix(self, issues: Any) -> TaskResult:
+        """
+        Recebe sinais de falha do ecossistema (ex: circuit breakers abertos)
+        e dispara uma varredura corretiva completa.
+        """
+        start = time.time()
+        normalized_issues = issues if isinstance(issues, list) else []
+
+        scan_result = await self._run_scan()
+        if not scan_result.success:
+            return TaskResult(
+                success=False,
+                error=scan_result.error or "auto_fix could not start scan",
+                execution_time=time.time() - start,
+            )
+
+        payload = scan_result.data if isinstance(scan_result.data, dict) else {}
+        return TaskResult(
+            success=True,
+            data={
+                "mode": "auto_fix",
+                "issues_received": len(normalized_issues),
+                "issues": normalized_issues[:10],
+                "scan_report_path": payload.get("report_path", ""),
+                "scan_summary": payload.get("summary", {}),
+            },
+            execution_time=time.time() - start,
+        )
 
     async def _publish_report(self, report: Dict[str, Any]) -> None:
         if not self.message_bus:
@@ -363,7 +413,10 @@ class AutonomousDevOpsRefactor(AgentBase):
             "high": summary.get("high", 0),
             "medium": summary.get("medium", 0),
             "low": summary.get("low", 0),
-            "actions": report.get("actions_taken", [])
+            "issues_found": len(report.get("issues", [])),
+            "summary": summary,
+            "actions": report.get("actions_taken", []),
+            "report_path": report.get("report_path", ""),
         }
         await self.message_bus.publish(self.name, "devops.scan_complete", message)
 

@@ -293,6 +293,11 @@ class MoonSystem:
                 "MoonSentinelAgent",
                 orchestrator=self.orchestrator
             )),
+            ("AutonomyEvolutionAgent", lambda: self._safe_import_agent(
+                "agents.autonomy_evolution_agent",
+                "AutonomyEvolutionAgent",
+                orchestrator=self.orchestrator
+            )),
             
             # Infra / Base
             ("ProactiveAgent", lambda: self._safe_import_agent("agents.proactive", "ProactiveAgent")),

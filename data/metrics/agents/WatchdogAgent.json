@@ -1,0 +1,17 @@
+{
+  "agent_id": "WatchdogAgent",
+  "total_calls": 1,
+  "successful_calls": 1,
+  "failed_calls": 0,
+  "total_execution_time": 0.0007855892181396484,
+  "min_execution_time": 0.0007855892181396484,
+  "max_execution_time": 0.0007855892181396484,
+  "last_call_timestamp": 1774671159.4724932,
+  "last_error": null,
+  "error_counts": {},
+  "task_type_counts": {
+    "status": 1
+  },
+  "avg_execution_time": 0.0007855892181396484,
+  "success_rate": 1.0
+}

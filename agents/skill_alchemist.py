@@ -115,12 +115,10 @@ class SkillAlchemist(AgentBase):
                 success = await self._transmute(tool)
                 if success:
                     self._mark_as_discovered(tool)
-                    # Notifica o Orchestrator sobre a nova descoberta
-                    if self.orchestrator:
-                        await self.orchestrator.publish("alchemist.skill_proposed", {
-                            "skill": tool['name'],
-                            "path": f"{self.quarantine}/{tool['name']}"
-                        })
+                    await self._publish_skill_proposed(
+                        tool["name"],
+                        f"{self.quarantine}/{tool['name']}",
+                    )
 
         return TaskResult(success=True, data={"status": "cycle-complete", "discovered": len(promising)})
 
@@ -810,6 +808,20 @@ class {self._sanitize_class_name(tool["name"])}Skill(SkillBase):
             logger.warning(f"Falha ao publicar no SemanticMemoryWeaver: {e}")
             return False
 
+    async def _publish_skill_proposed(self, skill_name: str, skill_path: str) -> None:
+        """Publica descoberta de skill no MessageBus (consumido pelo Sentinel)."""
+        try:
+            from core.message_bus import MessageBus
+
+            bus = MessageBus()
+            await bus.publish(
+                sender="SkillAlchemist",
+                topic="alchemist.skill_proposed",
+                payload={"skill": skill_name, "path": skill_path},
+            )
+        except Exception as e:
+            logger.warning(f"Falha ao publicar skill_proposed: {e}")
+
     def _mark_as_discovered(self, tool: Dict):
         """
         Marca ferramenta como descoberta e publica no SemanticMemoryWeaver.
@@ -835,33 +847,29 @@ class {self._sanitize_class_name(tool["name"])}Skill(SkillBase):
             with open(self.discoveries_file, "w") as f:
                 json.dump(history, f, indent=4)
 
-        # Publica no SemanticMemoryWeaver (se orchestrator disponível)
-        if self.orchestrator:
-            # Publica no tópico do alchemist
-            asyncio.create_task(
-                self.orchestrator.publish("alchemist.skill_proposed", {
-                    "skill": tool['name'],
-                    "path": f"{self.quarantine}/{tool['name']}"
-                })
+        # Publica no tópico do alchemist (independe de orchestrator)
+        asyncio.create_task(
+            self._publish_skill_proposed(
+                tool["name"],
+                f"{self.quarantine}/{tool['name']}",
             )
+        )
 
-            # Publica adicionalmente no SemanticMemoryWeaver
-            indexed = asyncio.create_task(self._publish_to_semantic_weaver(tool))
+        # Publica adicionalmente no SemanticMemoryWeaver
+        indexed = asyncio.create_task(self._publish_to_semantic_weaver(tool))
 
-            # Atualiza proposal.json com indexed_in_memory quando completar
-            async def update_indexed_status():
-                try:
-                    result = await indexed
-                    proposal_path = f"{self.quarantine}/{tool['name']}_proposal.json"
-                    if os.path.exists(proposal_path):
-                        with open(proposal_path, "r") as f:
-                            proposal = json.load(f)
-                        proposal["indexed_in_memory"] = result
-                        with open(proposal_path, "w") as f:
-                            json.dump(proposal, f, indent=4)
-                except Exception as e:
-                    logger.warning(f"Erro ao atualizar indexed_in_memory: {e}")
+        # Atualiza proposal.json com indexed_in_memory quando completar
+        async def update_indexed_status():
+            try:
+                result = await indexed
+                proposal_path = f"{self.quarantine}/{tool['name']}_proposal.json"
+                if os.path.exists(proposal_path):
+                    with open(proposal_path, "r") as f:
+                        proposal = json.load(f)
+                    proposal["indexed_in_memory"] = result
+                    with open(proposal_path, "w") as f:
+                        json.dump(proposal, f, indent=4)
+            except Exception as e:
+                logger.warning(f"Erro ao atualizar indexed_in_memory: {e}")
 
-            asyncio.create_task(update_indexed_status())
-        else:
-            logger.warning("Orchestrator não disponível - rodando em standalone mode")
+        asyncio.create_task(update_indexed_status())

@@ -1,0 +1,16 @@
+{
+  "name": "evening_report",
+  "session_mode": "workspace",
+  "steps": [
+    {
+      "name": "generate_report",
+      "agent": "MoonSentinelAgent",
+      "task": "report",
+      "depends_on": [],
+      "on_error": "continue",
+      "timeout": 90.0,
+      "max_retries": 1,
+      "retry_delay": 5.0
+    }
+  ]
+}

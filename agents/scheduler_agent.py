@@ -44,16 +44,18 @@ class SchedulerAgent(AgentBase):
 
     async def start(self) -> None:
         """Inicia o loop do scheduler."""
-        await self._bus.subscribe("hive.heartbeat", self._on_heartbeat_wrapper)
-        
-        async with self._scheduler:
-            await self._scheduler.start()
-            logger.info("SchedulerAgent iniciado")
+        self._bus.subscribe("hive.heartbeat", self._on_heartbeat_wrapper)
+
+        try:
+            async with self._scheduler:
+                logger.info("SchedulerAgent iniciado")
+                await self._scheduler.run_until_stopped()
+        except asyncio.CancelledError:
+            logger.info("SchedulerAgent sendo encerrado...")
             try:
-                while True:
-                    await asyncio.sleep(1)
-            except asyncio.CancelledError:
-                logger.info("SchedulerAgent sendo encerrado...")
+                await self._scheduler.stop()
+            except Exception:
+                pass
 
     async def _register_default_jobs(self) -> None:
         """Registra jobs padrão: health_check, daily_research, memory_sync."""

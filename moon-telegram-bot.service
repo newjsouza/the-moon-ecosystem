@@ -7,10 +7,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=johnathan
-WorkingDirectory=/home/johnathan/Área de trabalho/The Moon
-EnvironmentFile=/home/johnathan/Área de trabalho/The Moon/.env
-Environment=PYTHONPATH=/home/johnathan/Área de trabalho/The Moon
-ExecStart=/usr/bin/python3 agents/telegram/bot.py
+WorkingDirectory=/home/johnathan
+ExecStart=/home/johnathan/moon_bot_start.sh
 Restart=on-failure
 RestartSec=5s
 StandardOutput=journal

@@ -95,6 +95,22 @@
       "next_run_at": 0.0,
       "run_count": 0,
       "last_run_id": ""
+    },
+    {
+      "job_id": "autonomy-growth-6h",
+      "flow_name": "autonomy_growth_cycle",
+      "job_type": "flow",
+      "context": {"trigger": "scheduler"},
+      "schedule_type": "interval",
+      "time_of_day": "",
+      "interval_minutes": 360,
+      "run_at": 0.0,
+      "enabled": true,
+      "created_at": 0.0,
+      "last_run_at": 0.0,
+      "next_run_at": 0.0,
+      "run_count": 0,
+      "last_run_id": ""
     }
   ]
 }

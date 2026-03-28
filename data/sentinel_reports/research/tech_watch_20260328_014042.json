@@ -1,0 +1,228 @@
+{
+  "cycle_id": "20260328_014036",
+  "topics": [
+    "VibeCoding e IA Generativa",
+    "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+    "agentic AI"
+  ],
+  "status": "validated",
+  "findings": [
+    "**VibeCoding e IA Generativa**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+    "**Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+    "**agentic AI**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas."
+  ],
+  "summary_report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 28/03/2026 01:40\n\n🆔 Ciclo: `20260328_014036`\n✅ Validação real: 3 tópicos, 6 evidências verificadas\n🔐 Assinatura: `e4dbe798d6d29aae`\n\n1. **VibeCoding e IA Generativa**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\n2. **Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\n3. **agentic AI**: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\n\n_Próxima varredura em 4 horas._",
+  "detailed_report": "RELATORIO DETALHADO DE PESQUISA - SENTINELA\nGerado em: 28/03/2026 01:40:42\n\nID do ciclo: 20260328_014036\nAssinatura de conteudo: e4dbe798d6d29aae\nValidacao: 3 topicos validos, 6 referencias reais\n\nTOPICO 1: VibeCoding e IA Generativa\nAgente: ResearcherAgent | Resultados: 2 | Fontes: web, youtube\nSintese: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\nEvidencias coletadas:\n- [web] OpenAI Responses API\n  https://platform.openai.com/docs/api-reference/responses\n- [youtube] Agent engineering guide\n  https://www.youtube.com/watch?v=dQw4w9WgXcQ\n\nTOPICO 2: Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)\nAgente: ResearcherAgent | Resultados: 2 | Fontes: web, youtube\nSintese: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\nEvidencias coletadas:\n- [web] OpenAI Responses API\n  https://platform.openai.com/docs/api-reference/responses\n- [youtube] Agent engineering guide\n  https://www.youtube.com/watch?v=dQw4w9WgXcQ\n\nTOPICO 3: agentic AI\nAgente: ResearcherAgent | Resultados: 2 | Fontes: web, youtube\nSintese: As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.\nEvidencias coletadas:\n- [web] OpenAI Responses API\n  https://platform.openai.com/docs/api-reference/responses\n- [youtube] Agent engineering guide\n  https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "research_packets": [
+    {
+      "topic": "VibeCoding e IA Generativa",
+      "source_agent": "ResearcherAgent",
+      "sources_used": [
+        "web",
+        "youtube"
+      ],
+      "total_results": 2,
+      "synthesis": "As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+      "references": [
+        {
+          "source": "web",
+          "title": "OpenAI Responses API",
+          "url": "https://platform.openai.com/docs/api-reference/responses",
+          "description": "API real"
+        },
+        {
+          "source": "youtube",
+          "title": "Agent engineering guide",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "description": "conteudo real"
+        }
+      ],
+      "raw_payload": {
+        "vault_file": "/tmp/sentinel_real_check_naaw58re/vault.json",
+        "timestamp": "2026-03-28T01:00:00"
+      },
+      "validation": {
+        "references_count": 2,
+        "real_references_count": 2,
+        "synthesis_valid": true
+      }
+    },
+    {
+      "topic": "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+      "source_agent": "ResearcherAgent",
+      "sources_used": [
+        "web",
+        "youtube"
+      ],
+      "total_results": 2,
+      "synthesis": "As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+      "references": [
+        {
+          "source": "web",
+          "title": "OpenAI Responses API",
+          "url": "https://platform.openai.com/docs/api-reference/responses",
+          "description": "API real"
+        },
+        {
+          "source": "youtube",
+          "title": "Agent engineering guide",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "description": "conteudo real"
+        }
+      ],
+      "raw_payload": {
+        "vault_file": "/tmp/sentinel_real_check_naaw58re/vault.json",
+        "timestamp": "2026-03-28T01:00:00"
+      },
+      "validation": {
+        "references_count": 2,
+        "real_references_count": 2,
+        "synthesis_valid": true
+      }
+    },
+    {
+      "topic": "agentic AI",
+      "source_agent": "ResearcherAgent",
+      "sources_used": [
+        "web",
+        "youtube"
+      ],
+      "total_results": 2,
+      "synthesis": "As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+      "references": [
+        {
+          "source": "web",
+          "title": "OpenAI Responses API",
+          "url": "https://platform.openai.com/docs/api-reference/responses",
+          "description": "API real"
+        },
+        {
+          "source": "youtube",
+          "title": "Agent engineering guide",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "description": "conteudo real"
+        }
+      ],
+      "raw_payload": {
+        "vault_file": "/tmp/sentinel_real_check_naaw58re/vault.json",
+        "timestamp": "2026-03-28T01:00:00"
+      },
+      "validation": {
+        "references_count": 2,
+        "real_references_count": 2,
+        "synthesis_valid": true
+      }
+    }
+  ],
+  "validation": {
+    "valid_packets": [
+      {
+        "topic": "VibeCoding e IA Generativa",
+        "source_agent": "ResearcherAgent",
+        "sources_used": [
+          "web",
+          "youtube"
+        ],
+        "total_results": 2,
+        "synthesis": "As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+        "references": [
+          {
+            "source": "web",
+            "title": "OpenAI Responses API",
+            "url": "https://platform.openai.com/docs/api-reference/responses",
+            "description": "API real"
+          },
+          {
+            "source": "youtube",
+            "title": "Agent engineering guide",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "description": "conteudo real"
+          }
+        ],
+        "raw_payload": {
+          "vault_file": "/tmp/sentinel_real_check_naaw58re/vault.json",
+          "timestamp": "2026-03-28T01:00:00"
+        },
+        "validation": {
+          "references_count": 2,
+          "real_references_count": 2,
+          "synthesis_valid": true
+        }
+      },
+      {
+        "topic": "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+        "source_agent": "ResearcherAgent",
+        "sources_used": [
+          "web",
+          "youtube"
+        ],
+        "total_results": 2,
+        "synthesis": "As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+        "references": [
+          {
+            "source": "web",
+            "title": "OpenAI Responses API",
+            "url": "https://platform.openai.com/docs/api-reference/responses",
+            "description": "API real"
+          },
+          {
+            "source": "youtube",
+            "title": "Agent engineering guide",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "description": "conteudo real"
+          }
+        ],
+        "raw_payload": {
+          "vault_file": "/tmp/sentinel_real_check_naaw58re/vault.json",
+          "timestamp": "2026-03-28T01:00:00"
+        },
+        "validation": {
+          "references_count": 2,
+          "real_references_count": 2,
+          "synthesis_valid": true
+        }
+      },
+      {
+        "topic": "agentic AI",
+        "source_agent": "ResearcherAgent",
+        "sources_used": [
+          "web",
+          "youtube"
+        ],
+        "total_results": 2,
+        "synthesis": "As pesquisas mostram integração prática entre orchestration e avaliação contínua com métricas objetivas.",
+        "references": [
+          {
+            "source": "web",
+            "title": "OpenAI Responses API",
+            "url": "https://platform.openai.com/docs/api-reference/responses",
+            "description": "API real"
+          },
+          {
+            "source": "youtube",
+            "title": "Agent engineering guide",
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "description": "conteudo real"
+          }
+        ],
+        "raw_payload": {
+          "vault_file": "/tmp/sentinel_real_check_naaw58re/vault.json",
+          "timestamp": "2026-03-28T01:00:00"
+        },
+        "validation": {
+          "references_count": 2,
+          "real_references_count": 2,
+          "synthesis_valid": true
+        }
+      }
+    ],
+    "rejected_packets": [],
+    "total_packets": 3,
+    "validated_packets_count": 3,
+    "rejected_packets_count": 0,
+    "total_real_references": 6
+  },
+  "content_signature": "e4dbe798d6d29aae106fe77a9fe51278b596214600c823e9c1e106d2aa1cbf04",
+  "timestamp": "2026-03-28T01:40:42.423477",
+  "report_file": "data/sentinel_reports/research/tech_watch_20260328_014042.json"
+}

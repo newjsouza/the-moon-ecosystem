@@ -1,0 +1,26 @@
+{
+  "name": "alchemist_cycle",
+  "session_mode": "workspace",
+  "steps": [
+    {
+      "name": "discover",
+      "agent": "SkillAlchemist",
+      "task": "discover",
+      "depends_on": [],
+      "on_error": "continue",
+      "timeout": 120.0,
+      "max_retries": 1,
+      "retry_delay": 10.0
+    },
+    {
+      "name": "sentinel_log",
+      "agent": "MoonSentinelAgent",
+      "task": "initiatives",
+      "depends_on": ["discover"],
+      "on_error": "continue",
+      "timeout": 30.0,
+      "max_retries": 0,
+      "retry_delay": 0.0
+    }
+  ]
+}

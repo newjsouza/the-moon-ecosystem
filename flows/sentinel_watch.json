@@ -1,0 +1,36 @@
+{
+  "name": "sentinel_watch",
+  "session_mode": "workspace",
+  "steps": [
+    {
+      "name": "tech_watch",
+      "agent": "MoonSentinelAgent",
+      "task": "tech-watch",
+      "depends_on": [],
+      "on_error": "continue",
+      "timeout": 90.0,
+      "max_retries": 1,
+      "retry_delay": 5.0
+    },
+    {
+      "name": "health_watch",
+      "agent": "MoonSentinelAgent",
+      "task": "health",
+      "depends_on": ["tech_watch"],
+      "on_error": "continue",
+      "timeout": 60.0,
+      "max_retries": 1,
+      "retry_delay": 3.0
+    },
+    {
+      "name": "report",
+      "agent": "MoonSentinelAgent",
+      "task": "report",
+      "depends_on": ["health_watch"],
+      "on_error": "continue",
+      "timeout": 90.0,
+      "max_retries": 1,
+      "retry_delay": 3.0
+    }
+  ]
+}

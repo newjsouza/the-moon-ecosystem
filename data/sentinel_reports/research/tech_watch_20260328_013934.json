@@ -1,0 +1,23 @@
+{
+  "cycle_id": "20260328_013928",
+  "topics": [
+    "VibeCoding e IA Generativa",
+    "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+    "agentic AI"
+  ],
+  "status": "rejected_no_real_evidence",
+  "validation": {
+    "valid_packets": [],
+    "rejected_packets": [],
+    "total_packets": 0,
+    "validated_packets_count": 0,
+    "rejected_packets_count": 0,
+    "total_real_references": 0
+  },
+  "summary_report": "SENTINELA - CICLO EXECUTADO SEM EVIDENCIA REAL\nGerado em: 28/03/2026 01:39:34\nID do ciclo: 20260328_013928\nTopicos executados: VibeCoding e IA Generativa, Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek), agentic AI\n\nNenhum relatorio detalhado foi publicado porque faltaram evidencias verificaveis.\nAuto-implementacao deste ciclo: NAO EXECUTADA",
+  "detailed_report": "",
+  "research_packets": [],
+  "raw_packets_count": 0,
+  "timestamp": "2026-03-28T01:39:34.645151",
+  "report_file": "data/sentinel_reports/research/tech_watch_20260328_013934.json"
+}

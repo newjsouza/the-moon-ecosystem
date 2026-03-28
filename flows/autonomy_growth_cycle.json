@@ -1,0 +1,36 @@
+{
+  "name": "autonomy_growth_cycle",
+  "session_mode": "workspace",
+  "steps": [
+    {
+      "name": "assess",
+      "agent": "AutonomyEvolutionAgent",
+      "task": "assess",
+      "depends_on": [],
+      "on_error": "continue",
+      "timeout": 90.0,
+      "max_retries": 1,
+      "retry_delay": 5.0
+    },
+    {
+      "name": "apply",
+      "agent": "AutonomyEvolutionAgent",
+      "task": "apply_next_steps",
+      "depends_on": ["assess"],
+      "on_error": "continue",
+      "timeout": 180.0,
+      "max_retries": 0,
+      "retry_delay": 0.0
+    },
+    {
+      "name": "notify",
+      "agent": "telegram",
+      "task": "🧠 Ciclo de auto-crescimento executado. Consulte /flow-runs autonomy_growth_cycle para evidências.",
+      "depends_on": ["apply"],
+      "on_error": "continue",
+      "timeout": 30.0,
+      "max_retries": 0,
+      "retry_delay": 0.0
+    }
+  ]
+}

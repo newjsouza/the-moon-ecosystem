@@ -1,0 +1,95 @@
+{
+  "generated_at": "2026-03-28T01:02:21.912300",
+  "autonomy_score": 73.7,
+  "score_components": {
+    "reliability": 0.192,
+    "schedule_integrity": 0.23,
+    "credentials_readiness": 0.2,
+    "devops_health": 0.015,
+    "initiative_signal": 0.1
+  },
+  "limitations": [
+    "Telemetria com baixa sinalização (total_calls=0 no snapshot mais recente)."
+  ],
+  "growth_potential": {
+    "automation_leverage": 0.75,
+    "integration_readiness": 0.167,
+    "learning_velocity": 1.0,
+    "resilience_headroom": 0.0
+  },
+  "recommended_actions": [
+    {
+      "id": "tune_devops_rules",
+      "priority": 88,
+      "title": "Reduzir falso-positivo da análise DevOps",
+      "rationale": "O scan está recente, mas reporta muitos críticos. É preciso calibrar heurísticas para evitar ciclos de correção improdutivos.",
+      "automated": false,
+      "command": "Ajustar CodexComplianceChecker/ASTAnalyzer e severidades"
+    }
+  ],
+  "evidence": {
+    "jobs": {
+      "total_jobs": 7,
+      "enabled_jobs": 6,
+      "resolved_enabled_jobs": 6,
+      "coverage_ratio": 1.0,
+      "unresolved_enabled_jobs": [],
+      "never_ran_job_ids": [
+        "apex-morning-07h30",
+        "research-daily",
+        "sentinel-tech-watch",
+        "alchemist-discover",
+        "evening-report",
+        "autonomy-growth-6h"
+      ],
+      "has_autonomy_growth_schedule": true
+    },
+    "metrics": {
+      "has_signal": false,
+      "session_file": "data/metrics/sessions/session_1774669072.json",
+      "session_age_hours": 0.41,
+      "overall_success_rate": 1.0,
+      "total_calls": 0,
+      "total_errors": 0,
+      "degraded_agents": []
+    },
+    "devops": {
+      "available": true,
+      "report_file": "data/devops_reports/scan_20260328_005928.json",
+      "age_hours": 0.05,
+      "critical": 98,
+      "high": 0,
+      "medium": 11,
+      "low": 219,
+      "issues_found": 328
+    },
+    "credentials": {
+      "required_present": [
+        "GROQ_API_KEY",
+        "GITHUB_TOKEN",
+        "TELEGRAM_BOT_TOKEN",
+        "TELEGRAM_CHAT_ID"
+      ],
+      "required_missing": [],
+      "optional_present": [
+        "SUPABASE_URL"
+      ],
+      "optional_missing": [
+        "SUPABASE_KEY",
+        "YOUTUBE_API_KEY",
+        "HUGGINGFACE_TOKEN",
+        "OPENROUTER_API_KEY",
+        "GEMINI_API_KEY"
+      ],
+      "required_coverage": 1.0,
+      "optional_coverage": 0.167
+    },
+    "initiatives": {
+      "last_24h_total": 11,
+      "last_24h_by_type": {
+        "tech_trend": 9,
+        "ecosystem_health": 2
+      }
+    }
+  }
+}

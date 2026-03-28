@@ -181,6 +181,7 @@ class Orchestrator:
 
     def __init__(self) -> None:
         self._agents: Dict[str, AgentBase] = {}
+        self._agent_aliases: Dict[str, str] = {}
         self.skills: Dict[str, SkillBase] = {}
         self.channels: List[ChannelBase] = []
 
@@ -265,12 +266,16 @@ class Orchestrator:
     # ═══════════════════════════════════════════════════════════
 
     def register_agent(self, agent: AgentBase) -> None:
+        if agent is None:
+            return
         self._agents[agent.name] = agent
         self._circuits[agent.name] = _CircuitState()
+        self._register_agent_aliases(agent)
         logger.info(f"Registered agent: {agent.name}")
 
     def get_agent(self, name: str) -> Optional[AgentBase]:
-        return self._agents.get(name)
+        resolved = self._resolve_agent_name(name)
+        return self._agents.get(resolved) if resolved else None
 
     def register_skill(self, skill: SkillBase) -> None:
         self.skills[skill.name] = skill
@@ -280,6 +285,76 @@ class Orchestrator:
         channel.set_callback(self.handle_channel_message)
         self.channels.append(channel)
         logger.info(f"Registered channel: {channel.name}")
+
+    @staticmethod
+    def _snake_case(name: str) -> str:
+        s1 = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
+        return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
+
+    @staticmethod
+    def _alias_key(name: str) -> str:
+        return re.sub(r"[^a-z0-9]", "", (name or "").lower())
+
+    def _register_alias(self, alias: str, canonical: str) -> None:
+        if not alias:
+            return
+        self._agent_aliases[alias.lower()] = canonical
+        self._agent_aliases[self._alias_key(alias)] = canonical
+
+    def _register_agent_aliases(self, agent: AgentBase) -> None:
+        canonical = agent.name
+        aliases = {
+            canonical,
+            canonical.lower(),
+            agent.__class__.__name__,
+            self._snake_case(canonical),
+            self._snake_case(agent.__class__.__name__),
+            getattr(agent, "AGENT_ID", ""),
+        }
+        for candidate in list(aliases):
+            if isinstance(candidate, str) and candidate.endswith("_agent"):
+                aliases.add(candidate[:-6])
+            if isinstance(candidate, str) and candidate.endswith("agent"):
+                aliases.add(candidate[:-5])
+        for alias in aliases:
+            if alias:
+                self._register_alias(alias, canonical)
+
+    def _resolve_agent_name(self, requested: str) -> Optional[str]:
+        if not requested:
+            return None
+        if requested in self._agents:
+            return requested
+        lower = requested.strip().lower()
+        if lower in self._agents:
+            return lower
+        resolved = self._agent_aliases.get(lower)
+        if resolved:
+            return resolved
+        return self._agent_aliases.get(self._alias_key(lower))
+
+    async def _dispatch_channel_alias(self, agent_name: str, task: str, **kwargs: Any) -> Optional[TaskResult]:
+        """Handles flow steps that intentionally target channels (e.g. telegram)."""
+        name = (agent_name or "").strip().lower()
+        if name not in {"telegram", "channel:telegram"}:
+            return None
+
+        text = str(kwargs.get("text") or task or "")
+        recipient = kwargs.get("recipient_id")
+        if not text:
+            return TaskResult(success=False, error="Empty message for telegram dispatch")
+
+        delivered = False
+        for ch in self.channels:
+            if ch.name.lower() == "telegram":
+                try:
+                    delivered = await ch.send_message(text, recipient_id=recipient) or delivered
+                except Exception as exc:
+                    logger.error(f"Telegram channel dispatch failed: {exc}")
+
+        if delivered:
+            return TaskResult(success=True, data={"channel": "telegram", "delivered": True})
+        return TaskResult(success=False, error="Telegram channel not available or delivery failed")
 
     # ═══════════════════════════════════════════════════════════
     #  Lifecycle
@@ -354,11 +429,41 @@ class Orchestrator:
             except Exception as exc:
                 logger.error(f"Error shutting down agent '{agent.name}': {exc}")
 
+        try:
+            from core.observability.observer import MoonObserver
+
+            await MoonObserver.get_instance().persist_session()
+        except Exception as exc:
+            logger.warning(f"Could not persist observer session: {exc}")
+
         logger.info("Orchestrator stopped.")
 
     @staticmethod
     async def _safe_init_agent(agent: AgentBase) -> None:
         await agent.initialize()
+
+    @staticmethod
+    async def _record_observer_metric(
+        agent_name: str,
+        success: bool,
+        execution_time: float,
+        error: str = None,
+        task_type: str = "general",
+    ) -> None:
+        """Best-effort observability hook."""
+        try:
+            from core.observability.observer import MoonObserver
+
+            observer = MoonObserver.get_instance()
+            await observer.record(
+                agent_id=agent_name,
+                success=success,
+                execution_time=execution_time,
+                error=error,
+                task_type=(task_type or "general")[:80],
+            )
+        except Exception as exc:
+            logger.debug(f"Observer metric skipped for {agent_name}: {exc}")
 
     # ═══════════════════════════════════════════════════════════
     #  Agent call helpers (timeout + circuit breaker)
@@ -378,36 +483,56 @@ class Orchestrator:
           - Configurable timeout
           - Automatic circuit state update
         """
-        agent = self._agents.get(agent_name)
+        resolved_name = self._resolve_agent_name(agent_name)
+        agent = self._agents.get(resolved_name) if resolved_name else None
         if agent is None:
+            channel_result = await self._dispatch_channel_alias(agent_name, task, **kwargs)
+            if channel_result is not None:
+                return channel_result
             return TaskResult(success=False, error=f"Agent '{agent_name}' not registered.")
 
-        circuit = self._circuits[agent_name]
+        circuit = self._circuits[agent.name]
         if not circuit.is_callable():
             return TaskResult(
                 success=False,
-                error=f"Agent '{agent_name}' circuit is OPEN — temporarily unavailable.",
+                error=f"Agent '{agent.name}' circuit is OPEN — temporarily unavailable.",
             )
 
         await self.message_bus.publish(
             sender="orchestrator",
             topic="workspace.network",
-            payload={"type": "agent_start", "task": task, "agent": agent_name},
-            target=agent_name,
+            payload={"type": "agent_start", "task": task, "agent": agent.name},
+            target=agent.name,
         )
+
+        started = time.monotonic()
 
         try:
             result: TaskResult = await asyncio.wait_for(
                 agent.execute(task, **kwargs), timeout=timeout
             )
         except asyncio.TimeoutError:
-            msg = f"Agent '{agent_name}' timed out after {timeout}s."
+            msg = f"Agent '{agent.name}' timed out after {timeout}s."
             circuit.record_failure(msg)
             logger.warning(msg)
+            await self._record_observer_metric(
+                agent_name=agent.name,
+                success=False,
+                execution_time=time.monotonic() - started,
+                error=msg,
+                task_type=task,
+            )
             return TaskResult(success=False, error=msg)
         except Exception as exc:
             circuit.record_failure(str(exc))
-            logger.error(f"Agent '{agent_name}' raised: {exc}")
+            logger.error(f"Agent '{agent.name}' raised: {exc}")
+            await self._record_observer_metric(
+                agent_name=agent.name,
+                success=False,
+                execution_time=time.monotonic() - started,
+                error=str(exc),
+                task_type=task,
+            )
             return TaskResult(success=False, error=str(exc))
 
         if result.success:
@@ -415,8 +540,16 @@ class Orchestrator:
         else:
             circuit.record_failure(result.error or "TaskResult returned success=False.")
 
+        await self._record_observer_metric(
+            agent_name=agent.name,
+            success=result.success,
+            execution_time=result.execution_time or (time.monotonic() - started),
+            error=result.error,
+            task_type=task,
+        )
+
         await self.message_bus.publish(
-            sender=agent_name,
+            sender=agent.name,
             topic="workspace.network",
             payload={"type": "agent_done", "success": result.success},
             target="orchestrator",

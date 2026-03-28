@@ -1,0 +1,21 @@
+{
+  "summary_report": "Resumo tecnico",
+  "research_packets": [
+    {
+      "topic": "agentic AI",
+      "synthesis": "melhoria de autonomia e seguranca",
+      "references": [
+        {
+          "source": "github",
+          "title": "repo",
+          "url": "https://github.com/example/repo"
+        }
+      ],
+      "sources_used": [
+        "github"
+      ],
+      "source_agent": "ResearcherAgent",
+      "total_results": 1
+    }
+  ]
+}

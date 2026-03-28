@@ -1,0 +1,119 @@
+{
+  "topics": [
+    "VibeCoding e IA Generativa",
+    "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+    "agentic AI"
+  ],
+  "findings": [
+    "**VibeCoding e IA Generativa**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
+    "**Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
+    "**agentic AI**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline."
+  ],
+  "summary_report": "🔭 *Sentinel — Tendências Detectadas*\n🕐 28/03/2026 01:25\n\n1. **VibeCoding e IA Generativa**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\n2. **Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\n3. **agentic AI**: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\n\n_Próxima varredura em 4 horas._",
+  "detailed_report": "RELATORIO DETALHADO DE PESQUISA - SENTINELA\nGerado em: 28/03/2026 01:25:04\n\nTOPICO 1: VibeCoding e IA Generativa\nAgente: ResearcherAgent | Resultados: 3 | Fontes: web, youtube\nSintese: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\nEvidencias coletadas:\n- [web] Framework A\n  https://example.com/a\n- [web] Framework B\n  https://example.com/b\n- [youtube] Video X\n  https://youtube.com/watch?v=abc\n\nTOPICO 2: Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)\nAgente: ResearcherAgent | Resultados: 3 | Fontes: web, youtube\nSintese: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\nEvidencias coletadas:\n- [web] Framework A\n  https://example.com/a\n- [web] Framework B\n  https://example.com/b\n- [youtube] Video X\n  https://youtube.com/watch?v=abc\n\nTOPICO 3: agentic AI\nAgente: ResearcherAgent | Resultados: 3 | Fontes: web, youtube\nSintese: Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.\nEvidencias coletadas:\n- [web] Framework A\n  https://example.com/a\n- [web] Framework B\n  https://example.com/b\n- [youtube] Video X\n  https://youtube.com/watch?v=abc",
+  "research_packets": [
+    {
+      "topic": "VibeCoding e IA Generativa",
+      "source_agent": "ResearcherAgent",
+      "sources_used": [
+        "web",
+        "youtube"
+      ],
+      "total_results": 3,
+      "synthesis": "Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
+      "references": [
+        {
+          "source": "web",
+          "title": "Framework A",
+          "url": "https://example.com/a",
+          "description": "Agentes autônomos com foco em produção"
+        },
+        {
+          "source": "web",
+          "title": "Framework B",
+          "url": "https://example.com/b",
+          "description": "Automação e orquestração"
+        },
+        {
+          "source": "youtube",
+          "title": "Video X",
+          "url": "https://youtube.com/watch?v=abc",
+          "description": "Resumo técnico"
+        }
+      ],
+      "raw_payload": {
+        "vault_file": "/tmp/sentinel_demo_hgj_hh_6/research_sample.json",
+        "timestamp": "2026-03-28T01:00:00"
+      }
+    },
+    {
+      "topic": "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+      "source_agent": "ResearcherAgent",
+      "sources_used": [
+        "web",
+        "youtube"
+      ],
+      "total_results": 3,
+      "synthesis": "Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
+      "references": [
+        {
+          "source": "web",
+          "title": "Framework A",
+          "url": "https://example.com/a",
+          "description": "Agentes autônomos com foco em produção"
+        },
+        {
+          "source": "web",
+          "title": "Framework B",
+          "url": "https://example.com/b",
+          "description": "Automação e orquestração"
+        },
+        {
+          "source": "youtube",
+          "title": "Video X",
+          "url": "https://youtube.com/watch?v=abc",
+          "description": "Resumo técnico"
+        }
+      ],
+      "raw_payload": {
+        "vault_file": "/tmp/sentinel_demo_hgj_hh_6/research_sample.json",
+        "timestamp": "2026-03-28T01:00:00"
+      }
+    },
+    {
+      "topic": "agentic AI",
+      "source_agent": "ResearcherAgent",
+      "sources_used": [
+        "web",
+        "youtube"
+      ],
+      "total_results": 3,
+      "synthesis": "Descobertas apontam oportunidade de melhorar autonomia e segurança do pipeline.",
+      "references": [
+        {
+          "source": "web",
+          "title": "Framework A",
+          "url": "https://example.com/a",
+          "description": "Agentes autônomos com foco em produção"
+        },
+        {
+          "source": "web",
+          "title": "Framework B",
+          "url": "https://example.com/b",
+          "description": "Automação e orquestração"
+        },
+        {
+          "source": "youtube",
+          "title": "Video X",
+          "url": "https://youtube.com/watch?v=abc",
+          "description": "Resumo técnico"
+        }
+      ],
+      "raw_payload": {
+        "vault_file": "/tmp/sentinel_demo_hgj_hh_6/research_sample.json",
+        "timestamp": "2026-03-28T01:00:00"
+      }
+    }
+  ],
+  "timestamp": "2026-03-28T01:25:04.409205"
+}

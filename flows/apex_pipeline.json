@@ -24,8 +24,8 @@
     },
     {
       "name": "analyze",
-      "agent": "apex",
-      "task": "analisar partidas com dados disponíveis e gerar análise de apostas",
+      "agent": "hedge",
+      "task": "pipeline",
       "depends_on": ["fetch_lineups"],
       "on_error": "stop",
       "timeout": 90.0,
@@ -35,7 +35,7 @@
     {
       "name": "notify",
       "agent": "telegram",
-      "task": "enviar análise APEX via Telegram",
+      "task": "✅ APEX concluído: {step_analyze}",
       "depends_on": ["analyze"],
       "on_error": "continue",
       "timeout": 15.0,

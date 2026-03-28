@@ -1,0 +1,54 @@
+{
+  "cycle_id": "20260328_014030",
+  "topics": [
+    "VibeCoding e IA Generativa",
+    "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+    "agentic AI"
+  ],
+  "status": "rejected_no_real_evidence",
+  "validation": {
+    "valid_packets": [],
+    "rejected_packets": [
+      {
+        "topic": "VibeCoding e IA Generativa",
+        "reasons": [
+          "sem_referencias_reais",
+          "sintese_generica_ou_placeholder"
+        ],
+        "total_results": 2,
+        "references_count": 2,
+        "real_references_count": 0
+      },
+      {
+        "topic": "Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek)",
+        "reasons": [
+          "sem_referencias_reais",
+          "sintese_generica_ou_placeholder"
+        ],
+        "total_results": 2,
+        "references_count": 2,
+        "real_references_count": 0
+      },
+      {
+        "topic": "agentic AI",
+        "reasons": [
+          "sem_referencias_reais",
+          "sintese_generica_ou_placeholder"
+        ],
+        "total_results": 2,
+        "references_count": 2,
+        "real_references_count": 0
+      }
+    ],
+    "total_packets": 3,
+    "validated_packets_count": 0,
+    "rejected_packets_count": 3,
+    "total_real_references": 0
+  },
+  "summary_report": "SENTINELA - CICLO EXECUTADO SEM EVIDENCIA REAL\nGerado em: 28/03/2026 01:40:36\nID do ciclo: 20260328_014030\nTopicos executados: VibeCoding e IA Generativa, Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek), agentic AI\n\nNenhum relatorio detalhado foi publicado porque faltaram evidencias verificaveis.\nAuto-implementacao deste ciclo: NAO EXECUTADA\n\nMotivos de rejeicao detectados:\n- VibeCoding e IA Generativa: sem_referencias_reais, sintese_generica_ou_placeholder\n- Novidades AI (Anthropic, GPT, Gemini, Groq, Alibaba, DeepSeek): sem_referencias_reais, sintese_generica_ou_placeholder\n- agentic AI: sem_referencias_reais, sintese_generica_ou_placeholder",
+  "detailed_report": "",
+  "research_packets": [],
+  "raw_packets_count": 3,
+  "timestamp": "2026-03-28T01:40:36.265112",
+  "report_file": "data/sentinel_reports/research/tech_watch_20260328_014036.json"
+}

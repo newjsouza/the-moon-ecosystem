@@ -20,6 +20,7 @@ from .watchdog import WatchdogAgent
 from .omni_channel_strategist import OmniChannelStrategist
 from .autonomous_devops_refactor import AutonomousDevOpsRefactor
 from .semantic_memory_weaver import SemanticMemoryWeaver
+from .autonomy_evolution_agent import AutonomyEvolutionAgent
 
 # The following agents may have GUI/hardware dependencies that fail in headless environments
 try:
@@ -66,5 +67,6 @@ __all__ = [
     'OmniChannelStrategist',
     'HardwareSynergyBridge',
     'AutonomousDevOpsRefactor',
-    'SemanticMemoryWeaver'
+    'SemanticMemoryWeaver',
+    'AutonomyEvolutionAgent',
 ]

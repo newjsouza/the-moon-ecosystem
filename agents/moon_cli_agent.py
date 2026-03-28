@@ -423,10 +423,12 @@ Gere o código completo agora:"""
         Retorna TaskResult com o texto completo ao final.
         """
         import time
-        from agents.llm import LLMRouter
-
         start = time.time()
-        llm = LLMRouter()
+        llm = getattr(self, "llm", None)
+        if llm is None or not hasattr(llm, "stream"):
+            from agents.llm import LLMRouter
+            llm = LLMRouter()
+            self.llm = llm
         full_response = ""
         cursor = "▌" if show_cursor else ""
 
