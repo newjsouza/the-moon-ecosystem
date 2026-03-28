@@ -2816,3 +2816,8 @@ class RadarAgent(AgentBase):
 - Fixed: `_CircuitState.record_failure()` called without required `error` arg in 5 sites (`core/orchestrator.py`: 405, 409, 416, 1484, 1486)
 - Fix: made `error` optional (`error: str = ""`) + passed contextual error strings at call sites
 - Effect: removed `record_failure()` TypeError loop; proactive cycle now runs without opening circuit from that exception
+- Disabled: `HardwareSynergyBridge` - `GLib.timeout_add(50ms)` consuming 55-63% CPU
+- Root cause: 20x/s timer + pyudev USB monitor + Whisper audio/background components
+- Agent is non-critical (no dependency in llm/blog/telegram/sports flow)
+- Re-enable: revert `main.py` and `agents/__init__.py` when hardware overlay is needed again
+- Total CPU reduction session: 83% (loop) + 63% (bridge) -> target <10%

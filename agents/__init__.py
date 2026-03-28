@@ -27,10 +27,12 @@ try:
 except ImportError:
     SystemAgent = None
 
-try:
-    from .hardware_synergy_bridge import HardwareSynergyBridge
-except ImportError:
-    HardwareSynergyBridge = None
+# DISABLED 2026-03-27: GLib 50ms timer consuming 55-63% CPU (non-critical agent)
+HardwareSynergyBridge = None
+# try:
+#     from .hardware_synergy_bridge import HardwareSynergyBridge
+# except ImportError:
+#     HardwareSynergyBridge = None
 
 # New agents
 from .nexus_intelligence import NexusIntelligence

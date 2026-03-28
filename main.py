@@ -328,14 +328,14 @@ class MoonSystem:
             # Omni-Channel
             ("OmniChannelStrategist", lambda: self._safe_import_agent("agents.omni_channel_strategist", "OmniChannelStrategist", message_bus=self.message_bus, groq_client=groq_client)),
             
-            # Hardware Bridge
-            ("HardwareSynergyBridge", lambda: self._safe_import_agent(
-                "agents.hardware_synergy_bridge",
-                "HardwareSynergyBridge",
-                groq_client=groq_client,
-                message_bus=self.message_bus,
-                orchestrator=self.orchestrator
-            )),
+            # Hardware Bridge (disabled: high CPU from aggressive GLib/pyudev polling)
+            # ("HardwareSynergyBridge", lambda: self._safe_import_agent(
+            #     "agents.hardware_synergy_bridge",
+            #     "HardwareSynergyBridge",
+            #     groq_client=groq_client,
+            #     message_bus=self.message_bus,
+            #     orchestrator=self.orchestrator
+            # )),
             
             # DevOps
             ("AutonomousDevOpsRefactor", lambda: self._safe_import_agent(

@@ -254,3 +254,12 @@
 [23:42:33] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [23:43:33] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [23:44:33] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:46:36] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:48:38] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:50:41] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:52:43] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:54:45] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:56:04] Sala inicializada para a skill orchestrator. Bem-vindo, Core System!
+[23:56:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:57:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[23:58:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
