@@ -263,3 +263,4 @@
 [23:56:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [23:57:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
 [23:58:24] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
+[00:00:28] Mensagem recebida de BettingAnalystAgent: {'type': 'agent_done', 'success': False}
